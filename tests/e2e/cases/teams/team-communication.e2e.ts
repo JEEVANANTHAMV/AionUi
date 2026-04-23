@@ -19,19 +19,13 @@ test.describe('Team Communication', () => {
       teamId = existing.id;
     } else {
       const created = await invokeBridge<{ id: string }>(page, 'team.create', {
-        user_id: 'system_default_user',
         name: 'E2E Test Team',
-        workspace: '',
-        workspace_mode: 'shared',
         agents: [
           {
-            slot_id: 'slot-lead',
-            conversation_id: '',
-            role: 'leader',
-            agent_type: 'gemini',
-            agent_name: 'Leader',
-            conversation_type: 'gemini',
-            status: 'pending',
+            name: 'Leader',
+            role: 'lead',
+            backend: 'gemini',
+            model: 'gemini',
           },
         ],
       });

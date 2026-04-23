@@ -8,10 +8,10 @@
 import { test, expect } from '../../fixtures';
 import { invokeBridge, navigateTo, TEAM_SUPPORTED_BACKENDS } from '../../helpers';
 
-const AGENT_TYPE_MAP: Record<string, { agent_type: string; conversation_type: string }> = {
-  gemini: { agent_type: 'gemini', conversation_type: 'gemini' },
-  claude: { agent_type: 'claude', conversation_type: 'acp' },
-  codex: { agent_type: 'codex', conversation_type: 'acp' },
+const AGENT_TYPE_MAP: Record<string, { backend: string; model: string }> = {
+  gemini: { backend: 'gemini', model: 'gemini' },
+  claude: { backend: 'acp', model: 'claude' },
+  codex: { backend: 'acp', model: 'codex' },
 };
 
 test.describe('Team Tab Context Persistence', () => {
@@ -45,19 +45,13 @@ test.describe('Team Tab Context Persistence', () => {
       teamId = existing.id;
     } else {
       const created = await invokeBridge<{ id: string } | null>(page, 'team.create', {
-        user_id: 'system_default_user',
         name: teamName,
-        workspace: '',
-        workspace_mode: 'shared',
         agents: [
           {
-            slot_id: 'slot-lead',
-            conversation_id: '',
-            role: 'leader',
-            agent_type: agentMeta.agent_type,
-            agent_name: 'Leader',
-            conversation_type: agentMeta.conversation_type,
-            status: 'pending',
+            name: 'Leader',
+            role: 'lead',
+            backend: agentMeta.backend,
+            model: agentMeta.model,
           },
         ],
       }).catch(() => null);
@@ -137,7 +131,7 @@ test.describe('Team Tab Context Persistence', () => {
     const leaderConvId = await invokeBridge<
       Array<{ id: string; name: string; agents: Array<{ role: string; conversation_id: string }> }>
     >(page, 'team.list', { user_id: 'system_default_user' })
-      .then((list) => list.find((t) => t.id === teamId)?.agents.find((a) => a.role === 'leader')?.conversation_id || '')
+      .then((list) => list.find((t) => t.id === teamId)?.agents.find((a) => a.role === 'lead')?.conversation_id || '')
       .catch(() => '');
 
     if (leaderConvId) {

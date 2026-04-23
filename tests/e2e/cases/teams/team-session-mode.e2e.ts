@@ -22,11 +22,11 @@ type TeamRecord = {
   session_mode?: string;
   agents: Array<{
     slot_id: string;
-    conversation_id: string;
+    name: string;
     role: string;
-    agent_type: string;
-    agent_name: string;
-    conversation_type: string;
+    conversation_id: string;
+    backend: string;
+    model: string;
     status: string;
   }>;
 };
@@ -42,8 +42,6 @@ test.describe('Team Session Mode Propagation', () => {
       return;
     }
 
-    const conversationType = 'acp';
-
     // [setup] Find or create the E2E team.
     const teams = await invokeBridge<TeamRecord[]>(page, 'team.list', {
       user_id: 'system_default_user',
@@ -55,19 +53,13 @@ test.describe('Team Session Mode Propagation', () => {
       teamId = existing.id;
     } else {
       const created = await invokeBridge<TeamRecord | null>(page, 'team.create', {
-        user_id: 'system_default_user',
         name: TEAM_NAME,
-        workspace: '',
-        workspace_mode: 'shared',
         agents: [
           {
-            slot_id: 'slot-lead',
-            conversation_id: '',
-            role: 'leader',
-            agent_type: leaderBackend,
-            agent_name: 'Leader',
-            conversation_type: conversationType,
-            status: 'pending',
+            name: 'Leader',
+            role: 'lead',
+            backend: 'acp',
+            model: leaderBackend,
           },
         ],
       }).catch(() => null);

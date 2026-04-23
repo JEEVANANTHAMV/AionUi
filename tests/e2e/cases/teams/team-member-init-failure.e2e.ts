@@ -17,15 +17,13 @@ import { test, expect } from '../../fixtures';
 import { invokeBridge, navigateTo, createTeam, deleteTeam } from '../../helpers';
 
 type AgentPayload = {
+  name: string;
   role: string;
-  agent_type: string;
-  agent_name: string;
-  conversation_type: string;
-  conversation_id: string;
-  status: string;
+  backend: string;
+  model: string;
 };
 
-type TeamAgentResult = { slot_id: string; agent_name: string; status: string };
+type TeamAgentResult = { slot_id: string; name: string; status: string };
 
 test.describe('Team Member Init Failure UI', () => {
   test('failed agent slot renders error overlay with remove button', async ({ page }) => {
@@ -39,14 +37,13 @@ test.describe('Team Member Init Failure UI', () => {
       return;
     }
 
-    // [inject] Add a teammate with status="failed" via team.add-agent.
+    // [inject] Add a teammate via team.add-agent. Backend assigns slot_id/status;
+    // init-failure surface is produced by the agent not being able to initialise.
     const failedAgent: AgentPayload = {
+      name: 'FailedMember',
       role: 'teammate',
-      agent_type: 'claude',
-      agent_name: 'FailedMember',
-      conversation_type: 'acp',
-      conversation_id: '',
-      status: 'failed',
+      backend: 'acp',
+      model: 'claude',
     };
 
     const addResult = await invokeBridge<TeamAgentResult | { __bridgeError: true; message: string }>(

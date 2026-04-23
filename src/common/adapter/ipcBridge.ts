@@ -1259,8 +1259,30 @@ export type IAddTeamAgentParams = {
   agent: Omit<import('@process/team/types').TeamAgent, 'slot_id'>;
 };
 
+// Map frontend TeamAgent shape to backend API agent schema.
+// Backend expects { name, role, backend, model, custom_agent_id? }.
+// Frontend uses { agent_name, role, agent_type, conversation_type, model?, custom_agent_id? }.
+type BackendTeamAgent = {
+  name: string;
+  role: string;
+  backend: string;
+  model: string;
+  custom_agent_id?: string;
+};
+
+const toBackendAgent = (a: Omit<import('@process/team/types').TeamAgent, 'slot_id'>): BackendTeamAgent => ({
+  name: a.agent_name,
+  role: a.role === 'leader' ? 'lead' : a.role,
+  backend: a.conversation_type === 'acp' ? 'acp' : a.agent_type,
+  model: a.model || a.agent_type,
+  ...(a.custom_agent_id ? { custom_agent_id: a.custom_agent_id } : {}),
+});
+
 export const team = {
-  create: httpPost<import('@process/team/types').TTeam, ICreateTeamParams>('/api/teams'),
+  create: httpPost<import('@process/team/types').TTeam, ICreateTeamParams>('/api/teams', (p) => ({
+    name: p.name,
+    agents: p.agents.map(toBackendAgent),
+  })),
   list: httpGet<import('@process/team/types').TTeam[], { user_id: string }>(
     (p) => `/api/teams?user_id=${encodeURIComponent(p.user_id)}`
   ),
@@ -1268,18 +1290,18 @@ export const team = {
   remove: httpDelete<void, { id: string }>((p) => `/api/teams/${p.id}`),
   addAgent: httpPost<import('@process/team/types').TeamAgent, IAddTeamAgentParams>(
     (p) => `/api/teams/${p.team_id}/agents`,
-    (p) => p.agent
+    (p) => toBackendAgent(p.agent)
   ),
   removeAgent: httpDelete<void, { team_id: string; slot_id: string }>(
     (p) => `/api/teams/${p.team_id}/agents/${p.slot_id}`
   ),
   sendMessage: httpPost<void, { team_id: string; content: string; files?: string[] }>(
     (p) => `/api/teams/${p.team_id}/messages`,
-    (p) => ({ content: p.content, files: p.files })
+    (p) => ({ content: p.content })
   ),
   sendMessageToAgent: httpPost<void, { team_id: string; slot_id: string; content: string; files?: string[] }>(
     (p) => `/api/teams/${p.team_id}/agents/${p.slot_id}/messages`,
-    (p) => ({ content: p.content, files: p.files })
+    (p) => ({ content: p.content })
   ),
   stop: httpDelete<void, { team_id: string }>((p) => `/api/teams/${p.team_id}/session`),
   ensureSession: httpPost<void, { team_id: string }>((p) => `/api/teams/${p.team_id}/session`),
