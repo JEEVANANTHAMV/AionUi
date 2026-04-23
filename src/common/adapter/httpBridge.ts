@@ -38,6 +38,18 @@ async function httpRequest<T>(method: string, path: string, body?: unknown): Pro
     headers['Content-Type'] = 'application/json';
   }
 
+  // CSRF: read token from cookie and attach to mutating requests
+  if (method !== 'GET' && method !== 'HEAD' && typeof document !== 'undefined') {
+    try {
+      const match = document.cookie.match(/(?:^|;\s*)aionui-csrf-token=([^;]*)/);
+      if (match?.[1]) {
+        headers['x-csrf-token'] = decodeURIComponent(match[1]);
+      }
+    } catch {
+      // cookie read failed — proceed without CSRF header
+    }
+  }
+
   const response = await fetch(url, {
     method,
     headers,
@@ -77,67 +89,77 @@ type ProviderLike<Data, Params> = {
 };
 
 export function httpGet<Data, Params = undefined>(
-  path: string | ((params: Params) => string)
+  path: string | ((params: Params) => string),
+  mapResponse?: (raw: unknown) => Data
 ): ProviderLike<Data, Params> {
   return {
     provider: () => {},
     invoke: (async (params?: Params) => {
       const resolvedPath = typeof path === 'function' ? path(params!) : path;
-      return httpRequest<Data>('GET', resolvedPath);
+      const raw = await httpRequest<unknown>('GET', resolvedPath);
+      return mapResponse ? mapResponse(raw) : (raw as Data);
     }) as ProviderLike<Data, Params>['invoke'],
   };
 }
 
 export function httpPost<Data, Params = undefined>(
   path: string | ((params: Params) => string),
-  mapBody?: (params: Params) => unknown
+  mapBody?: (params: Params) => unknown,
+  mapResponse?: (raw: unknown) => Data
 ): ProviderLike<Data, Params> {
   return {
     provider: () => {},
     invoke: (async (params?: Params) => {
       const resolvedPath = typeof path === 'function' ? path(params!) : path;
       const body = mapBody ? mapBody(params!) : params;
-      return httpRequest<Data>('POST', resolvedPath, body);
+      const raw = await httpRequest<unknown>('POST', resolvedPath, body);
+      return mapResponse ? mapResponse(raw) : (raw as Data);
     }) as ProviderLike<Data, Params>['invoke'],
   };
 }
 
 export function httpPut<Data, Params = undefined>(
   path: string | ((params: Params) => string),
-  mapBody?: (params: Params) => unknown
+  mapBody?: (params: Params) => unknown,
+  mapResponse?: (raw: unknown) => Data
 ): ProviderLike<Data, Params> {
   return {
     provider: () => {},
     invoke: (async (params?: Params) => {
       const resolvedPath = typeof path === 'function' ? path(params!) : path;
       const body = mapBody ? mapBody(params!) : params;
-      return httpRequest<Data>('PUT', resolvedPath, body);
+      const raw = await httpRequest<unknown>('PUT', resolvedPath, body);
+      return mapResponse ? mapResponse(raw) : (raw as Data);
     }) as ProviderLike<Data, Params>['invoke'],
   };
 }
 
 export function httpPatch<Data, Params = undefined>(
   path: string | ((params: Params) => string),
-  mapBody?: (params: Params) => unknown
+  mapBody?: (params: Params) => unknown,
+  mapResponse?: (raw: unknown) => Data
 ): ProviderLike<Data, Params> {
   return {
     provider: () => {},
     invoke: (async (params?: Params) => {
       const resolvedPath = typeof path === 'function' ? path(params!) : path;
       const body = mapBody ? mapBody(params!) : params;
-      return httpRequest<Data>('PATCH', resolvedPath, body);
+      const raw = await httpRequest<unknown>('PATCH', resolvedPath, body);
+      return mapResponse ? mapResponse(raw) : (raw as Data);
     }) as ProviderLike<Data, Params>['invoke'],
   };
 }
 
 export function httpDelete<Data, Params = undefined>(
-  path: string | ((params: Params) => string)
+  path: string | ((params: Params) => string),
+  mapResponse?: (raw: unknown) => Data
 ): ProviderLike<Data, Params> {
   return {
     provider: () => {},
     invoke: (async (params?: Params) => {
       const resolvedPath = typeof path === 'function' ? path(params!) : path;
-      return httpRequest<Data>('DELETE', resolvedPath);
+      const raw = await httpRequest<unknown>('DELETE', resolvedPath);
+      return mapResponse ? mapResponse(raw) : (raw as Data);
     }) as ProviderLike<Data, Params>['invoke'],
   };
 }

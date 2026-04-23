@@ -52,7 +52,7 @@ const TeamAgentIdentity: React.FC<Props> = ({
     if (backendLogo) {
       return <img src={backendLogo} alt={agent_type} className={resolvedLogoClassName} />;
     }
-    return <span className={resolvedAvatarClassName}>{agent_name.charAt(0).toUpperCase() || '🤖'}</span>;
+    return <span className={resolvedAvatarClassName}>{(agent_name ?? '').charAt(0).toUpperCase() || '🤖'}</span>;
   };
 
   const crownIcon = (

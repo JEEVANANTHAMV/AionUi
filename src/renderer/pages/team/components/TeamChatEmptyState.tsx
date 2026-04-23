@@ -129,7 +129,7 @@ const TeamChatEmptyState: React.FC<Props> = ({ conversation_id }) => {
     }
     return (
       <div className='w-48px h-48px rounded-full bg-fill-3 flex items-center justify-center text-20px font-medium text-t-secondary'>
-        {agent_name.charAt(0).toUpperCase()}
+        {(agent_name ?? '').charAt(0).toUpperCase()}
       </div>
     );
   };

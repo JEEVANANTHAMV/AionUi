@@ -193,19 +193,24 @@ const TeamSiderSection: React.FC<TeamSiderSectionProps> = ({
                         setRenameName(team.name);
                         setRenameVisible(true);
                       } else if (key === 'delete') {
+                        const teamIdToDelete = team.id;
                         Modal.confirm({
                           title: t('team.sider.deleteConfirm'),
                           content: t('team.sider.deleteConfirmContent'),
                           okText: t('team.sider.deleteOk'),
                           cancelText: t('team.sider.deleteCancel'),
                           okButtonProps: { status: 'warning' },
+                          // Keep onOk synchronous: issue the DELETE + navigate, then close.
+                          // Revalidating the team list is fire-and-forget so a slow/failed refetch
+                          // doesn't block Modal.confirm from closing or the router from navigating.
                           onOk: async () => {
-                            const teamIdToDelete = team.id;
-                            await removeTeam(teamIdToDelete);
-                            Message.success(t('team.sider.deleteSuccess'));
+                            await ipcBridge.team.remove.invoke({ id: teamIdToDelete });
+                            localStorage.removeItem(`team-active-slot-${teamIdToDelete}`);
                             if (window.location.hash.includes(`/team/${teamIdToDelete}`)) {
                               navigate('/');
                             }
+                            Message.success(t('team.sider.deleteSuccess'));
+                            void refreshTeams();
                           },
                           style: { borderRadius: '12px' },
                           alignCenter: true,

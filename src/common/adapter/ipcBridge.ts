@@ -1278,19 +1278,62 @@ const toBackendAgent = (a: Omit<import('@process/team/types').TeamAgent, 'slot_i
   ...(a.custom_agent_id ? { custom_agent_id: a.custom_agent_id } : {}),
 });
 
+// Reverse of toBackendAgent. Backend responses use { name, backend, role: 'lead' | 'teammate', ... };
+// renderer consumers expect the legacy { agent_name, agent_type, conversation_type, role: 'leader' | 'teammate' } shape.
+// Tolerate already-mapped objects so double-mapping (e.g. from WS + HTTP) is a no-op.
+const resolveConversationType = (backend: string): string => {
+  if (backend === 'codex' || backend === 'acp') return 'acp';
+  return backend;
+};
+const fromBackendAgent = (raw: unknown): import('@process/team/types').TeamAgent => {
+  const r = (raw ?? {}) as Record<string, unknown>;
+  const agent_name = (r.agent_name as string | undefined) ?? (r.name as string | undefined) ?? '';
+  const agent_type = (r.agent_type as string | undefined) ?? (r.backend as string | undefined) ?? '';
+  const role = r.role === 'lead' ? 'leader' : ((r.role as string | undefined) ?? 'teammate');
+  const conversation_type =
+    (r.conversation_type as string | undefined) ?? resolveConversationType(agent_type);
+  return {
+    slot_id: (r.slot_id as string | undefined) ?? '',
+    conversation_id: (r.conversation_id as string | undefined) ?? '',
+    role: role as import('@/common/types/teamTypes').TeammateRole,
+    agent_type,
+    agent_name,
+    conversation_type,
+    status: (r.status as import('@/common/types/teamTypes').TeammateStatus | undefined) ?? 'idle',
+    cli_path: r.cli_path as string | undefined,
+    custom_agent_id: r.custom_agent_id as string | undefined,
+    model: r.model as string | undefined,
+  };
+};
+const fromBackendTeam = (raw: unknown): import('@process/team/types').TTeam => {
+  const r = (raw ?? {}) as Record<string, unknown>;
+  const agents = Array.isArray(r.agents) ? (r.agents as unknown[]).map(fromBackendAgent) : [];
+  return { ...(r as object), agents } as import('@process/team/types').TTeam;
+};
+const fromBackendTeamOrNull = (raw: unknown): import('@process/team/types').TTeam | null =>
+  raw == null ? null : fromBackendTeam(raw);
+const fromBackendTeamList = (raw: unknown): import('@process/team/types').TTeam[] =>
+  Array.isArray(raw) ? (raw as unknown[]).map(fromBackendTeam) : [];
+
 export const team = {
-  create: httpPost<import('@process/team/types').TTeam, ICreateTeamParams>('/api/teams', (p) => ({
-    name: p.name,
-    agents: p.agents.map(toBackendAgent),
-  })),
-  list: httpGet<import('@process/team/types').TTeam[], { user_id: string }>(
-    (p) => `/api/teams?user_id=${encodeURIComponent(p.user_id)}`
+  create: httpPost<import('@process/team/types').TTeam, ICreateTeamParams>(
+    '/api/teams',
+    (p) => ({ name: p.name, agents: p.agents.map(toBackendAgent) }),
+    fromBackendTeam
   ),
-  get: httpGet<import('@process/team/types').TTeam | null, { id: string }>((p) => `/api/teams/${p.id}`),
+  list: httpGet<import('@process/team/types').TTeam[], { user_id: string }>(
+    (p) => `/api/teams?user_id=${encodeURIComponent(p.user_id)}`,
+    fromBackendTeamList
+  ),
+  get: httpGet<import('@process/team/types').TTeam | null, { id: string }>(
+    (p) => `/api/teams/${p.id}`,
+    fromBackendTeamOrNull
+  ),
   remove: httpDelete<void, { id: string }>((p) => `/api/teams/${p.id}`),
   addAgent: httpPost<import('@process/team/types').TeamAgent, IAddTeamAgentParams>(
     (p) => `/api/teams/${p.team_id}/agents`,
-    (p) => toBackendAgent(p.agent)
+    (p) => toBackendAgent(p.agent),
+    fromBackendAgent
   ),
   removeAgent: httpDelete<void, { team_id: string; slot_id: string }>(
     (p) => `/api/teams/${p.team_id}/agents/${p.slot_id}`
