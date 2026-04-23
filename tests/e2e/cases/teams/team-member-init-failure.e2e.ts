@@ -18,14 +18,14 @@ import { invokeBridge, navigateTo, createTeam, deleteTeam } from '../../helpers'
 
 type AgentPayload = {
   role: string;
-  agentType: string;
-  agentName: string;
-  conversationType: string;
-  conversationId: string;
+  agent_type: string;
+  agent_name: string;
+  conversation_type: string;
+  conversation_id: string;
   status: string;
 };
 
-type TeamAgentResult = { slotId: string; agentName: string; status: string };
+type TeamAgentResult = { slot_id: string; agent_name: string; status: string };
 
 test.describe('Team Member Init Failure UI', () => {
   test('failed agent slot renders error overlay with remove button', async ({ page }) => {
@@ -42,24 +42,24 @@ test.describe('Team Member Init Failure UI', () => {
     // [inject] Add a teammate with status="failed" via team.add-agent.
     const failedAgent: AgentPayload = {
       role: 'teammate',
-      agentType: 'claude',
-      agentName: 'FailedMember',
-      conversationType: 'acp',
-      conversationId: '',
+      agent_type: 'claude',
+      agent_name: 'FailedMember',
+      conversation_type: 'acp',
+      conversation_id: '',
       status: 'failed',
     };
 
     const addResult = await invokeBridge<TeamAgentResult | { __bridgeError: true; message: string }>(
       page,
       'team.add-agent',
-      { teamId, agent: failedAgent }
+      { team_id: teamId, agent: failedAgent }
     ).catch((error) => ({ __bridgeError: true, message: String(error) }) as const);
 
     const injected =
       addResult !== null &&
       typeof addResult === 'object' &&
       !('__bridgeError' in addResult) &&
-      typeof (addResult as TeamAgentResult).slotId === 'string';
+      typeof (addResult as TeamAgentResult).slot_id === 'string';
 
     if (!injected) {
       console.log('[E2E] team.add-agent unavailable or failed — skipping injection assertions');

@@ -3,12 +3,12 @@ import { invokeBridge } from './bridge';
 import { TEAM_SUPPORTED_BACKENDS } from './teamConfig';
 
 type TeamAgent = {
-  slotId: string;
-  conversationId: string;
+  slot_id: string;
+  conversation_id: string;
   role: string;
-  agentType: string;
-  agentName: string;
-  conversationType: string;
+  agent_type: string;
+  agent_name: string;
+  conversation_type: string;
   status: string;
 };
 
@@ -37,18 +37,18 @@ export async function createTeam(page: Page, name: string, backend?: string): Pr
   const conversationType = resolveConversationType(agentType);
 
   const result = await invokeBridge<TeamRecord>(page, 'team.create', {
-    userId: 'system_default_user',
+    user_id: 'system_default_user',
     name,
     workspace: '',
-    workspaceMode: 'shared',
+    workspace_mode: 'shared',
     agents: [
       {
-        slotId: 'slot-lead',
-        conversationId: '',
+        slot_id: 'slot-lead',
+        conversation_id: '',
         role: 'leader',
-        agentType,
-        agentName: 'Leader',
-        conversationType,
+        agent_type: agentType,
+        agent_name: 'Leader',
+        conversation_type: conversationType,
         status: 'pending',
       },
     ],
@@ -63,7 +63,7 @@ export async function createTeam(page: Page, name: string, backend?: string): Pr
  */
 export async function ensureTeam(page: Page, name: string, backend?: string): Promise<string> {
   const teams = await invokeBridge<TeamRecord[]>(page, 'team.list', {
-    userId: 'system_default_user',
+    user_id: 'system_default_user',
   });
 
   const existing = teams.find((t) => t.name === name);
@@ -84,7 +84,7 @@ export async function deleteTeam(page: Page, id: string): Promise<void> {
  */
 export async function cleanupTeamsByName(page: Page, name: string): Promise<void> {
   const teams = await invokeBridge<TeamRecord[]>(page, 'team.list', {
-    userId: 'system_default_user',
+    user_id: 'system_default_user',
   }).catch(() => [] as TeamRecord[]);
 
   for (const t of teams.filter((t) => t.name === name)) {

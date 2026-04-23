@@ -26,7 +26,7 @@ test.describe('Team Stale URL', () => {
 
     // Confirm the team is no longer in the list
     const teams = await invokeBridge<TeamListResult>(page, 'team.list', {
-      userId: 'system_default_user',
+      user_id: 'system_default_user',
     }).catch(() => [] as TeamListResult);
 
     if (teams.some((t) => t.id === teamId)) {

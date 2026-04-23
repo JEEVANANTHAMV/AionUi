@@ -38,7 +38,7 @@ for (const { leaderType, teamName } of LEADER_CONFIGS) {
     }
 
     const teams = await invokeBridge<Array<{ id: string; name: string }>>(page, 'team.list', {
-      userId: 'system_default_user',
+      user_id: 'system_default_user',
     });
     const existing = teams.find((t) => t.name === teamName);
     let resolvedTeamId: string;
@@ -47,10 +47,10 @@ for (const { leaderType, teamName } of LEADER_CONFIGS) {
       resolvedTeamId = existing.id;
     } else {
       const created = await invokeBridge<{ id: string } | null>(page, 'team.create', {
-        userId: 'system_default_user',
+        user_id: 'system_default_user',
         name: teamName,
         workspace: '',
-        workspaceMode: 'shared',
+        workspace_mode: 'shared',
         agents: [
           {
             slot_id: 'slot-lead',

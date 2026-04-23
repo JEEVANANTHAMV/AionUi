@@ -556,7 +556,7 @@ export class TeamSessionService {
     };
     await this.repo.create(team);
 
-    ipcBridge.team.listChanged.emit({ teamId, action: 'created' });
+    ipcBridge.team.listChanged.emit({ team_id, action: 'created' });
     return team;
   }
 
@@ -611,7 +611,7 @@ export class TeamSessionService {
     await this.repo.deleteTasksByTeam(id);
     await this.repo.delete(id);
 
-    ipcBridge.team.listChanged.emit({ teamId: id, action: 'removed' });
+    ipcBridge.team.listChanged.emit({ team_id: id, action: 'removed' });
   }
 
   async addAgent(team_id: string, agent: Omit<TeamAgent, 'slot_id'>): Promise<TeamAgent> {

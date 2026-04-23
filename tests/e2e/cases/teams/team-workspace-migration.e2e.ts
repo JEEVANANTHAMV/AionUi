@@ -24,7 +24,7 @@ const LEADER_BACKEND = [...TEAM_SUPPORTED_BACKENDS][0] ?? 'claude';
 
 test.describe('Team Workspace Migration', () => {
   let targetWorkspace: string;
-  let team_id: string | undefined;
+  let teamId: string | undefined;
 
   test.beforeAll(async () => {
     targetWorkspace = fs.mkdtempSync(path.join(os.tmpdir(), 'aionui-target-'));
@@ -40,7 +40,7 @@ test.describe('Team Workspace Migration', () => {
     // ── Cleanup leftover E2E Migration teams from previous runs ─────────
 
     const existingTeams = await invokeBridge<Array<{ id: string; name: string }>>(page, 'team.list', {
-      userId: 'system_default_user',
+      user_id: 'system_default_user',
     });
     for (const t of existingTeams) {
       if (t.name.startsWith('E2E Migration')) {

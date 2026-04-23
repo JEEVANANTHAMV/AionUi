@@ -28,20 +28,26 @@ test.describe('Team Agent Whitelist', () => {
     const createBtn = page.locator('[data-testid="team-create-btn"]').first();
     await createBtn.click();
 
-    // Verify agent cards are visible (new UI uses card grid, not a select dropdown)
-    const firstCard = page.locator('[data-testid^="team-create-agent-card-"]').first();
-    await expect(firstCard).toBeVisible({ timeout: 5000 });
+    // Open the leader AionSelect dropdown (options portal to document.body)
+    const modal = page.locator('.arco-modal');
+    const leaderSelect = modal.locator('[data-testid="team-create-leader-select"]');
+    await expect(leaderSelect).toBeVisible({ timeout: 5000 });
+    await leaderSelect.click();
+
+    // Wait for at least one option to render at page scope (not inside .arco-modal)
+    const firstOption = page.locator('[data-testid^="team-create-agent-option-"]').first();
+    await expect(firstOption).toBeVisible({ timeout: 5000 });
 
     // Screenshot: dropdown options
     await page.screenshot({ path: 'tests/e2e/results/team-whitelist-01-dropdown.png' });
 
-    // Get all agent card texts
-    const cards = page.locator('[data-testid^="team-create-agent-card-"]');
-    const count = await cards.count();
+    // Collect all agent option texts from the open dropdown
+    const options = page.locator('[data-testid^="team-create-agent-option-"]');
+    const count = await options.count();
 
     const optionTexts: string[] = [];
     for (let i = 0; i < count; i++) {
-      const text = await cards.nth(i).textContent();
+      const text = await options.nth(i).textContent();
       if (text) optionTexts.push(text.trim());
     }
 
@@ -51,12 +57,13 @@ test.describe('Team Agent Whitelist', () => {
     // Do NOT hardcode which agents should or should not appear — the whitelist is the single source of truth.
     // If the supported backend list changes, update teamConfig.ts, not this test.
 
-    // Every whitelisted backend must appear in the card grid
+    // Every whitelisted backend must appear in the dropdown options
     for (const backend of TEAM_SUPPORTED_BACKENDS) {
       expect(optionTexts.some((t) => t.toLowerCase().includes(backend))).toBe(true);
     }
 
-    // Close modal via Cancel button
+    // Close the dropdown first, then close the modal via Cancel button
+    await page.keyboard.press('Escape').catch(() => {});
     await page.locator('.arco-modal .arco-btn-text').first().click();
     await expect(page.locator('.arco-modal')).toBeHidden({ timeout: 5000 });
   });

@@ -424,7 +424,7 @@ const TeamPageContent: React.FC<TeamPageContentProps> = ({ team, onRenameTeam })
                       ref={(el) => {
                         agentRefs.current[agent.slot_id] = el;
                       }}
-                      data-slot-id={agent.slotId}
+                      data-slot-id={agent.slot_id}
                       data-role={isLeaderSlot ? 'leader' : 'member'}
                       className='relative h-full border-r border-solid border-[color:var(--border-base)]'
                       style={{
