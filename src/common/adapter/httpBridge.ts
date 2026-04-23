@@ -4,15 +4,11 @@
  *
  * Exported helpers produce objects with the same shape as @office-ai/platform bridge,
  * so existing renderer code works without changes.
- *
- * When the aionui-backend binary is unavailable (__backendPort === 0), calls
- * with an explicit `key` option transparently fall back to the in-process
- * platform bridge (Electron IPC). See httpBridgeFallback.ts.
  */
 
-import { buildProviderFallback, shouldUseFallback, isMainProcess } from './httpBridgeFallback';
-
-export { wsEmitter, stubEmitter } from './httpBridgeWs';
+// ---------------------------------------------------------------------------
+// Base URL
+// ---------------------------------------------------------------------------
 
 declare global {
   interface Window {
@@ -23,6 +19,11 @@ declare global {
 function getBaseUrl(): string {
   const port = typeof window !== 'undefined' ? (window as Window).__backendPort || 13400 : 13400;
   return `http://127.0.0.1:${port}`;
+}
+
+function getWsUrl(): string {
+  const port = typeof window !== 'undefined' ? (window as Window).__backendPort || 13400 : 13400;
+  return `ws://127.0.0.1:${port}/ws`;
 }
 
 // ---------------------------------------------------------------------------
@@ -75,95 +76,70 @@ type ProviderLike<Data, Params> = {
   invoke: Params extends undefined ? () => Promise<Data> : (params: Params) => Promise<Data>;
 };
 
-type ProviderOptions = {
-  /** Dotted key (e.g. `'team.list'`) used for in-process fallback via platform bridge. */
-  key?: string;
-};
-
-/**
- * Build a provider object that routes to HTTP in renderer, but falls back to
- * @office-ai/platform IPC bridge when:
- *   - Main process is registering a handler via `.provider(...)`
- *   - Renderer calls `.invoke(...)` and backend is unavailable
- */
-function buildProvider<Data, Params>(
-  httpInvoker: (params?: Params) => Promise<Data>,
-  options?: ProviderOptions
+export function httpGet<Data, Params = undefined>(
+  path: string | ((params: Params) => string)
 ): ProviderLike<Data, Params> {
-  const fallback = options?.key ? buildProviderFallback<Data, Params>(options.key) : null;
-
   return {
-    provider: (handler) => {
-      // Main process: register the handler on platform bridge so renderer can reach it
-      // via Electron IPC when the backend is down. When backend is up, the HTTP server
-      // inside aionui-backend is the real handler — this provider registration is harmless.
-      if (fallback && isMainProcess()) {
-        fallback.provider(handler);
-      }
-    },
+    provider: () => {},
     invoke: (async (params?: Params) => {
-      if (fallback && shouldUseFallback()) {
-        return fallback.invoke(params);
-      }
-      return httpInvoker(params);
+      const resolvedPath = typeof path === 'function' ? path(params!) : path;
+      return httpRequest<Data>('GET', resolvedPath);
     }) as ProviderLike<Data, Params>['invoke'],
   };
 }
 
-export function httpGet<Data, Params = undefined>(
-  path: string | ((params: Params) => string),
-  options?: ProviderOptions
-): ProviderLike<Data, Params> {
-  return buildProvider<Data, Params>((params?: Params) => {
-    const resolvedPath = typeof path === 'function' ? path(params!) : path;
-    return httpRequest<Data>('GET', resolvedPath);
-  }, options);
-}
-
 export function httpPost<Data, Params = undefined>(
   path: string | ((params: Params) => string),
-  mapBody?: (params: Params) => unknown,
-  options?: ProviderOptions
+  mapBody?: (params: Params) => unknown
 ): ProviderLike<Data, Params> {
-  return buildProvider<Data, Params>((params?: Params) => {
-    const resolvedPath = typeof path === 'function' ? path(params!) : path;
-    const body = mapBody ? mapBody(params!) : params;
-    return httpRequest<Data>('POST', resolvedPath, body);
-  }, options);
+  return {
+    provider: () => {},
+    invoke: (async (params?: Params) => {
+      const resolvedPath = typeof path === 'function' ? path(params!) : path;
+      const body = mapBody ? mapBody(params!) : params;
+      return httpRequest<Data>('POST', resolvedPath, body);
+    }) as ProviderLike<Data, Params>['invoke'],
+  };
 }
 
 export function httpPut<Data, Params = undefined>(
   path: string | ((params: Params) => string),
-  mapBody?: (params: Params) => unknown,
-  options?: ProviderOptions
+  mapBody?: (params: Params) => unknown
 ): ProviderLike<Data, Params> {
-  return buildProvider<Data, Params>((params?: Params) => {
-    const resolvedPath = typeof path === 'function' ? path(params!) : path;
-    const body = mapBody ? mapBody(params!) : params;
-    return httpRequest<Data>('PUT', resolvedPath, body);
-  }, options);
+  return {
+    provider: () => {},
+    invoke: (async (params?: Params) => {
+      const resolvedPath = typeof path === 'function' ? path(params!) : path;
+      const body = mapBody ? mapBody(params!) : params;
+      return httpRequest<Data>('PUT', resolvedPath, body);
+    }) as ProviderLike<Data, Params>['invoke'],
+  };
 }
 
 export function httpPatch<Data, Params = undefined>(
   path: string | ((params: Params) => string),
-  mapBody?: (params: Params) => unknown,
-  options?: ProviderOptions
+  mapBody?: (params: Params) => unknown
 ): ProviderLike<Data, Params> {
-  return buildProvider<Data, Params>((params?: Params) => {
-    const resolvedPath = typeof path === 'function' ? path(params!) : path;
-    const body = mapBody ? mapBody(params!) : params;
-    return httpRequest<Data>('PATCH', resolvedPath, body);
-  }, options);
+  return {
+    provider: () => {},
+    invoke: (async (params?: Params) => {
+      const resolvedPath = typeof path === 'function' ? path(params!) : path;
+      const body = mapBody ? mapBody(params!) : params;
+      return httpRequest<Data>('PATCH', resolvedPath, body);
+    }) as ProviderLike<Data, Params>['invoke'],
+  };
 }
 
 export function httpDelete<Data, Params = undefined>(
-  path: string | ((params: Params) => string),
-  options?: ProviderOptions
+  path: string | ((params: Params) => string)
 ): ProviderLike<Data, Params> {
-  return buildProvider<Data, Params>((params?: Params) => {
-    const resolvedPath = typeof path === 'function' ? path(params!) : path;
-    return httpRequest<Data>('DELETE', resolvedPath);
-  }, options);
+  return {
+    provider: () => {},
+    invoke: (async (params?: Params) => {
+      const resolvedPath = typeof path === 'function' ? path(params!) : path;
+      return httpRequest<Data>('DELETE', resolvedPath);
+    }) as ProviderLike<Data, Params>['invoke'],
+  };
 }
 
 /**
@@ -177,5 +153,117 @@ export function stubProvider<Data, Params = undefined>(name: string, defaultValu
       console.warn(`[httpBridge] stub: ${name} not yet implemented in backend`);
       return defaultValue;
     }) as ProviderLike<Data, Params>['invoke'],
+  };
+}
+
+// ---------------------------------------------------------------------------
+// WebSocket singleton
+// ---------------------------------------------------------------------------
+
+type WsCallback = (data: unknown) => void;
+const wsListeners = new Map<string, Set<WsCallback>>();
+let ws: WebSocket | null = null;
+let wsReconnectTimer: ReturnType<typeof setTimeout> | null = null;
+let wsReconnectAttempt = 0;
+
+function ensureWs(): void {
+  if (typeof window === 'undefined') return;
+  if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
+
+  const url = getWsUrl();
+  try {
+    ws = new WebSocket(url);
+  } catch {
+    scheduleWsReconnect();
+    return;
+  }
+
+  const current = ws;
+
+  current.addEventListener('open', () => {
+    wsReconnectAttempt = 0;
+  });
+
+  current.addEventListener('message', (event: MessageEvent) => {
+    try {
+      const msg = JSON.parse(event.data as string) as {
+        name?: string;
+        event?: string;
+        data?: unknown;
+        payload?: unknown;
+      };
+      // Support both { name, data } and { event, payload } formats
+      const eventName = msg.name ?? msg.event;
+      const payload = msg.data ?? msg.payload;
+      if (eventName) {
+        const handlers = wsListeners.get(eventName);
+        if (handlers) {
+          for (const h of handlers) {
+            try {
+              h(payload);
+            } catch {
+              /* never crash listener */
+            }
+          }
+        }
+      }
+    } catch {
+      // ignore non-JSON
+    }
+  });
+
+  current.addEventListener('close', () => {
+    if (ws === current) ws = null;
+    scheduleWsReconnect();
+  });
+
+  current.addEventListener('error', () => {
+    current.close();
+  });
+}
+
+function scheduleWsReconnect(): void {
+  if (wsReconnectTimer) return;
+  const delay = Math.min(1000 * Math.pow(2, wsReconnectAttempt), 30000);
+  wsReconnectAttempt++;
+  wsReconnectTimer = setTimeout(() => {
+    wsReconnectTimer = null;
+    ensureWs();
+  }, delay);
+}
+
+// ---------------------------------------------------------------------------
+// Emitter factory (same shape as bridge.buildEmitter)
+// ---------------------------------------------------------------------------
+
+type EmitterLike<Params> = {
+  on: (callback: Params extends undefined ? () => void : (params: Params) => void) => () => void;
+  emit: Params extends undefined ? () => void : (params: Params) => void;
+};
+
+export function wsEmitter<Params = undefined>(eventName: string): EmitterLike<Params> {
+  return {
+    on: (callback: (params: Params) => void) => {
+      ensureWs();
+      if (!wsListeners.has(eventName)) {
+        wsListeners.set(eventName, new Set());
+      }
+      const cb = callback as WsCallback;
+      wsListeners.get(eventName)!.add(cb);
+      return () => {
+        wsListeners.get(eventName)?.delete(cb);
+      };
+    },
+    emit: (() => {}) as EmitterLike<Params>['emit'],
+  };
+}
+
+/**
+ * Stub emitter for events not yet implemented in the backend.
+ */
+export function stubEmitter<Params = undefined>(_name: string): EmitterLike<Params> {
+  return {
+    on: () => () => {},
+    emit: (() => {}) as EmitterLike<Params>['emit'],
   };
 }
