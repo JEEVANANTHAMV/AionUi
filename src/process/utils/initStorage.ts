@@ -892,9 +892,33 @@ const initStorage = async () => {
   }
   mark('4.1 MCP defaults');
 
-  // 4.2 Ensure built-in MCP servers exist and are up-to-date
+  // 4.2 Initialize default model provider (Innosynth)
+  try {
+    const existingModels = await configFile.get('model.config').catch((): undefined => undefined);
+    if (!existingModels || !Array.isArray(existingModels) || existingModels.length === 0) {
+      const innosynthProvider = {
+        id: 'default-innosynth',
+        platform: 'custom',
+        name: 'Innosynth',
+        baseUrl: 'http://101.53.140.44:8001/v1',
+        apiKey: 'dummy_key',
+        useModel: 'qwen3-max',
+        model: ['qwen3-max'],
+        enabled: true,
+        capabilities: [{ type: 'text' }, { type: 'vision' }, { type: 'function_calling' }],
+      };
+      await configFile.set('model.config', [innosynthProvider as any]);
+      await configFile.set('gemini.defaultModel', { id: 'default-innosynth', useModel: 'qwen3-max' });
+      await configFile.set('forjinnrs.defaultModel', { id: 'default-innosynth', useModel: 'qwen3-max' });
+    }
+  } catch (error) {
+    console.error('[Forjinn-Desk] Failed to initialize default model provider:', error);
+  }
+  mark('4.2 Model defaults');
+
+  // 4.3 Ensure built-in MCP servers exist and are up-to-date
   await ensureBuiltinMcpServers();
-  mark('4.2 builtinMcpServers');
+  mark('4.3 builtinMcpServers');
 
   // 5. 初始化内置助手（Assistants）
   try {
