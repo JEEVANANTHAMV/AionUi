@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -190,11 +190,11 @@ export function rowToConversation(row: IConversationRow): TChatConversation {
     } as TChatConversation;
   }
 
-  // Aionrs type has model field
-  if (row.type === 'aionrs' && row.model) {
+  // Forjinnrs type has model field
+  if (row.type === 'forjinnrs' && row.model) {
     return {
       ...base,
-      type: 'aionrs' as const,
+      type: 'forjinnrs' as const,
       extra: JSON.parse(row.extra),
       model: JSON.parse(row.model),
     } as TChatConversation;

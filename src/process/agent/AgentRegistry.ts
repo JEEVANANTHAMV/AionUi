@@ -1,13 +1,13 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { acpDetector } from '@process/agent/acp/AcpDetector';
 import type {
   AcpDetectedAgent,
-  AionrsDetectedAgent,
+  ForjinnrsDetectedAgent,
   DetectedAgent,
   GeminiDetectedAgent,
   NanobotDetectedAgent,
@@ -28,7 +28,7 @@ import type { RemoteAgentConfig } from '@process/agent/remote/types';
  *   - ACP builtin  — CLI agents on PATH (claude, qwen, codex, …)
  *   - ACP extension — contributed by hub extensions
  *   - Remote       — user-configured WebSocket agents (from DB)
- *   - Aionrs       — always present (Rust binary, availability resolved at runtime)
+ *   - Forjinnrs    — always present (Rust binary, availability resolved at runtime)
  *   - OpenClaw GW  — detected via `openclaw` CLI on PATH
  *   - Nanobot      — detected via `nanobot` CLI on PATH
  *   - Custom ACP   — user-defined ACP CLIs from ConfigStorage 'assistants'
@@ -59,13 +59,13 @@ class AgentRegistry {
     };
   }
 
-  private createAionrsAgent(): AionrsDetectedAgent {
+  private createForjinnrsAgent(): ForjinnrsDetectedAgent {
     return {
-      id: 'aionrs',
-      name: 'Aion CLI',
-      kind: 'aionrs',
+      id: 'forjinnrs',
+      name: 'Forjinn CLI',
+      kind: 'forjinnrs',
       available: true,
-      backend: 'aionrs',
+      backend: 'forjinnrs',
     };
   }
 
@@ -126,7 +126,7 @@ class AgentRegistry {
 
   /**
    * Deduplicate agents by backend ID. First occurrence wins — merge order
-   * determines priority: Aionrs > Gemini > Builtin > Other > Remote > Extension > Custom.
+   * determines priority: Forjinnrs > Gemini > Builtin > Other > Remote > Extension > Custom.
    * When an extension contributes the same backend as a builtin, the builtin wins.
    *
    * Remote and custom agents share their `backend` string but are individually
@@ -149,7 +149,7 @@ class AgentRegistry {
   // prettier-ignore
   private merge(): void {
     this.detectedAgents = this.deduplicate([
-      this.createAionrsAgent(),
+      this.createForjinnrsAgent(),
       this.createGeminiAgent(),
       ...this.builtinAgents,
       ...this.otherAgents,

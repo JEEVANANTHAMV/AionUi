@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -56,7 +56,7 @@ describe('resetPasswordCLI helpers', () => {
     const closeDatabase = vi.fn();
 
     vi.doMock('@process/utils', () => ({
-      getDataPath: vi.fn(() => 'C:/mock/.aionui/aionui'),
+      getDataPath: vi.fn(() => 'C:/mock/.forjinn-desk/forjinn-desk'),
     }));
     vi.doMock('@process/services/database/export', () => ({
       getDatabase: vi.fn(() => Promise.resolve(mockDb)),

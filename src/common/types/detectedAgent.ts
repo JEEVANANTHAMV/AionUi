@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -24,7 +24,7 @@ export type RemoteAgentProtocol = 'openclaw' | 'zeroclaw' | 'acp';
 export type RemoteAgentAuthType = 'bearer' | 'password' | 'none';
 
 /** Execution engine kinds — each uses a different protocol or runtime */
-export type DetectedAgentKind = 'gemini' | 'acp' | 'remote' | 'aionrs' | 'openclaw-gateway' | 'nanobot';
+export type DetectedAgentKind = 'gemini' | 'acp' | 'remote' | 'forjinnrs' | 'openclaw-gateway' | 'nanobot';
 
 /** Kind-specific fields mapping */
 type KindFields = {
@@ -54,7 +54,7 @@ type KindFields = {
     authType: RemoteAgentAuthType;
   };
 
-  aionrs: {
+  forjinnrs: {
     /** Resolved CLI binary path */
     cliPath?: string;
     /** Binary version string */
@@ -93,7 +93,7 @@ export type DetectedAgent<K extends DetectedAgentKind = DetectedAgentKind> = {
 export type AcpDetectedAgent = DetectedAgent<'acp'>;
 export type GeminiDetectedAgent = DetectedAgent<'gemini'>;
 export type RemoteDetectedAgent = DetectedAgent<'remote'>;
-export type AionrsDetectedAgent = DetectedAgent<'aionrs'>;
+export type ForjinnrsDetectedAgent = DetectedAgent<'forjinnrs'>;
 export type NanobotDetectedAgent = DetectedAgent<'nanobot'>;
 export type OpenClawDetectedAgent = DetectedAgent<'openclaw-gateway'>;
 

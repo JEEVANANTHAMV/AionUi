@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,7 +15,7 @@ describe('extensions/pathSafety', () => {
   let root = '';
 
   beforeEach(async () => {
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'aionui-path-safety-'));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'forjinn-desk-path-safety-'));
     root = path.join(tempDir, 'safe-root');
     await fs.mkdir(root, { recursive: true });
   });

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -28,9 +28,9 @@ import GeminiChat from '../platforms/gemini/GeminiChat';
 import AcpModelSelector from '@/renderer/components/agent/AcpModelSelector';
 import GeminiModelSelector from '../platforms/gemini/GeminiModelSelector';
 import { useGeminiModelSelection } from '../platforms/gemini/useGeminiModelSelection';
-import AionrsChat from '../platforms/aionrs/AionrsChat';
-import AionrsModelSelector from '../platforms/aionrs/AionrsModelSelector';
-import { useAionrsModelSelection } from '../platforms/aionrs/useAionrsModelSelection';
+import ForjinnrsChat from '../platforms/forjinnrs/ForjinnrsChat';
+import ForjinnrsModelSelector from '../platforms/forjinnrs/ForjinnrsModelSelector';
+import { useForjinnrsModelSelection } from '../platforms/forjinnrs/useForjinnrsModelSelection';
 import { usePreviewContext } from '../Preview';
 import StarOfficeMonitorCard from '../platforms/openclaw/StarOfficeMonitorCard.tsx';
 import ConversationSkillsIndicator from './ConversationSkillsIndicator';
@@ -195,9 +195,9 @@ const GeminiConversationPanel: React.FC<{
   );
 };
 
-type AionrsConversation = Extract<TChatConversation, { type: 'aionrs' }>;
+type ForjinnrsConversation = Extract<TChatConversation, { type: 'forjinnrs' }>;
 
-const AionrsConversationPanel: React.FC<{ conversation: AionrsConversation; sliderTitle: React.ReactNode }> = ({
+const ForjinnrsConversationPanel: React.FC<{ conversation: ForjinnrsConversation; sliderTitle: React.ReactNode }> = ({
   conversation,
   sliderTitle,
 }) => {
@@ -212,19 +212,19 @@ const AionrsConversationPanel: React.FC<{ conversation: AionrsConversation; slid
     [conversation.id]
   );
 
-  const modelSelection = useAionrsModelSelection({
+  const modelSelection = useForjinnrsModelSelection({
     initialModel: conversation.model,
     onSelectModel,
   });
   const workspaceEnabled = Boolean(conversation.extra?.workspace);
   const { info: presetAssistantInfo } = usePresetAssistantInfo(conversation);
-  const aionrsAssistantId = resolveAssistantConfigId(conversation) ?? undefined;
+  const forjinnrsAssistantId = resolveAssistantConfigId(conversation) ?? undefined;
 
   const chatLayoutProps = {
     title: conversation.name,
     siderTitle: sliderTitle,
     sider: <ChatSider conversation={conversation} />,
-    headerLeft: <AionrsModelSelector selection={modelSelection} />,
+    headerLeft: <ForjinnrsModelSelector selection={modelSelection} />,
     headerExtra: (
       <div className='flex items-center gap-8px'>
         <ConversationSkillsIndicator conversation={conversation} />
@@ -236,13 +236,13 @@ const AionrsConversationPanel: React.FC<{ conversation: AionrsConversation; slid
       </div>
     ),
     workspaceEnabled,
-    backend: 'aionrs' as const,
-    presetAssistant: presetAssistantInfo ? { ...presetAssistantInfo, id: aionrsAssistantId } : undefined,
+    backend: 'forjinnrs' as const,
+    presetAssistant: presetAssistantInfo ? { ...presetAssistantInfo, id: forjinnrsAssistantId } : undefined,
   };
 
   return (
     <ChatLayout {...chatLayoutProps} conversationId={conversation.id}>
-      <AionrsChat
+      <ForjinnrsChat
         conversation_id={conversation.id}
         workspace={conversation.extra.workspace}
         modelSelection={modelSelection}
@@ -261,11 +261,11 @@ const ChatConversation: React.FC<{
   const workspaceEnabled = Boolean(conversation?.extra?.workspace);
 
   const isGeminiConversation = conversation?.type === 'gemini';
-  const isAionrsConversation = conversation?.type === 'aionrs';
+  const isForjinnrsConversation = conversation?.type === 'forjinnrs';
 
   // 使用统一的 Hook 获取预设助手信息（ACP/Codex 会话）
   // Use unified hook for preset assistant info (ACP/Codex conversations)
-  const acpConversation = isGeminiConversation || isAionrsConversation ? undefined : conversation;
+  const acpConversation = isGeminiConversation || isForjinnrsConversation ? undefined : conversation;
   const { info: presetAssistantInfo, isLoading: isLoadingPreset } = usePresetAssistantInfo(acpConversation);
   const acpAssistantId = acpConversation ? (resolveAssistantConfigId(acpConversation) ?? undefined) : undefined;
 
@@ -273,7 +273,7 @@ const ChatConversation: React.FC<{
   const assistantDisplayName = presetAssistantInfo?.name || conversationAgentName;
 
   const conversationNode = useMemo(() => {
-    if (!conversation || isGeminiConversation || isAionrsConversation) return null;
+    if (!conversation || isGeminiConversation || isForjinnrsConversation) return null;
     switch (conversation.type) {
       case 'acp':
         return (
@@ -337,7 +337,7 @@ const ChatConversation: React.FC<{
       default:
         return null;
     }
-  }, [conversation, isGeminiConversation, isAionrsConversation, assistantDisplayName, hideSendBox]);
+  }, [conversation, isGeminiConversation, isForjinnrsConversation, assistantDisplayName, hideSendBox]);
 
   const sliderTitle = useMemo(() => {
     return (
@@ -351,7 +351,7 @@ const ChatConversation: React.FC<{
   // For other non-Gemini conversations, show disabled GeminiModelSelector.
   // NOTE: This must be placed before the Gemini early return to maintain consistent hook order.
   const modelSelector = useMemo(() => {
-    if (!conversation || isGeminiConversation || isAionrsConversation) return undefined;
+    if (!conversation || isGeminiConversation || isForjinnrsConversation) return undefined;
     if (conversation.type === 'acp') {
       const extra = conversation.extra as { backend?: string; currentModelId?: string };
       return (
@@ -366,10 +366,10 @@ const ChatConversation: React.FC<{
       return <AcpModelSelector conversationId={conversation.id} />;
     }
     return <GeminiModelSelector disabled={true} />;
-  }, [conversation, isGeminiConversation, isAionrsConversation]);
+  }, [conversation, isGeminiConversation, isForjinnrsConversation]);
 
-  if (conversation && conversation.type === 'aionrs') {
-    return <AionrsConversationPanel key={conversation.id} conversation={conversation} sliderTitle={sliderTitle} />;
+  if (conversation && conversation.type === 'forjinnrs') {
+    return <ForjinnrsConversationPanel key={conversation.id} conversation={conversation} sliderTitle={sliderTitle} />;
   }
 
   if (conversation && conversation.type === 'gemini') {
@@ -397,8 +397,8 @@ const ChatConversation: React.FC<{
           backend:
             conversation?.type === 'acp'
               ? conversation?.extra?.backend
-              : conversation?.type === 'aionrs'
-                ? 'aionrs'
+              : conversation?.type === 'forjinnrs'
+                ? 'forjinnrs'
                 : conversation?.type === 'codex'
                   ? 'codex'
                   : conversation?.type === 'openclaw-gateway'

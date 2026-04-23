@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -568,7 +568,7 @@ export function resolveChannelConvType(backend: string): {
 } {
   if (backend === 'codex') return { convType: 'codex' };
   if (backend === 'gemini') return { convType: 'gemini' };
-  if (backend === 'aionrs') return { convType: 'aionrs' };
+  if (backend === 'forjinnrs') return { convType: 'forjinnrs' };
   if (backend === 'openclaw-gateway') return { convType: 'openclaw-gateway' };
   return { convType: 'acp', convBackend: backend };
 }

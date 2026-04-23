@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -67,7 +67,7 @@ const FileChangesPanel: React.FC<FileChangesPanelProps> = ({
   return (
     <div
       className={classNames(
-        'w-full box-border rounded-8px overflow-hidden border border-solid border-[var(--aou-2)]',
+        'w-full box-border rounded-8px overflow-hidden border border-solid border-[var(--forjinn-2)]',
         className
       )}
       style={{ width: '100%' }}

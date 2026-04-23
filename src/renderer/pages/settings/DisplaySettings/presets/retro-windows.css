@@ -23,17 +23,17 @@
   --color-brand-fill: #0078d4;
   --color-brand-bg: #e6f2fa;
 
-  /* AOU 品牌色板 - 蓝色系渐变 */
-  --aou-1: #e6f2fa;
-  --aou-2: #cce5f5;
-  --aou-3: #b3d8f0;
-  --aou-4: #99cbeb;
-  --aou-5: #66b1e1;
-  --aou-6: #0078d4;
-  --aou-7: #005a9e;
-  --aou-8: #004578;
-  --aou-9: #003052;
-  --aou-10: #001b2c;
+  /* Forjinn 品牌色板 - 蓝色系渐变 */
+  --forjinn-1: #e6f2fa;
+  --forjinn-2: #cce5f5;
+  --forjinn-3: #b3d8f0;
+  --forjinn-4: #99cbeb;
+  --forjinn-5: #66b1e1;
+  --forjinn-6: #0078d4;
+  --forjinn-7: #005a9e;
+  --forjinn-8: #004578;
+  --forjinn-9: #003052;
+  --forjinn-10: #001b2c;
 
   /* 背景色 - Classic Windows Gray/Beige */
   --color-bg-1: #f0f0f0;
@@ -826,17 +826,17 @@ input[type='radio']:checked::after {
   --color-brand-fill: #4da6f0;
   --color-brand-bg: #1a2a3a;
 
-  /* AOU 品牌色板 - 深色模式反转 */
-  --aou-1: #001b2c;
-  --aou-2: #003052;
-  --aou-3: #004578;
-  --aou-4: #005a9e;
-  --aou-5: #0078d4;
-  --aou-6: #4da6f0;
-  --aou-7: #66b1e1;
-  --aou-8: #80bce8;
-  --aou-9: #99cbeb;
-  --aou-10: #b3d8f0;
+  /* Forjinn 品牌色板 - 深色模式反转 */
+  --forjinn-1: #001b2c;
+  --forjinn-2: #003052;
+  --forjinn-3: #004578;
+  --forjinn-4: #005a9e;
+  --forjinn-5: #0078d4;
+  --forjinn-6: #4da6f0;
+  --forjinn-7: #66b1e1;
+  --forjinn-8: #80bce8;
+  --forjinn-9: #99cbeb;
+  --forjinn-10: #b3d8f0;
 
   /* 背景色 - 深色 Windows 风格 */
   --color-bg-1: #1a1a1a;

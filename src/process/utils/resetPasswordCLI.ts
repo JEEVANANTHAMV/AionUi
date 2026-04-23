@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  *
  * Reset password CLI utility for packaged applications
@@ -81,7 +81,7 @@ export async function resetPasswordCLI(username: string): Promise<void> {
     log.info(`Target user: ${username}`);
 
     // Get database path using the same logic as the main app
-    const dbPath = path.join(getDataPath(), 'aionui.db');
+    const dbPath = path.join(getDataPath(), 'forjinn-desk.db');
     log.info(`Database path: ${dbPath}`);
 
     const db = await getDatabase();
@@ -94,11 +94,11 @@ export async function resetPasswordCLI(username: string): Promise<void> {
     if (!hasUsersResult.data) {
       log.error('Database is not initialized yet');
       log.info('');
-      log.info('Please run AionUi at least once to initialize the database:');
-      log.info('  aionui --webui');
+      log.info('Please run Forjinn-Desk at least once to initialize the database:');
+      log.info('  forjinn-desk --webui');
       log.info('');
       log.info('Then you can reset the password using:');
-      log.info('  aionui --resetpass <username>');
+      log.info('  forjinn-desk --resetpass <username>');
       process.exit(1);
     }
 

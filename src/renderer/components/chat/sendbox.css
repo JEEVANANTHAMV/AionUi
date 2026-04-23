@@ -17,8 +17,8 @@
 
 /* Dark mode: adjust send button brightness */
 [data-theme='dark'] .send-button-custom:not(:disabled) {
-  background-color: var(--aou-4) !important;
-  border-color: var(--aou-4) !important;
+  background-color: var(--forjinn-4) !important;
+  border-color: var(--forjinn-4) !important;
 }
 
 [data-theme='dark'] .send-button-custom:disabled,

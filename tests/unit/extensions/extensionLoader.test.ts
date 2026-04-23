@@ -7,7 +7,7 @@ import { ExtensionLoader } from '../../../src/process/extensions/ExtensionLoader
 vi.mock('electron', () => ({
   app: {
     isPackaged: false,
-    getPath: vi.fn(() => '/tmp/aionui-test'),
+    getPath: vi.fn(() => '/tmp/forjinn-desk-test'),
   },
 }));
 
@@ -31,7 +31,7 @@ function createExtension(baseDir: string, folderName: string, manifestName: stri
   const extensionDir = path.join(baseDir, folderName);
   fs.mkdirSync(extensionDir, { recursive: true });
   fs.writeFileSync(
-    path.join(extensionDir, 'aion-extension.json'),
+    path.join(extensionDir, 'forjinn-extension.json'),
     JSON.stringify(
       {
         name: manifestName,
@@ -56,7 +56,7 @@ afterEach(() => {
 
 describe('extensions/ExtensionLoader', () => {
   it('prioritizes explicit env extensions over duplicate user-installed extensions and skips implicit examples', async () => {
-    const sandbox = createTempDir('aionui-loader-');
+    const sandbox = createTempDir('forjinn-desk-loader-');
     const homeDir = path.join(sandbox, 'home');
     const envDir = path.join(sandbox, 'env-extensions');
     const projectRoot = path.join(sandbox, 'project');
@@ -65,9 +65,9 @@ describe('extensions/ExtensionLoader', () => {
     fs.mkdirSync(envDir, { recursive: true });
     setSandboxEnv(homeDir);
     process.chdir(projectRoot);
-    process.env.AIONUI_EXTENSIONS_PATH = envDir;
+    process.env.FORJINN_DESK_EXTENSIONS_PATH = envDir;
 
-    createExtension(path.join(homeDir, '.aionui-dev', 'extensions'), 'ext-shadow', 'ext-shadow', '1.0.0');
+    createExtension(path.join(homeDir, '.forjinn-desk-dev', 'extensions'), 'ext-shadow', 'ext-shadow', '1.0.0');
     createExtension(envDir, 'ext-shadow', 'ext-shadow', '2.0.0');
     createExtension(path.join(projectRoot, 'examples'), 'dev-example', 'dev-example', '1.0.0');
 
@@ -80,7 +80,7 @@ describe('extensions/ExtensionLoader', () => {
   });
 
   it('keeps E2E discovery hermetic by ignoring user, appdata, and implicit example sources', async () => {
-    const sandbox = createTempDir('aionui-loader-e2e-');
+    const sandbox = createTempDir('forjinn-desk-loader-e2e-');
     const homeDir = path.join(sandbox, 'home');
     const envDir = path.join(sandbox, 'env-extensions');
     const projectRoot = path.join(sandbox, 'project');
@@ -90,10 +90,10 @@ describe('extensions/ExtensionLoader', () => {
     fs.mkdirSync(envDir, { recursive: true });
     setSandboxEnv(homeDir);
     process.chdir(projectRoot);
-    process.env.AIONUI_EXTENSIONS_PATH = envDir;
-    process.env.AIONUI_E2E_TEST = '1';
+    process.env.FORJINN_DESK_EXTENSIONS_PATH = envDir;
+    process.env.FORJINN_DESK_E2E_TEST = '1';
 
-    createExtension(path.join(homeDir, '.aionui-dev', 'extensions'), 'user-only', 'user-only');
+    createExtension(path.join(homeDir, '.forjinn-desk-dev', 'extensions'), 'user-only', 'user-only');
     createExtension(appDataExtensionsDir, 'appdata-only', 'appdata-only');
     createExtension(path.join(projectRoot, 'examples'), 'dev-example', 'dev-example');
     createExtension(envDir, 'env-only', 'env-only');

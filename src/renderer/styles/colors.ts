@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -18,28 +18,28 @@
  * CSS variable names for all theme colors
  */
 export const cssVars = {
-  // AOU colors
+  // Forjinn colors
   aou: {
-    1: '--color-aou-1',
+    1: '--color-forjinn-1',
     2: {
-      disabled: '--color-aou-2-disabled',
+      disabled: '--color-forjinn-2-disabled',
     },
     3: {
-      specialDisabled: '--color-aou-3-special-disabled',
+      specialDisabled: '--color-forjinn-3-special-disabled',
     },
     4: {
-      hover: '--color-aou-4-hover',
+      hover: '--color-forjinn-4-hover',
     },
-    5: '--color-aou-5',
+    5: '--color-forjinn-5',
     6: {
-      brand: '--color-aou-6-brand',
+      brand: '--color-forjinn-6-brand',
     },
-    7: '--color-aou-7',
+    7: '--color-forjinn-7',
     8: {
-      selected: '--color-aou-8-selected',
+      selected: '--color-forjinn-8-selected',
     },
-    9: '--color-aou-9',
-    10: '--color-aou-10',
+    9: '--color-forjinn-9',
+    10: '--color-forjinn-10',
   },
   // Background colors
   bg: {
@@ -140,13 +140,13 @@ export const diffColors = {
  * Maps common hex values to their theme variable names
  */
 export const colorMapping: Record<string, string> = {
-  // AOU colors
-  '#EFF0F6': 'var(--color-aou-1)',
-  '#eff0f6': 'var(--color-aou-1)',
-  '#E5E7F0': 'var(--color-aou-2-disabled)',
-  '#e5e7f0': 'var(--color-aou-2-disabled)',
-  '#7583B2': 'var(--color-aou-6-brand)',
-  '#7583b2': 'var(--color-aou-6-brand)',
+  // Forjinn colors
+  '#EFF0F6': 'var(--color-forjinn-1)',
+  '#eff0f6': 'var(--color-forjinn-1)',
+  '#E5E7F0': 'var(--color-forjinn-2-disabled)',
+  '#e5e7f0': 'var(--color-forjinn-2-disabled)',
+  '#7583B2': 'var(--color-forjinn-6-brand)',
+  '#7583b2': 'var(--color-forjinn-6-brand)',
 
   // Background colors
   '#FFFFFF': 'var(--color-bg-0)',

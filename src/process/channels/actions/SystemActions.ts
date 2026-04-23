@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -305,9 +305,9 @@ export const handleSessionNew: ActionHandler = async (context) => {
         channelChatId,
         extra: conversationExtra,
       });
-    } else if (backend === 'aionrs') {
+    } else if (backend === 'forjinnrs') {
       newConversation = await conversationServiceSingleton.createConversation({
-        type: 'aionrs',
+        type: 'forjinnrs',
         model,
         source,
         name,
@@ -465,9 +465,9 @@ export const handleHelpShow: ActionHandler = async (context) => {
   return createSuccessResponse({
     type: 'text',
     text: [
-      '❓ <b>AionUi Assistant</b>',
+      '❓ <b>Forjinn-Desk Assistant</b>',
       '',
-      'A remote assistant to interact with AionUi via Telegram.',
+      'A remote assistant to interact with Forjinn-Desk via Telegram.',
       '',
       '<b>Common Actions:</b>',
       '• 🆕 New Chat - Start a new session',
@@ -550,12 +550,12 @@ export const handleHelpPairing: ActionHandler = async (context) => {
       '<b>First-time Setup:</b>',
       '1. Send any message to the bot',
       '2. Bot displays pairing code',
-      '3. Approve pairing in AionUi settings',
+      '3. Approve pairing in Forjinn-Desk settings',
       '4. Ready to use after pairing',
       '',
       '<b>Notes:</b>',
       '• Pairing code valid for 10 minutes',
-      '• AionUi app must be running',
+      '• Forjinn-Desk app must be running',
       '• One Telegram account can only pair once',
     ].join('\n'),
     parseMode: 'HTML',
@@ -624,9 +624,9 @@ export const handleSettingsShow: ActionHandler = async (context) => {
     text: [
       '⚙️ <b>Settings</b>',
       '',
-      'Channel settings need to be configured in the AionUi app.',
+      'Channel settings need to be configured in the Forjinn-Desk app.',
       '',
-      'Open AionUi → WebUI → Channels',
+      'Open Forjinn-Desk → WebUI → Channels',
     ].join('\n'),
     parseMode: 'HTML',
     replyMarkup: createMainMenuKeyboard(),

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -28,7 +28,7 @@ export function buildChannelConversationExtra(args: {
 
   if (
     args.backend === 'gemini' ||
-    args.backend === 'aionrs' ||
+    args.backend === 'forjinnrs' ||
     args.backend === 'codex' ||
     args.backend === 'openclaw-gateway'
   ) {

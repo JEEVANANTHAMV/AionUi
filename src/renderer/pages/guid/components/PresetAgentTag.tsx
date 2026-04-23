@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -45,7 +45,7 @@ const PresetAgentTag: React.FC<PresetAgentTagProps> = ({
   const isImageAvatar = Boolean(
     avatarImage &&
     (/\.(svg|png|jpe?g|webp|gif)$/i.test(avatarImage) ||
-      /^(https?:|aion-asset:\/\/|file:\/\/|data:)/i.test(avatarImage))
+      /^(https?:|forjinn-asset:\/\/|file:\/\/|data:)/i.test(avatarImage))
   );
   const agent = customAgents.find((a) => a.id === agentInfo.customAgentId);
   const name = agent?.nameI18n?.[localeKey] || agent?.name || agentInfo.name;

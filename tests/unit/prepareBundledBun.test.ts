@@ -14,16 +14,16 @@ describe('prepareBundledBun', () => {
   const runtimeKey = `${process.platform}-${process.arch}`;
   const targetDir = path.join(projectRoot, 'resources', 'bundled-bun', runtimeKey);
 
-  const originalCacheDir = process.env.AIONUI_BUN_CACHE_DIR;
-  const originalVersion = process.env.AIONUI_BUN_VERSION;
+  const originalCacheDir = process.env.FORJINN_DESK_BUN_CACHE_DIR;
+  const originalVersion = process.env.FORJINN_DESK_BUN_VERSION;
 
   let tempRoot: string | null = null;
   let targetBackupDir: string | null = null;
   let targetExisted = false;
 
   afterEach(() => {
-    process.env.AIONUI_BUN_CACHE_DIR = originalCacheDir;
-    process.env.AIONUI_BUN_VERSION = originalVersion;
+    process.env.FORJINN_DESK_BUN_CACHE_DIR = originalCacheDir;
+    process.env.FORJINN_DESK_BUN_VERSION = originalVersion;
 
     if (fs.existsSync(targetDir)) {
       fs.rmSync(targetDir, { recursive: true, force: true });
@@ -48,7 +48,7 @@ describe('prepareBundledBun', () => {
   });
 
   it('copies bundled bun from cache when cache metadata is valid', () => {
-    tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'aionui-bun-test-'));
+    tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'forjinn-desk-bun-test-'));
 
     targetExisted = fs.existsSync(targetDir);
     if (targetExisted) {
@@ -78,8 +78,8 @@ describe('prepareBundledBun', () => {
     };
     fs.writeFileSync(path.join(cacheRuntimeDir, 'runtime-meta.json'), JSON.stringify(cacheMeta, null, 2), 'utf8');
 
-    process.env.AIONUI_BUN_CACHE_DIR = cacheRoot;
-    process.env.AIONUI_BUN_VERSION = version;
+    process.env.FORJINN_DESK_BUN_CACHE_DIR = cacheRoot;
+    process.env.FORJINN_DESK_BUN_VERSION = version;
 
     const result = prepareBundledBun();
 

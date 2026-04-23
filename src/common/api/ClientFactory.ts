@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -77,8 +77,8 @@ export class ClientFactory {
           baseURL: baseUrl,
           timeout: options.timeout,
           defaultHeaders: {
-            'HTTP-Referer': 'https://aionui.com',
-            'X-Title': 'AionUi',
+            'HTTP-Referer': 'https://forjinn-desk.com',
+            'X-Title': 'Forjinn-Desk',
           },
           ...(options.baseConfig as OpenAIClientConfig),
         };
@@ -129,8 +129,8 @@ export class ClientFactory {
           baseURL: baseUrl,
           timeout: options.timeout,
           defaultHeaders: {
-            'HTTP-Referer': 'https://aionui.com',
-            'X-Title': 'AionUi',
+            'HTTP-Referer': 'https://forjinn-desk.com',
+            'X-Title': 'Forjinn-Desk',
           },
           ...(options.baseConfig as OpenAIClientConfig),
         };

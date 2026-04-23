@@ -104,7 +104,7 @@ For every morph transition, plan the slide pair BEFORE writing any code. Use a t
 **Before generation starts, always remind the user:**
 
 - The PPT file may be rewritten multiple times during build.
-- Once the PPT file appears in the workspace, the user can preview the live generation progress directly in AionUi.
+- Once the PPT file appears in the workspace, the user can preview the live generation progress directly in Forjinn-Desk.
 - Do **not** click "Open with system app" during generation, to avoid file lock / write conflicts.
 - Use clear, direct language and make this a concrete warning, not an optional suggestion.
 

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,7 +15,7 @@ import {
   createOpenClawAgent,
   createNanobotAgent,
   createRemoteAgent,
-  createAionrsAgent,
+  createForjinnrsAgent,
 } from '@process/utils/initAgent';
 
 /**
@@ -159,8 +159,8 @@ export class ConversationServiceImpl implements IConversationService {
         conversation = await createRemoteAgent(params as any);
         break;
       }
-      case 'aionrs': {
-        conversation = await createAionrsAgent(params as any);
+      case 'forjinnrs': {
+        conversation = await createForjinnrsAgent(params as any);
         break;
       }
       default: {

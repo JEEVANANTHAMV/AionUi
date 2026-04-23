@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,8 +10,8 @@ import path from 'path';
 
 const PRESETS_DIR = path.resolve(__dirname, '../../src/renderer/pages/settings/DisplaySettings/presets');
 
-const BACKGROUND_BLOCK_START = '/* AionUi Theme Background Start */';
-const BACKGROUND_BLOCK_END = '/* AionUi Theme Background End */';
+const BACKGROUND_BLOCK_START = '/* Forjinn-Desk Theme Background Start */';
+const BACKGROUND_BLOCK_END = '/* Forjinn-Desk Theme Background End */';
 
 // ── helpers ──
 

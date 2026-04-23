@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -141,7 +141,7 @@ export interface ICdpConfig {
 export interface IStartOnBootStatus {
   /** Whether the current runtime can manage start-on-boot */
   supported: boolean;
-  /** Whether AionUi is currently configured to launch at login */
+  /** Whether Forjinn-Desk is currently configured to launch at login */
   enabled: boolean;
   /** Whether the app is running from a packaged build */
   isPackaged: boolean;
@@ -330,7 +330,7 @@ export const fs = {
     'add-custom-external-path'
   ),
   removeCustomExternalPath: bridge.buildProvider<IBridgeResponse, { path: string }>('remove-custom-external-path'),
-  // Skills Market: inject/remove the aionui-skills builtin skill
+  // Skills Market: inject/remove the forjinn-desk-skills builtin skill
   enableSkillsMarket: bridge.buildProvider<IBridgeResponse, void>('enable-skills-market'),
   disableSkillsMarket: bridge.buildProvider<IBridgeResponse, void>('disable-skills-market'),
 };
@@ -689,7 +689,7 @@ export const excelPreview = {
 
 // Deep link protocol handling / 深度链接协议处理
 export const deepLink = {
-  /** Emitted when app is opened via aionui:// protocol URL */
+  /** Emitted when app is opened via forjinn-desk:// protocol URL */
   received: bridge.buildEmitter<{
     action: string; // e.g. 'add-provider'
     params: Record<string, string>; // parsed query params
@@ -913,7 +913,7 @@ export interface IConfirmMessageParams {
 }
 
 export interface ICreateConversationParams {
-  type: 'gemini' | 'acp' | 'codex' | 'openclaw-gateway' | 'nanobot' | 'remote' | 'aionrs';
+  type: 'gemini' | 'acp' | 'codex' | 'openclaw-gateway' | 'nanobot' | 'remote' | 'forjinnrs';
   id?: string;
   name?: string;
   model: TProviderWithModel;

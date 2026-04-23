@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -89,7 +89,7 @@ const AgentCard: React.FC<AgentCardProps> = (props) => {
     }
 
     return (
-      <div className='flex items-center justify-between px-16px py-10px rd-8px bg-aou-1 hover:bg-aou-2'>
+      <div className='flex items-center justify-between px-16px py-10px rd-8px bg-forjinn-1 hover:bg-forjinn-2'>
         <div className='flex items-center gap-12px min-w-0 flex-1'>
           <Avatar size={32} shape='square' style={{ flexShrink: 0, backgroundColor: 'transparent' }}>
             {logo ? <img src={logo} alt={agent.name} className='w-full h-full object-contain' /> : '🤖'}
@@ -116,7 +116,7 @@ const AgentCard: React.FC<AgentCardProps> = (props) => {
   const { agent, onEdit, onDelete, onToggle } = props;
 
   return (
-    <div className='flex items-center justify-between px-16px py-10px rd-8px bg-aou-1 hover:bg-aou-2'>
+    <div className='flex items-center justify-between px-16px py-10px rd-8px bg-forjinn-1 hover:bg-forjinn-2'>
       <div className='flex items-center gap-12px min-w-0 flex-1'>
         <Avatar
           size={32}

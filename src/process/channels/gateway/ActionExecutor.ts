@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 ForjinnDesk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -464,9 +464,9 @@ export class ActionExecutor {
                 channelChatId: chatId,
                 extra: conversationExtra,
               });
-            } else if (backend === 'aionrs') {
+            } else if (backend === 'forjinnrs') {
               sessionConversation = await conversationServiceSingleton.createConversation({
-                type: 'aionrs',
+                type: 'forjinnrs',
                 model,
                 name: conversationName,
                 source,
@@ -776,7 +776,7 @@ export class ActionExecutor {
         // Use actual content of last message, add action buttons (based on platform)
         const responseMarkup = getResponseActionsMarkup(context.platform as PluginType, finalVisibleText);
         const finalReplyMarkup =
-          responseMarkup ?? (context.platform === 'wecom' ? ({ __aionuiFinal: true } as unknown) : undefined);
+          responseMarkup ?? (context.platform === 'wecom' ? ({ __forjinnDeskFinal: true } as unknown) : undefined);
         const finalMessage: IUnifiedOutgoingMessage = lastMessageContent
           ? {
               ...lastMessageContent,

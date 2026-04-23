@@ -9,8 +9,8 @@ let _services: IPlatformServices | null = null;
  * Centralised so that every call-site stays in sync.
  */
 export function getDevAppName(): string {
-  const isMultiInstance = process.env.AIONUI_MULTI_INSTANCE === '1';
-  return isMultiInstance ? 'AionUi-Dev-2' : 'AionUi-Dev';
+  const isMultiInstance = process.env.FORJINN_DESK_MULTI_INSTANCE === '1';
+  return isMultiInstance ? 'Forjinn-Desk-Dev-2' : 'Forjinn-Desk-Dev';
 }
 
 export function registerPlatformServices(services: IPlatformServices): void {

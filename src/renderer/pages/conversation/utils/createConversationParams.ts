@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -40,8 +40,8 @@ async function resolvePreferredMode(backend: string): Promise<string | undefined
 
   if (backend === 'gemini') {
     preference = await ConfigStorage.get('gemini.config');
-  } else if (backend === 'aionrs') {
-    preference = await ConfigStorage.get('aionrs.config');
+  } else if (backend === 'forjinnrs') {
+    preference = await ConfigStorage.get('forjinnrs.config');
   } else {
     const acpConfig = await ConfigStorage.get('acp.config');
     preference = acpConfig?.[backend as AcpBackend];
@@ -81,18 +81,18 @@ async function resolvePreferredAcpModelId(backend: string): Promise<string | und
 }
 
 /**
- * Get a model from configured providers that is compatible with aionrs.
- * aionrs supports all platforms via OpenAI-compatible protocol.
+ * Get a model from configured providers that is compatible with forjinnrs.
+ * forjinnrs supports all platforms via OpenAI-compatible protocol.
  * Throws if no compatible provider is configured.
  */
-export async function getDefaultAionrsModel(): Promise<TProviderWithModel> {
+export async function getDefaultForjinnrsModel(): Promise<TProviderWithModel> {
   const providers = await ConfigStorage.get('model.config');
 
   if (!providers || providers.length === 0) {
     throw new Error('No model provider configured');
   }
 
-  // aionrs supports all platforms via OpenAI-compatible protocol
+  // forjinnrs supports all platforms via OpenAI-compatible protocol
   const provider = providers.find((p) => p.enabled !== false);
   if (!provider) {
     throw new Error('No enabled model provider for Aion CLI');
@@ -188,9 +188,9 @@ export async function buildCliAgentParams(
   let model: TProviderWithModel;
   if (type === 'gemini') {
     model = await resolveGeminiModel();
-  } else if (type === 'aionrs') {
-    // Aionrs needs a real model from configured providers (anthropic, openai, ali-intl, aws)
-    model = await getDefaultAionrsModel();
+  } else if (type === 'forjinnrs') {
+    // Forjinnrs needs a real model from configured providers (anthropic, openai, ali-intl, aws)
+    model = await getDefaultForjinnrsModel();
   } else {
     model = {} as TProviderWithModel;
   }

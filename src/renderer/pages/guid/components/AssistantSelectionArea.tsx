@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -310,7 +310,7 @@ const AssistantSelectionArea: React.FC<AssistantSelectionAreaProps> = ({
             const isImageAvatar = Boolean(
               avatarImage &&
               (/\.(svg|png|jpe?g|webp|gif)$/i.test(avatarImage) ||
-                /^(https?:|aion-asset:\/\/|file:\/\/|data:)/i.test(avatarImage))
+                /^(https?:|forjinn-asset:\/\/|file:\/\/|data:)/i.test(avatarImage))
             );
             return (
               <div

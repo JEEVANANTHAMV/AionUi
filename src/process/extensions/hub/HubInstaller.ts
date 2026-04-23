@@ -137,10 +137,10 @@ export class HubInstallerImpl {
         finalExtractDir = packageDir;
       }
 
-      // Verify aion-extension.json exists
+      // Verify forjinn-extension.json exists
       const manifestPath = path.join(finalExtractDir, EXTENSION_MANIFEST_FILE);
       if (!fs.existsSync(manifestPath)) {
-        throw new Error('Invalid extension package: aion-extension.json missing');
+        throw new Error('Invalid extension package: forjinn-extension.json missing');
       }
 
       // Step 4: Move to target directory

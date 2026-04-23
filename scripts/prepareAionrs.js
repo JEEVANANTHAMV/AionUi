@@ -1,10 +1,10 @@
 /**
- * Prepare aionrs binary for Electron packaging.
+ * Prepare forjinnrs binary for Electron packaging.
  *
  * Resolution order:
  *  1. GitHub release download (requires AIONRS_VERSION or defaults to "latest")
  *
- * Output: resources/bundled-aionrs/{platform}-{arch}/aionrs[.exe]
+ * Output: resources/bundled-forjinnrs/{platform}-{arch}/forjinnrs[.exe]
  *
  * Pattern follows prepareBundledBun.js.
  */
@@ -15,7 +15,7 @@ const os = require('os');
 const path = require('path');
 
 const GITHUB_OWNER = 'iOfficeAI';
-const GITHUB_REPO = 'aionrs';
+const GITHUB_REPO = 'forjinnrs';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -48,7 +48,7 @@ function writeJson(filePath, payload) {
 }
 
 function getBinaryName(platform) {
-  return platform === 'win32' ? 'aionrs.exe' : 'aionrs';
+  return platform === 'win32' ? 'forjinnrs.exe' : 'forjinnrs';
 }
 
 function getVersion() {
@@ -95,8 +95,8 @@ function resolveLatestTag() {
 /**
  * 1. Download from GitHub releases
  *
- * aionrs release assets include the version tag in the filename:
- *   aionrs-v0.1.9-aarch64-apple-darwin.tar.gz
+ * forjinnrs release assets include the version tag in the filename:
+ *   forjinnrs-v0.1.9-aarch64-apple-darwin.tar.gz
  */
 function getAssetName(platform, arch, tag) {
   const archMap = { x64: 'x86_64', arm64: 'aarch64' };
@@ -105,7 +105,7 @@ function getAssetName(platform, arch, tag) {
   const normalizedPlatform = platformMap[platform];
   if (!normalizedArch || !normalizedPlatform) return null;
   const ext = platform === 'win32' ? '.zip' : '.tar.gz';
-  return `aionrs-${tag}-${normalizedArch}-${normalizedPlatform}${ext}`;
+  return `forjinnrs-${tag}-${normalizedArch}-${normalizedPlatform}${ext}`;
 }
 
 function getDownloadUrl(assetName, tag) {
@@ -113,7 +113,7 @@ function getDownloadUrl(assetName, tag) {
 }
 
 function downloadFile(url, outputPath) {
-  console.log(`  Downloading aionrs from ${url}`);
+  console.log(`  Downloading forjinnrs from ${url}`);
   if (process.platform === 'win32') {
     const ps = `$ProgressPreference='SilentlyContinue'; Invoke-WebRequest -Uri '${url}' -OutFile '${outputPath.replace(/'/g, "''")}'`;
     execFileSync('powershell', ['-NoProfile', '-NonInteractive', '-Command', ps], { timeout: 120000 });
@@ -157,11 +157,11 @@ function findBinaryInDir(dir, binaryName) {
 function downloadAndExtract(platform, arch, tag) {
   const assetName = getAssetName(platform, arch, tag);
   if (!assetName) {
-    throw new Error(`Unsupported aionrs target: ${platform}-${arch}`);
+    throw new Error(`Unsupported forjinnrs target: ${platform}-${arch}`);
   }
 
   const url = getDownloadUrl(assetName, tag);
-  const tempDir = path.join(os.tmpdir(), 'aionui-aionrs', tag, `${platform}-${arch}`);
+  const tempDir = path.join(os.tmpdir(), 'forjinn-desk-forjinnrs', tag, `${platform}-${arch}`);
   const archivePath = path.join(tempDir, assetName);
   const extractDir = path.join(tempDir, 'extracted');
 
@@ -184,7 +184,7 @@ function downloadAndExtract(platform, arch, tag) {
 // Main
 // ---------------------------------------------------------------------------
 
-function prepareAionrs() {
+function prepareForjinnrs() {
   const projectRoot = path.resolve(__dirname, '..');
   const platform = process.platform;
   // Support cross-compilation: AIONRS_ARCH > npm_config_target_arch > process.arch
@@ -197,19 +197,19 @@ function prepareAionrs() {
   if (version === 'latest') {
     const resolved = resolveLatestTag();
     if (!resolved) {
-      throw new Error('Failed to resolve latest aionrs release tag from GitHub API');
+      throw new Error('Failed to resolve latest forjinnrs release tag from GitHub API');
     }
     tag = resolved;
-    console.log(`Resolved aionrs "latest" → ${tag}`);
+    console.log(`Resolved forjinnrs "latest" → ${tag}`);
   } else {
     tag = version.startsWith('v') ? version : `v${version}`;
   }
 
-  const targetDir = path.join(projectRoot, 'resources', 'bundled-aionrs', runtimeKey);
+  const targetDir = path.join(projectRoot, 'resources', 'bundled-forjinnrs', runtimeKey);
   const binaryName = getBinaryName(platform);
   const targetBinaryPath = path.join(targetDir, binaryName);
 
-  console.log(`Preparing aionrs for ${runtimeKey} (version: ${tag})`);
+  console.log(`Preparing forjinnrs for ${runtimeKey} (version: ${tag})`);
 
   removeDirectorySafe(targetDir);
   ensureDirectory(targetDir);
@@ -257,7 +257,7 @@ function prepareAionrs() {
 
     writeJson(path.join(targetDir, 'manifest.json'), manifest);
     console.log(
-      `  Bundled aionrs prepared: resources/bundled-aionrs/${runtimeKey}/${binaryName} [source=${sourceType}]`
+      `  Bundled forjinnrs prepared: resources/bundled-forjinnrs/${runtimeKey}/${binaryName} [source=${sourceType}]`
     );
 
     if (tempDir) removeDirectorySafe(tempDir);
@@ -274,12 +274,12 @@ function prepareAionrs() {
     source: {},
     files: [],
     skipped: true,
-    reason: 'aionrs binary not found (ensure GitHub release exists)',
+    reason: 'forjinnrs binary not found (ensure GitHub release exists)',
   };
 
   writeJson(path.join(targetDir, 'manifest.json'), manifest);
-  console.warn(`  aionrs not found — skipping bundle (agent will not be available in packaged app)`);
+  console.warn(`  forjinnrs not found — skipping bundle (agent will not be available in packaged app)`);
   return { prepared: false, reason: 'not_found' };
 }
 
-module.exports = prepareAionrs;
+module.exports = prepareForjinnrs;

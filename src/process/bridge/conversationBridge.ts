@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -21,7 +21,7 @@ import {
 } from '@process/utils/initStorage';
 import type AcpAgentManager from '../task/AcpAgentManager';
 import type { GeminiAgentManager } from '../task/GeminiAgentManager';
-import { AionrsApprovalStore, type AionrsManager } from '../task/AionrsManager';
+import { ForjinnrsApprovalStore, type ForjinnrsManager } from '../task/ForjinnrsManager';
 import type OpenClawAgentManager from '../task/OpenClawAgentManager';
 import { prepareFirstMessage } from '../task/agentUtils';
 import { AcpSkillManager } from '../task/AcpSkillManager';
@@ -48,7 +48,7 @@ const VALID_CONVERSATION_TYPES = new Set<TChatConversation['type']>([
   'openclaw-gateway',
   'nanobot',
   'remote',
-  'aionrs',
+  'forjinnrs',
 ]);
 
 export function initConversationBridge(
@@ -65,7 +65,7 @@ export function initConversationBridge(
     ipcBridge.conversation.listChanged.emit({
       conversationId: conversation.id,
       action,
-      source: conversation.source || 'aionui',
+      source: conversation.source || 'forjinn-desk',
     });
   };
 
@@ -137,7 +137,7 @@ export function initConversationBridge(
           : params;
       const conversation = await conversationService.createConversation({
         ...createParams,
-        source: 'aionui',
+        source: 'forjinn-desk',
       } as CreateConversationParams);
 
       // Discover and persist loaded skills snapshot at creation time
@@ -270,9 +270,9 @@ export function initConversationBridge(
       // Kill the running task if exists
       workerTaskManager.kill(id);
 
-      // If source is not 'aionui' (e.g., telegram), cleanup channel resources
-      // 如果来源不是 aionui（如 telegram），需要清理 channel 相关资源
-      if (source && source !== 'aionui') {
+      // If source is not 'forjinn-desk' (e.g., telegram), cleanup channel resources
+      // 如果来源不是 forjinn-desk（如 telegram），需要清理 channel 相关资源
+      if (source && source !== 'forjinn-desk') {
         try {
           // Dynamic import to avoid circular dependency
           const { getChannelManager } = await import('@process/channels/core/ChannelManager');
@@ -626,7 +626,7 @@ export function initConversationBridge(
   ipcBridge.conversation.approval.check.provider(async ({ conversation_id, action, commandType }) => {
     const task = workerTaskManager.getTask(conversation_id) as unknown as
       | GeminiAgentManager
-      | AionrsManager
+      | ForjinnrsManager
       | undefined;
     if (!task || !('approvalStore' in task) || !task.approvalStore) {
       return false;
@@ -638,8 +638,8 @@ export function initConversationBridge(
       return task.approvalStore.allApproved(keys);
     }
 
-    if (task.type === 'aionrs') {
-      const keys = AionrsApprovalStore.createKeysFromConfirmation(action, commandType);
+    if (task.type === 'forjinnrs') {
+      const keys = ForjinnrsApprovalStore.createKeysFromConfirmation(action, commandType);
       if (keys.length === 0) return false;
       return task.approvalStore.allApproved(keys);
     }

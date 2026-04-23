@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,7 +9,7 @@ import { isAgentKind } from '@/common/types/detectedAgent';
 import type { IWorkerTaskManager } from '@process/task/IWorkerTaskManager';
 import AcpAgentManager from '@process/task/AcpAgentManager';
 import { GeminiAgentManager } from '@process/task/GeminiAgentManager';
-import { AionrsManager } from '@process/task/AionrsManager';
+import { ForjinnrsManager } from '@process/task/ForjinnrsManager';
 import { mcpService } from '@/process/services/mcpServices/McpService';
 import { ipcBridge } from '@/common';
 import { LegacyConnectorFactory } from '@process/acp/compat/LegacyConnectorFactory';
@@ -169,7 +169,7 @@ export function initAcpConversationBridge(workerTaskManager: IWorkerTaskManager)
     const task = workerTaskManager.getTask(conversationId);
     if (
       !task ||
-      !(task instanceof AcpAgentManager || task instanceof GeminiAgentManager || task instanceof AionrsManager)
+      !(task instanceof AcpAgentManager || task instanceof GeminiAgentManager || task instanceof ForjinnrsManager)
     ) {
       return Promise.resolve({
         success: true,
@@ -217,7 +217,7 @@ export function initAcpConversationBridge(workerTaskManager: IWorkerTaskManager)
       if (!task) {
         return { success: false, msg: 'Conversation not found' };
       }
-      if (!(task instanceof AcpAgentManager || task instanceof GeminiAgentManager || task instanceof AionrsManager)) {
+      if (!(task instanceof AcpAgentManager || task instanceof GeminiAgentManager || task instanceof ForjinnrsManager)) {
         return {
           success: false,
           msg: 'Mode switching not supported for this agent type',

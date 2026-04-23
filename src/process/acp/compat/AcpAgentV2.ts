@@ -162,8 +162,8 @@ export class AcpAgentV2 {
             args: aionStdioConfig.args,
             env: [
               ...aionStdioConfig.env,
-              { name: 'AION_MCP_BACKEND', value: this.agentConfig.agentBackend },
-              { name: 'AION_MCP_CONVERSATION_ID', value: this.conversationId },
+              { name: 'FORJINN_MCP_BACKEND', value: this.agentConfig.agentBackend },
+              { name: 'FORJINN_MCP_CONVERSATION_ID', value: this.conversationId },
             ],
           };
           (this.agentConfig as { presetMcpServers?: McpServer[] }).presetMcpServers = [

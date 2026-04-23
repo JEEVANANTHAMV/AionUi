@@ -5,8 +5,8 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check } from '@icon-park/react';
 import { iconColors } from '@/renderer/styles/colors';
-import AionSteps from '@/renderer/components/base/AionSteps';
-import AionModal from '@/renderer/components/base/AionModal';
+import ForjinnSteps from '@/renderer/components/base/ForjinnSteps';
+import ForjinnModal from '@/renderer/components/base/ForjinnModal';
 
 interface OneClickImportModalProps {
   visible: boolean;
@@ -271,7 +271,7 @@ const OneClickImportModal: React.FC<OneClickImportModalProps> = ({ visible, onCa
   );
 
   return (
-    <AionModal
+    <ForjinnModal
       header={{ title: t('settings.mcpOneKeyImport'), showClose: true }}
       visible={visible}
       onCancel={onCancel}
@@ -289,17 +289,17 @@ const OneClickImportModal: React.FC<OneClickImportModalProps> = ({ visible, onCa
         <div className='mb-6 text-t-secondary text-sm'>{t('settings.mcpImportDescription')}</div>
 
         <div className='mb-6'>
-          <AionSteps current={currentStep} size='small'>
-            <AionSteps.Step
+          <ForjinnSteps current={currentStep} size='small'>
+            <ForjinnSteps.Step
               title={t('settings.mcpStepSelectAgent')}
               icon={currentStep > 1 ? <Check theme='filled' size={16} fill='#165dff' /> : undefined}
             />
-            <AionSteps.Step
+            <ForjinnSteps.Step
               title={t('settings.mcpStepFetchTools')}
               icon={currentStep > 2 ? <Check theme='filled' size={16} fill='#165dff' /> : undefined}
             />
-            <AionSteps.Step title={t('settings.mcpStepImportSuccess')} />
-          </AionSteps>
+            <ForjinnSteps.Step title={t('settings.mcpStepImportSuccess')} />
+          </ForjinnSteps>
         </div>
 
         <div className={`mb-6 flex-1 overflow-y-auto ${currentStep === 1 ? 'min-h-[60px]' : 'min-h-[180px]'}`}>
@@ -308,7 +308,7 @@ const OneClickImportModal: React.FC<OneClickImportModalProps> = ({ visible, onCa
           {currentStep === 3 && renderStep3()}
         </div>
       </div>
-    </AionModal>
+    </ForjinnModal>
   );
 };
 

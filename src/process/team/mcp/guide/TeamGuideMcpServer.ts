@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -80,12 +80,12 @@ export class TeamGuideMcpServer {
   getStdioConfig(): StdioMcpConfig {
     const scriptPath = path.join(resolveMcpScriptDir(), 'team-guide-mcp-stdio.js');
     return {
-      name: 'aionui-team-guide',
+      name: 'forjinn-desk-team-guide',
       command: 'node',
       args: [scriptPath],
       env: [
-        { name: 'AION_MCP_PORT', value: String(this._port) },
-        { name: 'AION_MCP_TOKEN', value: this.authToken },
+        { name: 'FORJINN_MCP_PORT', value: String(this._port) },
+        { name: 'FORJINN_MCP_TOKEN', value: this.authToken },
       ],
     };
   }
@@ -99,7 +99,7 @@ export class TeamGuideMcpServer {
           tool?: string;
           args?: Record<string, unknown>;
           auth_token?: string;
-          /** Backend type of the calling agent, injected by team-guide-mcp-stdio via AION_MCP_BACKEND env var */
+          /** Backend type of the calling agent, injected by team-guide-mcp-stdio via FORJINN_MCP_BACKEND env var */
           backend?: string;
           /** Conversation ID of the calling agent, used to reuse conversation as team leader */
           conversation_id?: string;
@@ -186,7 +186,7 @@ export class TeamGuideMcpServer {
       }
     }
 
-    // Use system-injected backend (from AION_MCP_BACKEND env var) as the authoritative agent type.
+    // Use system-injected backend (from FORJINN_MCP_BACKEND env var) as the authoritative agent type.
     // Falls back to 'claude' only when the backend is unknown or not in the whitelist.
     const cachedInitResults = await ProcessConfig.get('acp.cachedInitializeResult');
     const agentType = backend && isTeamCapableBackend(backend, cachedInitResults) ? backend : 'claude';
@@ -223,7 +223,7 @@ export class TeamGuideMcpServer {
       ipcBridge.conversation.listChanged.emit({
         conversationId: callerConversationId,
         action: 'updated',
-        source: 'aionui',
+        source: 'forjinn-desk',
       });
     }
 

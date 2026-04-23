@@ -21,7 +21,7 @@
 <div className="border-b-light">    // 浅色边框
 
 // ✅ 品牌色系列
-<div className="bg-aou-1">           // AOU 色板 1-10
+<div className="bg-forjinn-1">           // Forjinn 色板 1-10
 <div className="hover:bg-brand-hover"> // 品牌色悬停
 ```
 
@@ -43,8 +43,8 @@
 | `#F2F3F5`  | `bg-2`                        | `var(--bg-2)`           | 三级背景        |
 | `#E5E6EB`  | `bg-3` 或 `border-b-base`     | `var(--border-base)`    | 边框/分隔线     |
 | `#7583B2`  | `bg-brand` / `text-brand`     | `var(--brand)`          | 品牌色          |
-| `#EFF0F6`  | `bg-aou-1` / `bg-brand-light` | `var(--aou-1)`          | 品牌浅色背景    |
-| `#E5E7F0`  | `bg-aou-2`                    | `var(--aou-2)`          | AOU 色板 2      |
+| `#EFF0F6`  | `bg-forjinn-1` / `bg-brand-light` | `var(--forjinn-1)`          | 品牌浅色背景    |
+| `#E5E7F0`  | `bg-forjinn-2`                    | `var(--forjinn-2)`          | Forjinn 色板 2      |
 | `#1D2129`  | `text-t-primary`              | `var(--text-primary)`   | 主要文字        |
 | `#86909C`  | `text-t-secondary` / `bg-6`   | `var(--text-secondary)` | 次要文字        |
 | `#165DFF`  | `bg-primary` / `text-primary` | `var(--primary)`        | 主色调          |
@@ -70,7 +70,7 @@
 ### After (主题变量):
 
 ```tsx
-<div className='bg-aou-1 hover:bg-aou-2'>
+<div className='bg-forjinn-1 hover:bg-forjinn-2'>
   <span className='text-t-primary'>文本</span>
   <div className='border border-b-base'></div>
 </div>
@@ -93,4 +93,4 @@
 - **边框**: `border-b-base`, `border-b-light`
 - **品牌**: `bg-brand`, `bg-brand-light`, `bg-brand-hover`
 - **状态**: `bg-primary`, `bg-success`, `bg-warning`, `bg-danger`
-- **AOU色板**: `bg-aou-1` ~ `bg-aou-10`
+- **Forjinn色板**: `bg-forjinn-1` ~ `bg-forjinn-10`

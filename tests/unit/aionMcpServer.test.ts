@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  *
  * Tests for TeamGuideMcpServer tool handler logic (TCP architecture):
@@ -87,12 +87,12 @@ import { MAX_MCP_MESSAGE_SIZE } from '../../src/process/team/mcp/tcpHelpers';
 // ------------------------------------------------------------------
 
 function getPort(service: TeamGuideMcpServer): number {
-  const entry = service.getStdioConfig().env.find((e) => e.name === 'AION_MCP_PORT');
+  const entry = service.getStdioConfig().env.find((e) => e.name === 'FORJINN_MCP_PORT');
   return Number(entry?.value ?? 0);
 }
 
 function getAuthToken(service: TeamGuideMcpServer): string {
-  return service.getStdioConfig().env.find((e) => e.name === 'AION_MCP_TOKEN')?.value ?? '';
+  return service.getStdioConfig().env.find((e) => e.name === 'FORJINN_MCP_TOKEN')?.value ?? '';
 }
 
 async function tcpRequest(port: number, data: unknown): Promise<unknown> {
@@ -157,11 +157,11 @@ describe('TeamGuideMcpServer lifecycle', () => {
 
   it('getStdioConfig returns correct structure', () => {
     const config = service.getStdioConfig();
-    expect(config.name).toBe('aionui-team-guide');
+    expect(config.name).toBe('forjinn-desk-team-guide');
     expect(config.command).toBe('node');
     expect(Array.isArray(config.args)).toBe(true);
-    expect(config.env.some((e) => e.name === 'AION_MCP_PORT')).toBe(true);
-    expect(config.env.some((e) => e.name === 'AION_MCP_TOKEN')).toBe(true);
+    expect(config.env.some((e) => e.name === 'FORJINN_MCP_PORT')).toBe(true);
+    expect(config.env.some((e) => e.name === 'FORJINN_MCP_TOKEN')).toBe(true);
   });
 
   it('start() returns the same StdioMcpConfig as getStdioConfig()', async () => {
@@ -172,7 +172,7 @@ describe('TeamGuideMcpServer lifecycle', () => {
     await service2.stop();
   });
 
-  it('AION_MCP_PORT resets to 0 after stop', async () => {
+  it('FORJINN_MCP_PORT resets to 0 after stop', async () => {
     await service.stop();
     expect(getPort(service)).toBe(0);
     await service.start();
@@ -357,7 +357,7 @@ describe('aion_create_team handler', () => {
     expect(response.error).toContain('DB write failed');
   });
 
-  it('uses system-injected backend (from AION_MCP_BACKEND) as agent type', async () => {
+  it('uses system-injected backend (from FORJINN_MCP_BACKEND) as agent type', async () => {
     await tcpRequest(getPort(service), {
       tool: 'aion_create_team',
       args: { summary: '分析代码' },

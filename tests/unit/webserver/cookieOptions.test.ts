@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { getCookieOptions, SERVER_CONFIG } from '@process/webserver/config/constants';
 
-const ENV_KEYS = ['AIONUI_HTTPS', 'HTTPS', 'NODE_ENV', 'SERVER_BASE_URL'] as const;
+const ENV_KEYS = ['FORJINN_DESK_HTTPS', 'HTTPS', 'NODE_ENV', 'SERVER_BASE_URL'] as const;
 
 function buildRequest(overrides: Partial<Request>): Request {
   return overrides as Request;
@@ -58,8 +58,8 @@ describe('getCookieOptions', () => {
     });
   });
 
-  it('issues Secure + SameSite=None when AIONUI_HTTPS=true', () => {
-    process.env.AIONUI_HTTPS = 'true';
+  it('issues Secure + SameSite=None when FORJINN_DESK_HTTPS=true', () => {
+    process.env.FORJINN_DESK_HTTPS = 'true';
 
     expect(getCookieOptions()).toEqual({
       httpOnly: true,

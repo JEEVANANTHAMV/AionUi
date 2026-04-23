@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -66,13 +66,13 @@ describe('savePreferredMode', () => {
     });
   });
 
-  it('saves preferred mode for aionrs under aionrs.config', async () => {
+  it('saves preferred mode for forjinnrs under forjinnrs.config', async () => {
     configStorageMocks.get.mockResolvedValue({});
 
-    await savePreferredMode('aionrs', 'yolo');
+    await savePreferredMode('forjinnrs', 'yolo');
 
-    expect(configStorageMocks.get).toHaveBeenCalledWith('aionrs.config');
-    expect(configStorageMocks.set).toHaveBeenCalledWith('aionrs.config', {
+    expect(configStorageMocks.get).toHaveBeenCalledWith('forjinnrs.config');
+    expect(configStorageMocks.set).toHaveBeenCalledWith('forjinnrs.config', {
       preferredMode: 'yolo',
     });
   });

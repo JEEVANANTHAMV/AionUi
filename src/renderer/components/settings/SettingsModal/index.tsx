@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import AionModal from '@/renderer/components/base/AionModal';
-import AionScrollArea from '@/renderer/components/base/AionScrollArea';
+import ForjinnModal from '@/renderer/components/base/ForjinnModal';
+import ForjinnScrollArea from '@/renderer/components/base/ForjinnScrollArea';
 import { iconColors } from '@/renderer/styles/colors';
 import { isElectronDesktop, resolveExtensionAssetUrl } from '@/renderer/utils/platform';
 import { extensions as extensionsIpc, type IExtensionSettingsTab } from '@/common/adapter/ipcBridge';
@@ -100,7 +100,7 @@ interface SubModalProps {
  */
 export const SubModal: React.FC<SubModalProps> = ({ visible, onCancel, title, children }) => {
   return (
-    <AionModal
+    <ForjinnModal
       visible={visible}
       onCancel={onCancel}
       footer={null}
@@ -108,8 +108,8 @@ export const SubModal: React.FC<SubModalProps> = ({ visible, onCancel, title, ch
       size='medium'
       title={title}
     >
-      <AionScrollArea className='h-full px-20px pb-16px text-14px text-t-primary'>{children}</AionScrollArea>
-    </AionModal>
+      <ForjinnScrollArea className='h-full px-20px pb-16px text-14px text-t-primary'>{children}</ForjinnScrollArea>
+    </ForjinnModal>
   );
 };
 
@@ -378,7 +378,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onCancel, defaul
 
   // 桌面端菜单（侧边栏）/ Desktop menu (sidebar)
   const desktopMenu = (
-    <AionScrollArea className='flex-shrink-0 b-color-border-2 scrollbar-hide' style={{ width: `${SIDEBAR_WIDTH}px` }}>
+    <ForjinnScrollArea className='flex-shrink-0 b-color-border-2 scrollbar-hide' style={{ width: `${SIDEBAR_WIDTH}px` }}>
       <div className='flex flex-col gap-2px'>
         {menuItems.map((item) => (
           <div
@@ -386,7 +386,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onCancel, defaul
             className={classNames(
               'flex items-center px-14px py-10px rd-8px cursor-pointer transition-all duration-150 select-none',
               {
-                'bg-aou-2 text-t-primary': activeTab === item.key,
+                'bg-forjinn-2 text-t-primary': activeTab === item.key,
                 'text-t-secondary hover:bg-fill-1': activeTab !== item.key,
               }
             )}
@@ -397,12 +397,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onCancel, defaul
           </div>
         ))}
       </div>
-    </AionScrollArea>
+    </ForjinnScrollArea>
   );
 
   return (
     <SettingsViewModeProvider value='modal'>
-      <AionModal
+      <ForjinnModal
         visible={visible}
         onCancel={onCancel}
         footer={null}
@@ -425,14 +425,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onCancel, defaul
         >
           {isMobile ? mobileMenu : desktopMenu}
 
-          <AionScrollArea
+          <ForjinnScrollArea
             className={classNames('flex-1 min-h-0', isMobile ? 'overflow-y-auto' : 'flex flex-col pl-24px gap-16px')}
           >
             {renderBuiltinContent()}
             {renderExtensionTabs()}
-          </AionScrollArea>
+          </ForjinnScrollArea>
         </div>
-      </AionModal>
+      </ForjinnModal>
     </SettingsViewModeProvider>
   );
 };

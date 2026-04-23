@@ -1,4 +1,4 @@
-import { AIONUI_FILES_MARKER, AIONUI_TIMESTAMP_REGEX } from '@/common/config/constants';
+import { FORJINN_DESK_FILES_MARKER, FORJINN_DESK_TIMESTAMP_REGEX } from '@/common/config/constants';
 import type { FileOrFolderItem } from '@/renderer/utils/file/fileTypes';
 
 export const collectSelectedFiles = (uploadFile: string[], atPath: Array<string | FileOrFolderItem>): string[] => {
@@ -10,7 +10,7 @@ export const buildDisplayMessage = (input: string, files: string[], workspacePat
   if (!files.length) return input;
   const normalizedWorkspace = workspacePath?.replace(/[\\/]+$/, '');
   const displayPaths = files.map((filePath) => {
-    const sanitizedPath = filePath.replace(AIONUI_TIMESTAMP_REGEX, '$1');
+    const sanitizedPath = filePath.replace(FORJINN_DESK_TIMESTAMP_REGEX, '$1');
     if (!normalizedWorkspace) {
       return sanitizedPath;
     }
@@ -22,7 +22,7 @@ export const buildDisplayMessage = (input: string, files: string[], workspacePat
       const normalizedWorkspaceWithForwardSlash = normalizedWorkspace.replace(/\\/g, '/');
       if (normalizedFile.startsWith(normalizedWorkspaceWithForwardSlash + '/')) {
         const relativePath = normalizedFile.slice(normalizedWorkspaceWithForwardSlash.length + 1);
-        return `${normalizedWorkspace}/${relativePath.replace(AIONUI_TIMESTAMP_REGEX, '$1')}`;
+        return `${normalizedWorkspace}/${relativePath.replace(FORJINN_DESK_TIMESTAMP_REGEX, '$1')}`;
       }
       // External file outside workspace: use basename only so the marker stays tied to this workspace
       const parts = sanitizedPath.split(/[\\/]/);
@@ -31,5 +31,5 @@ export const buildDisplayMessage = (input: string, files: string[], workspacePat
     }
     return `${normalizedWorkspace}/${sanitizedPath}`;
   });
-  return `${input}\n\n${AIONUI_FILES_MARKER}\n${displayPaths.join('\n')}`;
+  return `${input}\n\n${FORJINN_DESK_FILES_MARKER}\n${displayPaths.join('\n')}`;
 };

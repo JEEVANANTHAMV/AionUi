@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -17,8 +17,8 @@ import { Help, Down, Plus } from '@icon-park/react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useConfigModelListWithImage from '@/renderer/hooks/agent/useConfigModelListWithImage';
-import AionScrollArea from '@/renderer/components/base/AionScrollArea';
-import AionSelect from '@/renderer/components/base/AionSelect';
+import ForjinnScrollArea from '@/renderer/components/base/ForjinnScrollArea';
+import ForjinnSelect from '@/renderer/components/base/ForjinnSelect';
 import AddMcpServerModal from '@/renderer/pages/settings/components/AddMcpServerModal';
 import McpAgentStatusDisplay from '@/renderer/pages/settings/ToolsSettings/McpAgentStatusDisplay';
 import McpServerItem from '@/renderer/pages/settings/ToolsSettings/McpServerItem';
@@ -37,7 +37,7 @@ import { useSettingsViewMode } from '../settingsViewContext';
 type MessageInstance = ReturnType<typeof Message.useMessage>[0];
 
 const isBuiltinImageGenServer = (server: IMcpServer) => server.builtin === true && server.id === BUILTIN_IMAGE_GEN_ID;
-const SPEECH_TO_TEXT_CONFIG_CHANGED_EVENT = 'aionui:speech-to-text-config-changed';
+const SPEECH_TO_TEXT_CONFIG_CHANGED_EVENT = 'forjinn-desk:speech-to-text-config-changed';
 const DEFAULT_SPEECH_TO_TEXT_CONFIG: SpeechToTextConfig = {
   enabled: false,
   provider: 'openai',
@@ -146,10 +146,10 @@ const SpeechToTextSettingsSection: React.FC<{
 
       <Form layout='horizontal' labelAlign='left' className='space-y-12px'>
         <Form.Item label={t('settings.speechToTextProvider')}>
-          <AionSelect value={config.provider} onChange={handleProviderChange}>
-            <AionSelect.Option value='openai'>{t('settings.speechToTextProviderOpenAI')}</AionSelect.Option>
-            <AionSelect.Option value='deepgram'>{t('settings.speechToTextProviderDeepgram')}</AionSelect.Option>
-          </AionSelect>
+          <ForjinnSelect value={config.provider} onChange={handleProviderChange}>
+            <ForjinnSelect.Option value='openai'>{t('settings.speechToTextProviderOpenAI')}</ForjinnSelect.Option>
+            <ForjinnSelect.Option value='deepgram'>{t('settings.speechToTextProviderDeepgram')}</ForjinnSelect.Option>
+          </ForjinnSelect>
         </Form.Item>
 
         {config.provider === 'openai' ? (
@@ -438,7 +438,7 @@ const ModalMcpManagementSection: React.FC<{
             {t('settings.mcpNoServersFound')}
           </div>
         ) : (
-          <AionScrollArea
+          <ForjinnScrollArea
             className={classNames('max-h-360px', isPageMode && 'max-h-none')}
             disableOverflow={isPageMode}
           >
@@ -478,7 +478,7 @@ const ModalMcpManagementSection: React.FC<{
                 />
               ))}
             </div>
-          </AionScrollArea>
+          </ForjinnScrollArea>
         )}
       </div>
 
@@ -606,24 +606,24 @@ const ToolsModalContent: React.FC = () => {
 
       const env: Record<string, string> = { ...builtinServer.transport.env };
       if (model.platform) {
-        env.AIONUI_IMG_PLATFORM = model.platform;
+        env.FORJINN_DESK_IMG_PLATFORM = model.platform;
       } else {
-        delete env.AIONUI_IMG_PLATFORM;
+        delete env.FORJINN_DESK_IMG_PLATFORM;
       }
       if (model.baseUrl) {
-        env.AIONUI_IMG_BASE_URL = model.baseUrl;
+        env.FORJINN_DESK_IMG_BASE_URL = model.baseUrl;
       } else {
-        delete env.AIONUI_IMG_BASE_URL;
+        delete env.FORJINN_DESK_IMG_BASE_URL;
       }
       if (model.apiKey) {
-        env.AIONUI_IMG_API_KEY = model.apiKey;
+        env.FORJINN_DESK_IMG_API_KEY = model.apiKey;
       } else {
-        delete env.AIONUI_IMG_API_KEY;
+        delete env.FORJINN_DESK_IMG_API_KEY;
       }
       if (model.useModel) {
-        env.AIONUI_IMG_MODEL = model.useModel;
+        env.FORJINN_DESK_IMG_MODEL = model.useModel;
       } else {
-        delete env.AIONUI_IMG_MODEL;
+        delete env.FORJINN_DESK_IMG_MODEL;
       }
 
       const updatedServer: IMcpServer = {
@@ -744,12 +744,12 @@ const ToolsModalContent: React.FC = () => {
       {mcpMessageContext}
 
       {/* Content Area */}
-      <AionScrollArea className='flex-1 min-h-0 pb-16px' disableOverflow={isPageMode}>
+      <ForjinnScrollArea className='flex-1 min-h-0 pb-16px' disableOverflow={isPageMode}>
         <div className='space-y-16px'>
           {/* MCP 工具配置 */}
           <div className='px-[12px] md:px-[32px] py-[24px] bg-2 rd-12px md:rd-16px flex flex-col min-h-0 border border-border-2'>
             <div className='flex-1 min-h-0'>
-              <AionScrollArea
+              <ForjinnScrollArea
                 className={classNames('h-full', isPageMode && 'overflow-visible')}
                 disableOverflow={isPageMode}
               >
@@ -760,7 +760,7 @@ const ToolsModalContent: React.FC = () => {
                   saveMcpServers={saveMcpServers}
                   isPageMode={isPageMode}
                 />
-              </AionScrollArea>
+              </ForjinnScrollArea>
             </div>
           </div>
           {/* 图像生成 */}
@@ -796,7 +796,7 @@ const ToolsModalContent: React.FC = () => {
             <Form layout='horizontal' labelAlign='left' className='space-y-12px'>
               <Form.Item label={t('settings.imageGenerationModel')}>
                 {imageGenerationModelList.length > 0 ? (
-                  <AionSelect
+                  <ForjinnSelect
                     value={
                       imageGenerationModel?.id && imageGenerationModel?.useModel
                         ? `${imageGenerationModel.id}|${imageGenerationModel.useModel}`
@@ -814,15 +814,15 @@ const ToolsModalContent: React.FC = () => {
                     }}
                   >
                     {imageGenerationModelList.map(({ model, ...platform }) => (
-                      <AionSelect.OptGroup label={platform.name} key={platform.id}>
+                      <ForjinnSelect.OptGroup label={platform.name} key={platform.id}>
                         {model.map((modelName) => (
-                          <AionSelect.Option key={platform.id + modelName} value={platform.id + '|' + modelName}>
+                          <ForjinnSelect.Option key={platform.id + modelName} value={platform.id + '|' + modelName}>
                             {modelName}
-                          </AionSelect.Option>
+                          </ForjinnSelect.Option>
                         ))}
-                      </AionSelect.OptGroup>
+                      </ForjinnSelect.OptGroup>
                     ))}
-                  </AionSelect>
+                  </ForjinnSelect>
                 ) : (
                   <div className='text-t-secondary flex items-center'>
                     {t('settings.noAvailable')}
@@ -831,7 +831,7 @@ const ToolsModalContent: React.FC = () => {
                         <div>
                           {t('settings.needHelpTooltip')}
                           <a
-                            href='https://github.com/iOfficeAI/AionUi/wiki/AionUi-Image-Generation-Tool-Model-Configuration-Guide'
+                            href='https://github.com/iOfficeAI/Forjinn-Desk/wiki/Forjinn-Desk-Image-Generation-Tool-Model-Configuration-Guide'
                             target='_blank'
                             rel='noopener noreferrer'
                             className='text-[rgb(var(--primary-6))] hover:text-[rgb(var(--primary-5))] underline ml-4px'
@@ -843,7 +843,7 @@ const ToolsModalContent: React.FC = () => {
                       }
                     >
                       <a
-                        href='https://github.com/iOfficeAI/AionUi/wiki/AionUi-Image-Generation-Tool-Model-Configuration-Guide'
+                        href='https://github.com/iOfficeAI/Forjinn-Desk/wiki/Forjinn-Desk-Image-Generation-Tool-Model-Configuration-Guide'
                         target='_blank'
                         rel='noopener noreferrer'
                         className='ml-8px text-[rgb(var(--primary-6))] hover:text-[rgb(var(--primary-5))] cursor-pointer'
@@ -859,7 +859,7 @@ const ToolsModalContent: React.FC = () => {
           </div>
           <SpeechToTextSettingsSection config={speechToTextConfig} onChange={updateSpeechToTextConfig} />
         </div>
-      </AionScrollArea>
+      </ForjinnScrollArea>
     </div>
   );
 };

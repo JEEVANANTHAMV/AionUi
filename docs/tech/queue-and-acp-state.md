@@ -121,7 +121,7 @@ Queue 机制通过 SendBox 集成，以下平台均支持：
 - Gemini (`GeminiSendBox.tsx`)
 - ACP (`AcpSendBox.tsx`)
 - OpenClaw (`OpenClawSendBox.tsx`)
-- Aionrs
+- Forjinnrs
 
 ---
 

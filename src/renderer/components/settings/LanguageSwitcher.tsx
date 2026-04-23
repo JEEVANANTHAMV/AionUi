@@ -1,4 +1,4 @@
-import AionSelect from '@/renderer/components/base/AionSelect';
+import ForjinnSelect from '@/renderer/components/base/ForjinnSelect';
 import type { SelectHandle } from '@arco-design/web-react/es/Select/interface';
 import React, { useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -29,16 +29,16 @@ const LanguageSwitcher: React.FC = () => {
 
   return (
     <div className='flex items-center gap-8px'>
-      <AionSelect ref={selectRef} className='w-160px' value={i18n.language} onChange={handleLanguageChange}>
-        <AionSelect.Option value='zh-CN'>简体中文</AionSelect.Option>
-        <AionSelect.Option value='zh-TW'>繁體中文</AionSelect.Option>
-        <AionSelect.Option value='ja-JP'>日本語</AionSelect.Option>
-        <AionSelect.Option value='ko-KR'>한국어</AionSelect.Option>
-        <AionSelect.Option value='tr-TR'>Türkçe</AionSelect.Option>
-        <AionSelect.Option value='ru-RU'>Русский</AionSelect.Option>
-        <AionSelect.Option value='uk-UA'>Українська</AionSelect.Option>
-        <AionSelect.Option value='en-US'>English</AionSelect.Option>
-      </AionSelect>
+      <ForjinnSelect ref={selectRef} className='w-160px' value={i18n.language} onChange={handleLanguageChange}>
+        <ForjinnSelect.Option value='zh-CN'>简体中文</ForjinnSelect.Option>
+        <ForjinnSelect.Option value='zh-TW'>繁體中文</ForjinnSelect.Option>
+        <ForjinnSelect.Option value='ja-JP'>日本語</ForjinnSelect.Option>
+        <ForjinnSelect.Option value='ko-KR'>한국어</ForjinnSelect.Option>
+        <ForjinnSelect.Option value='tr-TR'>Türkçe</ForjinnSelect.Option>
+        <ForjinnSelect.Option value='ru-RU'>Русский</ForjinnSelect.Option>
+        <ForjinnSelect.Option value='uk-UA'>Українська</ForjinnSelect.Option>
+        <ForjinnSelect.Option value='en-US'>English</ForjinnSelect.Option>
+      </ForjinnSelect>
     </div>
   );
 };

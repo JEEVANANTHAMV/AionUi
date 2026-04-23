@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  *
  * 统一的 Agent Logo 映射工具
@@ -10,7 +10,7 @@
  * All places that need to display agent icons should use this utility instead of maintaining separate lists
  */
 
-import AionLogo from '@/renderer/assets/logos/brand/aion.svg';
+import ForjinnLogo from '@/renderer/assets/logos/brand/forjinn.svg';
 import AuggieLogo from '@/renderer/assets/logos/brand/auggie.svg';
 import ClaudeLogo from '@/renderer/assets/logos/ai-major/claude.svg';
 import CursorLogo from '@/renderer/assets/logos/tools/coding/cursor.png';
@@ -39,7 +39,7 @@ import QwenLogo from '@/renderer/assets/logos/ai-china/qwen.svg';
  * Note: keys are lowercase, supports multiple variants (e.g., openclaw-gateway and openclaw)
  */
 const AGENT_LOGO_MAP = {
-  aionrs: AionLogo,
+  forjinnrs: ForjinnLogo,
   claude: ClaudeLogo,
   gemini: GeminiLogo,
   qwen: QwenLogo,

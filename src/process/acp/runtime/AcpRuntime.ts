@@ -78,8 +78,8 @@ export class AcpRuntime {
             args: aionStdioConfig.args,
             env: [
               ...aionStdioConfig.env,
-              { name: 'AION_MCP_BACKEND', value: config.agentBackend },
-              { name: 'AION_MCP_CONVERSATION_ID', value: convId },
+              { name: 'FORJINN_MCP_BACKEND', value: config.agentBackend },
+              { name: 'FORJINN_MCP_CONVERSATION_ID', value: convId },
             ],
           };
           config.presetMcpServers = [...(config.presetMcpServers || []), guideServer];

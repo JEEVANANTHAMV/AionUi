@@ -100,7 +100,7 @@ function killChild(child: ChildProcess): Promise<void> {
 const FIXTURES_DIR = path.resolve(__dirname, '../fixtures');
 const FAKE_CLI_PATH = path.join(FIXTURES_DIR, 'fake-acp-cli', 'index.js');
 const FAKE_EXTENSION_DIR = path.join(FIXTURES_DIR, 'fake-extension');
-const FAKE_MANIFEST_PATH = path.join(FAKE_EXTENSION_DIR, 'aion-extension.json');
+const FAKE_MANIFEST_PATH = path.join(FAKE_EXTENSION_DIR, 'forjinn-extension.json');
 
 // ---------------------------------------------------------------------------
 // Mocks — declared before imports
@@ -114,7 +114,7 @@ vi.mock('electron', () => ({
 vi.mock('@process/utils', () => ({ getDataPath: () => '/data' }));
 
 vi.mock('@process/extensions/constants', () => ({
-  EXTENSION_MANIFEST_FILE: 'aion-extension.json',
+  EXTENSION_MANIFEST_FILE: 'forjinn-extension.json',
   HUB_REMOTE_URLS: ['https://mirror1.com'],
   getHubResourcesDir: vi.fn(() => path.join(os.tmpdir(), 'hub-resources')),
   getInstallTargetDir: vi.fn(() => path.join(os.tmpdir(), 'ext-install-dir')),
@@ -214,7 +214,7 @@ function collectMessagesUntil(
 
 describe('L1 Hub Install Flow — Integration', () => {
   describe('Step 1: Hub Index contains fixture extension', () => {
-    it('should parse aion-extension.json from fixture', () => {
+    it('should parse forjinn-extension.json from fixture', () => {
       const manifest = JSON.parse(fs.readFileSync(FAKE_MANIFEST_PATH, 'utf-8'));
 
       expect(manifest.name).toBe('fake-acp-extension');

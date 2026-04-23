@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,9 +14,9 @@ export async function savePreferredMode(agentKey: string, mode: string): Promise
     if (agentKey === 'gemini') {
       const config = await ConfigStorage.get('gemini.config');
       await ConfigStorage.set('gemini.config', { ...config, preferredMode: mode });
-    } else if (agentKey === 'aionrs') {
-      const config = await ConfigStorage.get('aionrs.config');
-      await ConfigStorage.set('aionrs.config', { ...config, preferredMode: mode });
+    } else if (agentKey === 'forjinnrs') {
+      const config = await ConfigStorage.get('forjinnrs.config');
+      await ConfigStorage.set('forjinnrs.config', { ...config, preferredMode: mode });
     } else if (agentKey !== 'custom') {
       const config = await ConfigStorage.get('acp.config');
       const backendConfig = config?.[agentKey as AcpBackendAll] || {};

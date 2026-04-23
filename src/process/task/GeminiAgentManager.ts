@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -395,15 +395,15 @@ export class GeminiAgentManager extends BaseAgentManager<
         // Inject Aion team-guide MCP server for solo agents (not in team mode)
         // so Gemini can call aion_create_team after the user requests a Team
         // or explicitly approves Team for an exceptionally hard task.
-        // AION_MCP_BACKEND tells the stdio bridge this is a gemini agent.
+        // FORJINN_MCP_BACKEND tells the stdio bridge this is a gemini agent.
         const aionStdioConfig = getTeamGuideStdioConfig();
         if (aionStdioConfig) {
           const aionEnvObj: Record<string, string> = {};
           for (const { name, value } of aionStdioConfig.env || []) {
             aionEnvObj[name] = value;
           }
-          aionEnvObj['AION_MCP_BACKEND'] = 'gemini';
-          aionEnvObj['AION_MCP_CONVERSATION_ID'] = this.conversation_id;
+          aionEnvObj['FORJINN_MCP_BACKEND'] = 'gemini';
+          aionEnvObj['FORJINN_MCP_CONVERSATION_ID'] = this.conversation_id;
           mcpConfig[aionStdioConfig.name] = {
             command: aionStdioConfig.command,
             args: aionStdioConfig.args || [],
@@ -673,10 +673,10 @@ export class GeminiAgentManager extends BaseAgentManager<
       void this.postMessagePromise(content.callId, ToolConfirmationOutcome.ProceedOnce);
       return true;
     }
-    // Team MCP servers (aionui-team-*) are always auto-approved regardless of mode
+    // Team MCP servers (forjinn-desk-team-*) are always auto-approved regardless of mode
     if (type === 'mcp') {
       const serverName = (content.confirmationDetails as { serverName?: string })?.serverName ?? '';
-      if (serverName.startsWith('aionui-team-')) {
+      if (serverName.startsWith('forjinn-desk-team-')) {
         console.log(
           `[GeminiAgentManager] Auto-approving team MCP tool: serverName=${serverName}, callId=${content.callId}`
         );

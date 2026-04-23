@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -80,7 +80,7 @@ const GuidPage: React.FC = () => {
 
   // --- Hooks ---
   // Track which provider-based agent is selected so model selection persists per agent type
-  const [providerAgentKey, setProviderAgentKey] = useState<'gemini' | 'aionrs'>('aionrs');
+  const [providerAgentKey, setProviderAgentKey] = useState<'gemini' | 'forjinnrs'>('forjinnrs');
   const modelSelection = useGuidModelSelection(providerAgentKey);
 
   const resetAssistantRequested = (location.state as { resetAssistant?: boolean } | null)?.resetAssistant === true;
@@ -95,7 +95,7 @@ const GuidPage: React.FC = () => {
   // Sync providerAgentKey when selected agent changes
   useEffect(() => {
     const agent = agentSelection.selectedAgent;
-    if (agent === 'gemini' || agent === 'aionrs') {
+    if (agent === 'gemini' || agent === 'forjinnrs') {
       setProviderAgentKey(agent);
     }
   }, [agentSelection.selectedAgent]);
@@ -326,7 +326,7 @@ const GuidPage: React.FC = () => {
     const isImageAvatar = Boolean(
       avatarImage &&
       (/\.(svg|png|jpe?g|webp|gif)$/i.test(avatarImage) ||
-        /^(https?:|aion-asset:\/\/|file:\/\/|data:)/i.test(avatarImage))
+        /^(https?:|forjinn-asset:\/\/|file:\/\/|data:)/i.test(avatarImage))
     );
     if (isImageAvatar && avatarImage) {
       return { kind: 'image' as const, value: avatarImage };
@@ -463,7 +463,7 @@ const GuidPage: React.FC = () => {
     : agentSelection.selectedAgent;
 
   // Agents that use configured model providers instead of ACP probe-based models
-  const PROVIDER_BASED_AGENTS = new Set(['gemini', 'aionrs']);
+  const PROVIDER_BASED_AGENTS = new Set(['gemini', 'forjinnrs']);
   const isGeminiMode =
     PROVIDER_BASED_AGENTS.has(effectiveAgentType) &&
     (!agentSelection.isPresetAgent || agentSelection.currentEffectiveAgentInfo.isAvailable);

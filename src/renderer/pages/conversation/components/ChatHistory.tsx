@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -233,8 +233,8 @@ const ChatHistory: React.FC<{ onSessionClick?: () => void; collapsed?: boolean }
               )}
               style={{
                 backgroundImage: isSelected
-                  ? `linear-gradient(to right, transparent, var(--aou-2) 50%)`
-                  : `linear-gradient(to right, transparent, var(--aou-1) 50%)`,
+                  ? `linear-gradient(to right, transparent, var(--forjinn-2) 50%)`
+                  : `linear-gradient(to right, transparent, var(--forjinn-1) 50%)`,
               }}
               onClick={(event) => {
                 event.stopPropagation();

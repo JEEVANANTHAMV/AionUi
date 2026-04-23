@@ -30,7 +30,7 @@ styles/themes/
 ├── index.css                 # Entry point 入口文件
 ├── base.css                  # Theme-independent base styles 主题无关的基础样式
 └── color-schemes/            # Color scheme definitions 配色方案定义
-    └── default.css           # Default color scheme (AOU brand) 默认配色方案
+    └── default.css           # Default color scheme (Forjinn brand) 默认配色方案
 ```
 
 ## How to Add a New Color Scheme 如何添加新配色方案
@@ -57,8 +57,8 @@ When you need to add a new color scheme in the future, follow these steps:
 
 ### Brand Colors 品牌色
 
-- `--aou-1` to `--aou-10`: Brand color palette (1=lightest, 10=darkest)
-- `--aou-1` 到 `--aou-10`：品牌色调色板（1=最浅，10=最深）
+- `--forjinn-1` to `--forjinn-10`: Brand color palette (1=lightest, 10=darkest)
+- `--forjinn-1` 到 `--forjinn-10`：品牌色调色板（1=最浅，10=最深）
 
 ### Background Colors 背景色
 

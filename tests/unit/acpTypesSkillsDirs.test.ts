@@ -4,7 +4,7 @@ import { ACP_BACKENDS_ALL, hasNativeSkillSupport, getSkillsDirsForBackend } from
 describe('acpTypes — skillsDirs integration', () => {
   describe('ACP_BACKENDS_ALL skillsDirs consistency', () => {
     it('should have skillsDirs for all backends that support native skill discovery', () => {
-      // Note: aionrs was removed from ACP_BACKENDS_ALL (non-ACP protocol)
+      // Note: forjinnrs was removed from ACP_BACKENDS_ALL (non-ACP protocol)
       const expectedSkillsDirs: Record<string, string[]> = {
         claude: ['.claude/skills'],
         qwen: ['.qwen/skills'],
@@ -55,7 +55,7 @@ describe('acpTypes — skillsDirs integration', () => {
         'cursor',
         'opencode',
         'gemini',
-        'aionrs',
+        'forjinnrs',
       ];
       for (const backend of supported) {
         expect(hasNativeSkillSupport(backend), `${backend}`).toBe(true);
@@ -86,9 +86,9 @@ describe('acpTypes — skillsDirs integration', () => {
     });
 
     it('should return true for non-ACP agents with native skill dirs', () => {
-      // gemini and aionrs are not ACP backends but support native skill discovery
+      // gemini and forjinnrs are not ACP backends but support native skill discovery
       expect(hasNativeSkillSupport('gemini')).toBe(true);
-      expect(hasNativeSkillSupport('aionrs')).toBe(true);
+      expect(hasNativeSkillSupport('forjinnrs')).toBe(true);
     });
   });
 
@@ -97,7 +97,7 @@ describe('acpTypes — skillsDirs integration', () => {
       expect(getSkillsDirsForBackend('claude')).toEqual(['.claude/skills']);
       expect(getSkillsDirsForBackend('droid')).toEqual(['.factory/skills']);
       expect(getSkillsDirsForBackend('gemini')).toEqual(['.gemini/skills']); // non-ACP but has skill dirs
-      expect(getSkillsDirsForBackend('aionrs')).toEqual(['.aionrs/skills']); // non-ACP but has skill dirs
+      expect(getSkillsDirsForBackend('forjinnrs')).toEqual(['.forjinnrs/skills']); // non-ACP but has skill dirs
     });
 
     it('should return undefined for unsupported backends', () => {

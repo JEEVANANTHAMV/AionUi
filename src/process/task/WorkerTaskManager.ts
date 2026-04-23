@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -44,7 +44,7 @@ export class WorkerTaskManager implements IWorkerTaskManager {
       const now = Date.now();
       const idleTasks = this.taskList.filter(
         (item) =>
-          (item.task.type === 'acp' || item.task.type === 'aionrs') &&
+          (item.task.type === 'acp' || item.task.type === 'forjinnrs') &&
           item.task.status === 'finished' &&
           !cronBusyGuard.isProcessing(item.id) &&
           now - item.task.lastActivityAt > timeoutMs

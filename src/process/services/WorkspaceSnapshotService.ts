@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -196,7 +196,7 @@ export class WorkspaceSnapshotService {
   }
 
   /**
-   * Remove leftover `aionui-snapshot-*` directories from previous sessions
+   * Remove leftover `forjinn-desk-snapshot-*` directories from previous sessions
    * that were not cleaned up (e.g. due to a crash). Safe to call at startup
    * as a fire-and-forget — errors are silently ignored.
    */
@@ -209,7 +209,7 @@ export class WorkspaceSnapshotService {
       return;
     }
 
-    const stale = entries.filter((name) => name.startsWith('aionui-snapshot-'));
+    const stale = entries.filter((name) => name.startsWith('forjinn-desk-snapshot-'));
     await Promise.allSettled(stale.map((name) => fs.rm(path.join(tmpdir, name), { recursive: true, force: true })));
   }
 
@@ -389,7 +389,7 @@ export class WorkspaceSnapshotService {
   }
 
   private async createWorkingTreeSnapshot(workspacePath: string): Promise<string> {
-    const gitdir = path.join(os.tmpdir(), `aionui-snapshot-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+    const gitdir = path.join(os.tmpdir(), `forjinn-desk-snapshot-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
     const gitArgs = [`--git-dir=${gitdir}`, `--work-tree=${workspacePath}`];
 
     await execFileAsync('git', ['init', '--bare', gitdir]);
@@ -415,7 +415,7 @@ export class WorkspaceSnapshotService {
         '-c',
         'user.name=AionUI',
         '-c',
-        'user.email=snapshot@aionui.local',
+        'user.email=snapshot@forjinn-desk.local',
         'commit',
         '--allow-empty',
         '-m',

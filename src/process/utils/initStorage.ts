@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -44,10 +44,10 @@ type ArchitectureType = 'x64' | 'arm64' | 'ia32' | 'arm';
 const nodePath = path;
 
 const STORAGE_PATH = {
-  config: 'aionui-config.txt',
-  chatMessage: 'aionui-chat-message.txt',
-  chat: 'aionui-chat.txt',
-  env: '.aionui-env',
+  config: 'forjinn-desk-config.txt',
+  chatMessage: 'forjinn-desk-chat-message.txt',
+  chat: 'forjinn-desk-chat.txt',
+  env: '.forjinn-desk-env',
   assistants: 'assistants',
   skills: 'skills',
   builtinSkills: 'builtin-skills',
@@ -75,7 +75,7 @@ const migrateLegacyData = async () => {
         try {
           return existsSync(newDir) && readdirSync(newDir).length === 0;
         } catch (error) {
-          console.warn('[AionUi] Warning: Could not read new directory during migration check:', error);
+          console.warn('[Forjinn-Desk] Warning: Could not read new directory during migration check:', error);
           return false; // 假设非空以避免迁移覆盖
         }
       })();
@@ -96,7 +96,7 @@ const migrateLegacyData = async () => {
           try {
             await fs.rm(oldDir, { recursive: true });
           } catch (cleanupError) {
-            console.warn('[AionUi] 原目录清理失败，请手动删除:', oldDir, cleanupError);
+            console.warn('[Forjinn-Desk] 原目录清理失败，请手动删除:', oldDir, cleanupError);
           }
         }
       }
@@ -104,7 +104,7 @@ const migrateLegacyData = async () => {
       return true;
     }
   } catch (error) {
-    console.error('[AionUi] 数据迁移失败:', error);
+    console.error('[Forjinn-Desk] 数据迁移失败:', error);
   }
 
   return false;
@@ -241,7 +241,7 @@ const JsonFileBuilder = <S extends object = Record<string, unknown>>(filePath: s
 
 const envFile = JsonFileBuilder<IEnvStorageRefer>(path.join(getHomePage(), STORAGE_PATH.env));
 
-const dirConfig = envFile.getSync('aionui.dir');
+const dirConfig = envFile.getSync('forjinn-desk.dir');
 
 const cacheDir = dirConfig?.cacheDir || getHomePage();
 
@@ -292,11 +292,11 @@ const chatFile = {
 };
 
 const buildMessageListStorage = (conversation_id: string, dir: string) => {
-  const fullName = path.join(dir, 'aionui-chat-history', conversation_id + '.txt');
+  const fullName = path.join(dir, 'forjinn-desk-chat-history', conversation_id + '.txt');
   if (!existsSync(fullName)) {
-    mkdirSync(path.join(dir, 'aionui-chat-history'));
+    mkdirSync(path.join(dir, 'forjinn-desk-chat-history'));
   }
-  return JsonFileBuilder<TMessage[]>(path.join(dir, 'aionui-chat-history', conversation_id + '.txt'));
+  return JsonFileBuilder<TMessage[]>(path.join(dir, 'forjinn-desk-chat-history', conversation_id + '.txt'));
 };
 
 const conversationHistoryProxy = (options: typeof _chatMessageFile, dir: string) => {
@@ -317,7 +317,7 @@ const conversationHistoryProxy = (options: typeof _chatMessageFile, dir: string)
     backup(conversation_id: string) {
       const storage = buildMessageListStorage(conversation_id, dir);
       return storage.backup(
-        path.join(dir, 'aionui-chat-history', 'backup', conversation_id + '_' + Date.now() + '.txt')
+        path.join(dir, 'forjinn-desk-chat-history', 'backup', conversation_id + '_' + Date.now() + '.txt')
       );
     },
   };
@@ -397,7 +397,7 @@ const initBuiltinAssistantRules = async (): Promise<void> => {
       }
     }
 
-    console.warn(`[AionUi] Could not find builtin ${dirPath} directory, tried:`, candidates);
+    console.warn(`[Forjinn-Desk] Could not find builtin ${dirPath} directory, tried:`, candidates);
     return candidates[0];
   };
 
@@ -446,7 +446,7 @@ const initBuiltinAssistantRules = async (): Promise<void> => {
         }
       }
     } catch (error) {
-      console.warn(`[AionUi] Failed to sync builtin skills directory:`, error);
+      console.warn(`[Forjinn-Desk] Failed to sync builtin skills directory:`, error);
     }
   }
 
@@ -487,7 +487,7 @@ const initBuiltinAssistantRules = async (): Promise<void> => {
 
           // 检查源文件是否存在 / Check if source file exists
           if (!existsSync(sourceRulesPath)) {
-            console.warn(`[AionUi] Source rule file not found: ${sourceRulesPath}`);
+            console.warn(`[Forjinn-Desk] Source rule file not found: ${sourceRulesPath}`);
             continue;
           }
 
@@ -500,7 +500,7 @@ const initBuiltinAssistantRules = async (): Promise<void> => {
           await fs.writeFile(targetPath, content, 'utf-8');
         } catch (error) {
           // 忽略缺失的语言文件 / Ignore missing locale files
-          console.warn(`[AionUi] Failed to copy rule file ${ruleFile}:`, error);
+          console.warn(`[Forjinn-Desk] Failed to copy rule file ${ruleFile}:`, error);
         }
       }
     } else {
@@ -532,7 +532,7 @@ const initBuiltinAssistantRules = async (): Promise<void> => {
 
           // 检查源文件是否存在 / Check if source file exists
           if (!existsSync(sourceSkillsPath)) {
-            console.warn(`[AionUi] Source skill file not found: ${sourceSkillsPath}`);
+            console.warn(`[Forjinn-Desk] Source skill file not found: ${sourceSkillsPath}`);
             continue;
           }
 
@@ -545,7 +545,7 @@ const initBuiltinAssistantRules = async (): Promise<void> => {
           await fs.writeFile(targetPath, content, 'utf-8');
         } catch (error) {
           // 忽略缺失的技能文件 / Ignore missing skill files
-          console.warn(`[AionUi] Failed to copy skill file ${skillFile}:`, error);
+          console.warn(`[Forjinn-Desk] Failed to copy skill file ${skillFile}:`, error);
         }
       }
     } else {
@@ -698,10 +698,10 @@ const ensureBuiltinMcpServers = async (): Promise<void> => {
     const buildEnvFromConfig = (cfg: typeof oldConfig): Record<string, string> => {
       if (!cfg) return {};
       const env: Record<string, string> = {};
-      if (cfg.platform) env.AIONUI_IMG_PLATFORM = cfg.platform;
-      if (cfg.baseUrl) env.AIONUI_IMG_BASE_URL = cfg.baseUrl;
-      if (cfg.apiKey) env.AIONUI_IMG_API_KEY = cfg.apiKey;
-      if (cfg.useModel) env.AIONUI_IMG_MODEL = cfg.useModel;
+      if (cfg.platform) env.FORJINN_DESK_IMG_PLATFORM = cfg.platform;
+      if (cfg.baseUrl) env.FORJINN_DESK_IMG_BASE_URL = cfg.baseUrl;
+      if (cfg.apiKey) env.FORJINN_DESK_IMG_API_KEY = cfg.apiKey;
+      if (cfg.useModel) env.FORJINN_DESK_IMG_MODEL = cfg.useModel;
       return env;
     };
 
@@ -786,7 +786,7 @@ const ensureBuiltinMcpServers = async (): Promise<void> => {
 
     if (changed) {
       await configFile.set('mcp.config', mcpServers);
-      console.log('[AionUi] Built-in MCP servers ensured');
+      console.log('[Forjinn-Desk] Built-in MCP servers ensured');
     }
 
     // Clear old switch flag after migration
@@ -795,7 +795,7 @@ const ensureBuiltinMcpServers = async (): Promise<void> => {
       await configFile.set('tools.imageGenerationModel', rest as typeof oldConfig);
     }
   } catch (error) {
-    console.error('[AionUi] Failed to ensure built-in MCP servers:', error);
+    console.error('[Forjinn-Desk] Failed to ensure built-in MCP servers:', error);
   }
 };
 
@@ -832,16 +832,16 @@ const cleanupOrphanedHealthCheckConversations = async () => {
     });
 
     if (deletedCount > 0) {
-      console.log(`[AionUi] Cleaned up ${deletedCount} orphaned health-check conversation(s) on startup`);
+      console.log(`[Forjinn-Desk] Cleaned up ${deletedCount} orphaned health-check conversation(s) on startup`);
     }
   } catch (error) {
-    console.warn('[AionUi] Failed to cleanup orphaned health-check conversations:', error);
+    console.warn('[Forjinn-Desk] Failed to cleanup orphaned health-check conversations:', error);
   }
 };
 
 const initStorage = async () => {
   const t0 = performance.now();
-  const mark = (label: string) => console.log(`[AionUi:init] ${label} +${Math.round(performance.now() - t0)}ms`);
+  const mark = (label: string) => console.log(`[Forjinn-Desk:init] ${label} +${Math.round(performance.now() - t0)}ms`);
   mark('start');
 
   // 1. 先执行数据迁移（在任何目录创建之前）
@@ -888,7 +888,7 @@ const initStorage = async () => {
       await configFile.set('mcp.config', defaultServers);
     }
   } catch (error) {
-    console.error('[AionUi] Failed to initialize default MCP servers:', error);
+    console.error('[Forjinn-Desk] Failed to initialize default MCP servers:', error);
   }
   mark('4.1 MCP defaults');
 
@@ -1064,7 +1064,7 @@ const initStorage = async () => {
     }
     mark('5.2 assistant config + migrations');
   } catch (error) {
-    console.error('[AionUi] Failed to initialize builtin assistants:', error);
+    console.error('[Forjinn-Desk] Failed to initialize builtin assistants:', error);
   }
 
   // 6. 初始化数据库（better-sqlite3）
@@ -1178,7 +1178,7 @@ export const loadSkillsContent = async (enabledSkills: string[]): Promise<string
         skillContents.push(`## Skill: ${skillName}\n${content}`);
       }
     } catch (error) {
-      console.warn(`[AionUi] Failed to load skill ${skillName}:`, error);
+      console.warn(`[Forjinn-Desk] Failed to load skill ${skillName}:`, error);
     }
   }
 

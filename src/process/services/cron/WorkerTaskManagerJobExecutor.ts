@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -135,9 +135,9 @@ export class WorkerTaskManagerJobExecutor implements ICronJobExecutor {
     const hasSkill = await hasCronSkillFile(job.id);
     const needsSkillSuggest = job.target.executionMode === 'new_conversation' && !!workspace && !hasSkill;
     const isGeminiLike =
-      job.metadata.agentConfig?.backend === 'gemini' || job.metadata.agentConfig?.backend === 'aionrs';
+      job.metadata.agentConfig?.backend === 'gemini' || job.metadata.agentConfig?.backend === 'forjinnrs';
 
-    // Gemini/Aionrs: inline SKILL_SUGGEST instructions in the task prompt (single-turn).
+    // Gemini/Forjinnrs: inline SKILL_SUGGEST instructions in the task prompt (single-turn).
     // Other agents: separate follow-up message via onFirstFinish (multi-turn).
     const messageText = this.buildMessageText(job, hasSkill, needsSkillSuggest && isGeminiLike);
 
@@ -171,7 +171,7 @@ export class WorkerTaskManagerJobExecutor implements ICronJobExecutor {
       skillSuggestWatcher.unregister(conversationId);
 
       if (isGeminiLike) {
-        // Gemini/Aionrs: SKILL_SUGGEST instructions are already in the prompt.
+        // Gemini/Forjinnrs: SKILL_SUGGEST instructions are already in the prompt.
         // Just register the watcher (no onFirstFinish) and start polling.
         skillSuggestWatcher.register(conversationId, job.id, workspace!);
         void this.detectSkillSuggestWithRetry(job.id, workspace!, conversationId, 0);
@@ -254,7 +254,7 @@ export class WorkerTaskManagerJobExecutor implements ICronJobExecutor {
     ipcBridge.conversation.listChanged.emit({
       conversationId: conversation.id,
       action: 'created',
-      source: conversation.source || 'aionui',
+      source: conversation.source || 'forjinn-desk',
     });
 
     return conversation;
@@ -288,8 +288,8 @@ export class WorkerTaskManagerJobExecutor implements ICronJobExecutor {
     switch (backend) {
       case 'gemini':
         return 'gemini';
-      case 'aionrs':
-        return 'aionrs';
+      case 'forjinnrs':
+        return 'forjinnrs';
       case 'openclaw-gateway':
       case 'openclaw' as AgentBackend:
         return 'openclaw-gateway';
@@ -380,8 +380,8 @@ export class WorkerTaskManagerJobExecutor implements ICronJobExecutor {
       } else if (typeof savedModel === 'string') {
         preferredModelId = savedModel;
       }
-    } else if (backend === 'aionrs') {
-      const savedModel = await ProcessConfig.get('aionrs.defaultModel');
+    } else if (backend === 'forjinnrs') {
+      const savedModel = await ProcessConfig.get('forjinnrs.defaultModel');
       preferredModelId = savedModel?.useModel;
     } else {
       const acpConfig = await ProcessConfig.get('acp.config');

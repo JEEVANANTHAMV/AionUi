@@ -1,4 +1,4 @@
-/* Retroma Obsidian Theme - AionUi Adaptation */
+/* Retroma Obsidian Theme - Forjinn-Desk Adaptation */
 /* Inspired by retroma-obsidian-theme color philosophy */
 /* Low-saturation organic palette with warm purples, teal blues, and olive greens */
 
@@ -19,17 +19,17 @@
   --color-brand-fill: #6e3a66;
   --color-brand-bg: #f2e8f0;
 
-  /* ===== AOU Palette: Warm Olive-Green Gradient ===== */
-  --aou-1: #f4f4ec;
-  --aou-2: #e8e9d8;
-  --aou-3: #d0d2b0;
-  --aou-4: #b4b888;
-  --aou-5: #979d62;
-  --aou-6: #737f16;
-  --aou-7: #575f10;
-  --aou-8: #3c420b;
-  --aou-9: #222606;
-  --aou-10: #0c0e02;
+  /* ===== Forjinn Palette: Warm Olive-Green Gradient ===== */
+  --forjinn-1: #f4f4ec;
+  --forjinn-2: #e8e9d8;
+  --forjinn-3: #d0d2b0;
+  --forjinn-4: #b4b888;
+  --forjinn-5: #979d62;
+  --forjinn-6: #737f16;
+  --forjinn-7: #575f10;
+  --forjinn-8: #3c420b;
+  --forjinn-9: #222606;
+  --forjinn-10: #0c0e02;
 
   /* ===== Backgrounds: Warm Parchment ===== */
   --bg-base: #faf9f6;
@@ -114,17 +114,17 @@
   --color-brand-fill: #be80bf;
   --color-brand-bg: #3d2840;
 
-  /* AOU Palette: Dark Olive */
-  --aou-1: #232318;
-  --aou-2: #363525;
-  --aou-3: #4a4a30;
-  --aou-4: #666640;
-  --aou-5: #898a54;
-  --aou-6: #a2a554;
-  --aou-7: #bbbf6e;
-  --aou-8: #d0d490;
-  --aou-9: #e4e6b8;
-  --aou-10: #f2f4da;
+  /* Forjinn Palette: Dark Olive */
+  --forjinn-1: #232318;
+  --forjinn-2: #363525;
+  --forjinn-3: #4a4a30;
+  --forjinn-4: #666640;
+  --forjinn-5: #898a54;
+  --forjinn-6: #a2a554;
+  --forjinn-7: #bbbf6e;
+  --forjinn-8: #d0d490;
+  --forjinn-9: #e4e6b8;
+  --forjinn-10: #f2f4da;
 
   /* Backgrounds: Dark Obsidian with warm undertones */
   --bg-base: #0f0f0c;
@@ -229,7 +229,7 @@ body {
 
 .message-content h3,
 .markdown-body h3 {
-  color: var(--aou-6);
+  color: var(--forjinn-6);
 }
 
 .message-content h4,
@@ -424,7 +424,7 @@ body {
   border-right: 1px solid var(--border-base);
 }
 
-/* ===== Conversation Bubble (AOU purple-gray) ===== */
+/* ===== Conversation Bubble (Forjinn purple-gray) ===== */
 .message-item.user .message-bubble {
   background: var(--message-user-bg) !important;
   border: 1px solid #cbc0da !important;
@@ -432,7 +432,7 @@ body {
 
 [data-theme='dark'] .message-item.user .message-bubble {
   background: var(--message-user-bg) !important;
-  border-color: color-mix(in srgb, var(--aou-5) 46%, var(--border-base)) !important;
+  border-color: color-mix(in srgb, var(--forjinn-5) 46%, var(--border-base)) !important;
 }
 
 /* ===== Selection Highlight ===== */
@@ -444,6 +444,6 @@ body {
   background: color-mix(in srgb, var(--brand) 30%, transparent);
 }
 
-/* AionUi Theme Background Start */
+/* Forjinn-Desk Theme Background Start */
 /* Preview cover only: do not auto-inject full-page background image */
-/* AionUi Theme Background End */
+/* Forjinn-Desk Theme Background End */

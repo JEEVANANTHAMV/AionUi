@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,7 +9,7 @@ import type { AcpBackendConfig, AcpModelInfo } from '@/common/types/acpTypes';
 /**
  * Available agent entry returned by the backend.
  * `backend` is typed as `string` because the IPC layer returns plain strings
- * and the superset includes non-ACP values like `'remote'` and `'aionrs'`.
+ * and the superset includes non-ACP values like `'remote'` and `'forjinnrs'`.
  */
 export type AvailableAgent = {
   backend: string;

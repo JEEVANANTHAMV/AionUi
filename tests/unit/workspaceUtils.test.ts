@@ -8,11 +8,11 @@ import {
 
 describe('workspace utils', () => {
   it('shows only the last directory for Unix-style workspace paths', () => {
-    expect(getWorkspaceDisplayName('/Users/demo/projects/AionUi')).toBe('AionUi');
+    expect(getWorkspaceDisplayName('/Users/demo/projects/Forjinn-Desk')).toBe('Forjinn-Desk');
   });
 
   it('shows only the last directory for Windows-style workspace paths', () => {
-    expect(getWorkspaceDisplayName('E:\\code\\taichuCode\\AionUi')).toBe('AionUi');
+    expect(getWorkspaceDisplayName('E:\\code\\taichuCode\\Forjinn-Desk')).toBe('Forjinn-Desk');
   });
 
   it('detects temporary workspaces on Windows-style paths', () => {

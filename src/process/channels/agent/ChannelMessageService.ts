@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -250,8 +250,8 @@ export class ChannelMessageService {
       });
 
       // Build payload based on agent type.
-      // Gemini and Aionrs expect { input }, ACP expects { content }.
-      const useInputPayload = task.type === 'gemini' || task.type === 'aionrs';
+      // Gemini and Forjinnrs expect { input }, ACP expects { content }.
+      const useInputPayload = task.type === 'gemini' || task.type === 'forjinnrs';
       const payload: { input?: string; content?: string; msg_id: string } = useInputPayload
         ? { input: message, msg_id: msgId }
         : { content: message, msg_id: msgId };

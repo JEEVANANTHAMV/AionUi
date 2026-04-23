@@ -62,19 +62,19 @@ const brandColors = {
   'brand-hover': 'var(--brand-hover)',
 };
 
-// ==================== AOU 品牌色系 / AOU Brand Colors ====================
-const aouColors = {
-  aou: {
-    1: 'var(--aou-1)',
-    2: 'var(--aou-2)',
-    3: 'var(--aou-3)',
-    4: 'var(--aou-4)',
-    5: 'var(--aou-5)',
-    6: 'var(--aou-6)',
-    7: 'var(--aou-7)',
-    8: 'var(--aou-8)',
-    9: 'var(--aou-9)',
-    10: 'var(--aou-10)',
+// ==================== forjinn 品牌色系 / forjinn Brand Colors ====================
+const forjinnColors = {
+  forjinn: {
+    1: 'var(--forjinn-1)',
+    2: 'var(--forjinn-2)',
+    3: 'var(--forjinn-3)',
+    4: 'var(--forjinn-4)',
+    5: 'var(--forjinn-5)',
+    6: 'var(--forjinn-6)',
+    7: 'var(--forjinn-7)',
+    8: 'var(--forjinn-8)',
+    9: 'var(--forjinn-9)',
+    10: 'var(--forjinn-10)',
   },
 };
 
@@ -188,7 +188,7 @@ export default defineConfig({
       ...backgroundColors,
       ...borderColors,
       ...brandColors,
-      ...aouColors,
+      ...forjinnColors,
       ...componentColors,
       ...specialColors,
     },

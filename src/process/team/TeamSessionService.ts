@@ -135,7 +135,7 @@ export class TeamSessionService {
     return this.createGoogleAuthGeminiModel('gemini-2.0-flash');
   }
 
-  private async resolveDefaultAionrsModel(): Promise<TProviderWithModel> {
+  private async resolveDefaultForjinnrsModel(): Promise<TProviderWithModel> {
     const configuredProviders = await ProcessConfig.get('model.config');
     const providers = Array.isArray(configuredProviders) ? configuredProviders.filter((p) => p.enabled !== false) : [];
 
@@ -167,8 +167,8 @@ export class TeamSessionService {
       }
     }
 
-    if (type === 'aionrs') {
-      return this.resolveDefaultAionrsModel();
+    if (type === 'forjinnrs') {
+      return this.resolveDefaultForjinnrsModel();
     }
 
     return {} as TProviderWithModel;
@@ -306,10 +306,10 @@ export class TeamSessionService {
       presetAgentType: isPreset ? backend : undefined,
     });
 
-    // Override useModel for Gemini/Aionrs when agent has an explicit model
+    // Override useModel for Gemini/Forjinnrs when agent has an explicit model
     if (agent.model) {
       const type = getConversationTypeForBackend(backend);
-      if (type === 'gemini' || type === 'aionrs') {
+      if (type === 'gemini' || type === 'forjinnrs') {
         model = { ...model, useModel: agent.model };
       }
     }
@@ -349,8 +349,8 @@ export class TeamSessionService {
     switch (conversation.type) {
       case 'gemini':
         return 'gemini';
-      case 'aionrs':
-        return 'aionrs';
+      case 'forjinnrs':
+        return 'forjinnrs';
       case 'remote':
         return 'remote';
       case 'nanobot':
@@ -685,7 +685,7 @@ export class TeamSessionService {
 
   private resolveConversationType(agentType: string): AgentType {
     if (agentType === 'gemini') return 'gemini';
-    if (agentType === 'aionrs') return 'aionrs';
+    if (agentType === 'forjinnrs') return 'forjinnrs';
     if (agentType === 'codex') return 'acp';
     if (agentType === 'openclaw-gateway') return 'openclaw-gateway';
     if (agentType === 'nanobot') return 'nanobot';

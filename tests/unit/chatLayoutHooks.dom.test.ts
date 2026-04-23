@@ -48,9 +48,9 @@ vi.mock('@/renderer/utils/ui/focus', () => ({
 }));
 
 vi.mock('@/renderer/utils/workspace/workspaceEvents', () => ({
-  WORKSPACE_TOGGLE_EVENT: 'aionui-workspace-toggle',
-  WORKSPACE_STATE_EVENT: 'aionui-workspace-state',
-  WORKSPACE_HAS_FILES_EVENT: 'aionui-workspace-has-files',
+  WORKSPACE_TOGGLE_EVENT: 'forjinn-desk-workspace-toggle',
+  WORKSPACE_STATE_EVENT: 'forjinn-desk-workspace-state',
+  WORKSPACE_HAS_FILES_EVENT: 'forjinn-desk-workspace-has-files',
   dispatchWorkspaceStateEvent: vi.fn(),
   dispatchWorkspaceToggleEvent: vi.fn(),
   dispatchWorkspaceHasFilesEvent: vi.fn(),
@@ -260,7 +260,7 @@ describe('useContainerWidth', () => {
 // ── useWorkspaceCollapse ───────────────────────────────────────────────────
 
 describe('useWorkspaceCollapse', () => {
-  const STORAGE_KEY = 'aionui_workspace_panel_collapsed';
+  const STORAGE_KEY = 'forjinn-desk_workspace_panel_collapsed';
 
   function clearStorage() {
     globalThis.localStorage.removeItem(STORAGE_KEY);

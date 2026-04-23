@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -43,7 +43,7 @@ const AgentPillBar: React.FC<AgentPillBarProps> = ({
           marginBottom: 20,
           padding: '6px',
           borderRadius: '30px',
-          backgroundColor: 'var(--color-guid-agent-bar, var(--aou-2))',
+          backgroundColor: 'var(--color-guid-agent-bar, var(--forjinn-2))',
           transition: 'background-color 0.35s ease',
           width: isMobile ? 'calc(100% + 28px)' : 'fit-content',
           maxWidth: isMobile ? 'none' : '100%',

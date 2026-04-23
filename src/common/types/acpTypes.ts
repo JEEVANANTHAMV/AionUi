@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -36,7 +36,7 @@ export type AcpBackendAll =
   | 'custom'; // User-configured custom ACP agent (extension adapters)
 
 // Superset type covering all execution engine backends (ACP + non-ACP).
-export type AgentBackend = AcpBackendAll | 'gemini' | 'remote' | 'aionrs' | 'nanobot' | 'openclaw-gateway';
+export type AgentBackend = AcpBackendAll | 'gemini' | 'remote' | 'forjinnrs' | 'nanobot' | 'openclaw-gateway';
 
 /**
  * 潜在的 ACP CLI 工具列表
@@ -496,7 +496,7 @@ export type AcpBackend = keyof typeof ACP_BACKENDS_ALL;
  */
 const NON_ACP_SKILLS_DIRS: Record<string, string[]> = {
   gemini: ['.gemini/skills'],
-  aionrs: ['.aionrs/skills'],
+  forjinnrs: ['.forjinnrs/skills'],
 };
 
 /**

@@ -1,4 +1,4 @@
-/* Default Theme - AOU Purple Theme / 默认主题 */
+/* Default Theme - Forjinn Purple Theme / 默认主题 */
 /* 此主题展示了系统默认的颜色变量，您可以基于此进行自定义 */
 /* This theme shows the system default color variables, you can customize based on this */
 
@@ -19,17 +19,17 @@
   --color-brand-fill: #7583b2;
   --color-brand-bg: #eff0f6;
 
-  /* AOU Brand Colors - AOU 品牌色板 */
-  --aou-1: #eff0f6;
-  --aou-2: #e5e7f0;
-  --aou-3: #d1d5e5;
-  --aou-4: #b5bcd6;
-  --aou-5: #97a0c5;
-  --aou-6: #7583b2;
-  --aou-7: #596590;
-  --aou-8: #3f4868;
-  --aou-9: #262c41;
-  --aou-10: #0d101c;
+  /* Forjinn Brand Colors - Forjinn 品牌色板 */
+  --forjinn-1: #eff0f6;
+  --forjinn-2: #e5e7f0;
+  --forjinn-3: #d1d5e5;
+  --forjinn-4: #b5bcd6;
+  --forjinn-5: #97a0c5;
+  --forjinn-6: #7583b2;
+  --forjinn-7: #596590;
+  --forjinn-8: #3f4868;
+  --forjinn-9: #262c41;
+  --forjinn-10: #0d101c;
 
   /* Background Colors - 背景色 */
   --color-bg-1: #f9fafb;
@@ -107,17 +107,17 @@
   --color-brand-fill: #a1aacb;
   --color-brand-bg: #3d4150;
 
-  /* AOU Brand Colors - Dark Mode */
-  --aou-1: #2a2a2a;
-  --aou-2: #3d4150;
-  --aou-3: #525a77;
-  --aou-4: #6a749b;
-  --aou-5: #838fba;
-  --aou-6: #a1aacb;
-  --aou-7: #b5bcd6;
-  --aou-8: #d1d5e5;
-  --aou-9: #e5e7f0;
-  --aou-10: #eff0f6;
+  /* Forjinn Brand Colors - Dark Mode */
+  --forjinn-1: #2a2a2a;
+  --forjinn-2: #3d4150;
+  --forjinn-3: #525a77;
+  --forjinn-4: #6a749b;
+  --forjinn-5: #838fba;
+  --forjinn-6: #a1aacb;
+  --forjinn-7: #b5bcd6;
+  --forjinn-8: #d1d5e5;
+  --forjinn-9: #e5e7f0;
+  --forjinn-10: #eff0f6;
 
   /* Background Colors - Dark Mode */
   --color-bg-1: #1a1a1a;

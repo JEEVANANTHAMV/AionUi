@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -98,8 +98,8 @@ const SiderItem: React.FC<SiderItemProps> = ({
             })}
             style={{
               backgroundImage: selected
-                ? `linear-gradient(to right, transparent, var(--aou-2) 20%)`
-                : `linear-gradient(to right, transparent, var(--aou-1) 20%)`,
+                ? `linear-gradient(to right, transparent, var(--forjinn-2) 20%)`
+                : `linear-gradient(to right, transparent, var(--forjinn-1) 20%)`,
             }}
             onClick={(e) => e.stopPropagation()}
           >

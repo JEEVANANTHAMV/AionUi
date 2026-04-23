@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,7 +15,7 @@ const FULL_AUTO_MODE: Record<string, string> = {
   qwen: 'yolo',
   opencode: 'build',
   gemini: 'yolo',
-  aionrs: 'yolo',
+  forjinnrs: 'yolo',
   codex: CODEX_MODE_FULL_AUTO,
   cursor: 'agent',
   snow: 'yolo',

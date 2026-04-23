@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -149,7 +149,7 @@ describe('createConversationParams', () => {
     expect(params.model.platform).toBe('gemini-with-google-auth');
   });
 
-  it('resolves aionrs model from enabled provider', async () => {
+  it('resolves forjinnrs model from enabled provider', async () => {
     configGet.mockResolvedValue([
       {
         id: 'provider-1',
@@ -164,24 +164,24 @@ describe('createConversationParams', () => {
 
     const params = await buildCliAgentParams(
       {
-        backend: 'aionrs',
+        backend: 'forjinnrs',
         name: 'Aion CLI Agent',
       },
       '/tmp/workspace'
     );
 
-    expect(params.type).toBe('aionrs');
+    expect(params.type).toBe('forjinnrs');
     expect(params.model.id).toBe('provider-1');
     expect(params.model.useModel).toBe('gpt-4.1');
   });
 
-  it('throws error for aionrs if no provider configured', async () => {
+  it('throws error for forjinnrs if no provider configured', async () => {
     configGet.mockResolvedValue([]);
 
     await expect(
       buildCliAgentParams(
         {
-          backend: 'aionrs',
+          backend: 'forjinnrs',
           name: 'Aion CLI Agent',
         },
         '/tmp/workspace'
@@ -298,9 +298,9 @@ describe('createConversationParams', () => {
     expect(params.extra.currentModelId).toBe('gpt-5');
   });
 
-  it('throws error for aionrs if no enabled provider', async () => {
+  it('throws error for forjinnrs if no enabled provider', async () => {
     configGet.mockResolvedValue([{ id: 'p1', enabled: false, model: ['m1'] }]);
-    await expect(buildCliAgentParams({ backend: 'aionrs', name: 'Agent' }, '/tmp')).rejects.toThrow(
+    await expect(buildCliAgentParams({ backend: 'forjinnrs', name: 'Agent' }, '/tmp')).rejects.toThrow(
       'No enabled model provider for Aion CLI'
     );
   });
@@ -326,7 +326,7 @@ describe('createConversationParams', () => {
     }
   });
 
-  it('falls back to first model if none enabled for aionrs', async () => {
+  it('falls back to first model if none enabled for forjinnrs', async () => {
     configGet.mockResolvedValue([
       {
         id: 'p1',
@@ -340,7 +340,7 @@ describe('createConversationParams', () => {
       },
     ]);
 
-    const params = await buildCliAgentParams({ backend: 'aionrs', name: 'A' }, '/tmp');
+    const params = await buildCliAgentParams({ backend: 'forjinnrs', name: 'A' }, '/tmp');
     expect(params.model.useModel).toBe('m1');
   });
 

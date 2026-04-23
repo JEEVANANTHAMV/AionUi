@@ -9,16 +9,16 @@
   --brand-light: #3b3126;
   --brand-hover: #dcc59a;
 
-  --aou-1: #201a14;
-  --aou-2: #2a221a;
-  --aou-3: #3a2f24;
-  --aou-4: #524334;
-  --aou-5: #74614b;
-  --aou-6: #9a8465;
-  --aou-7: #b69b73;
-  --aou-8: #d1b48b;
-  --aou-9: #e6ceb0;
-  --aou-10: #f4e7d4;
+  --forjinn-1: #201a14;
+  --forjinn-2: #2a221a;
+  --forjinn-3: #3a2f24;
+  --forjinn-4: #524334;
+  --forjinn-5: #74614b;
+  --forjinn-6: #9a8465;
+  --forjinn-7: #b69b73;
+  --forjinn-8: #d1b48b;
+  --forjinn-9: #e6ceb0;
+  --forjinn-10: #f4e7d4;
 
   --bg-base: #120f0c;
   --bg-1: #1a1511;
@@ -134,7 +134,7 @@ body,
 .chat-history__item--active,
 .chat-history__item[aria-selected='true'],
 .chat-history__item[class~='!bg-active'],
-.settings-sider__item[class~='!bg-aou-2'] {
+.settings-sider__item[class~='!bg-forjinn-2'] {
   background: linear-gradient(
     90deg,
     rgba(82, 67, 72, 0.96) 0%,

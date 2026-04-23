@@ -20,17 +20,17 @@
   --color-brand-fill: var(--color-primary-base);
   --color-brand-bg: #dbeafe;
 
-  /* AOU 品牌色板 - 蓝色系渐变（常盘台校服色） */
-  --aou-1: #eff6ff;
-  --aou-2: #dbeafe;
-  --aou-3: #bfdbfe;
-  --aou-4: #93c5fd;
-  --aou-5: #60a5fa;
-  --aou-6: #3b82f6;
-  --aou-7: #2563eb;
-  --aou-8: #1e40af;
-  --aou-9: #1e3a8a;
-  --aou-10: #172554;
+  /* Forjinn 品牌色板 - 蓝色系渐变（常盘台校服色） */
+  --forjinn-1: #eff6ff;
+  --forjinn-2: #dbeafe;
+  --forjinn-3: #bfdbfe;
+  --forjinn-4: #93c5fd;
+  --forjinn-5: #60a5fa;
+  --forjinn-6: #3b82f6;
+  --forjinn-7: #2563eb;
+  --forjinn-8: #1e40af;
+  --forjinn-9: #1e3a8a;
+  --forjinn-10: #172554;
 
   /* 背景色 - 完整定义以兼容所有组件 */
   --bg-base-color: #f0f9ff;
@@ -502,17 +502,17 @@ a:hover:not([class*='button']):not([class*='btn']) {
   --color-brand-fill: var(--color-primary-base);
   --color-brand-bg: #1e3a5a;
 
-  /* AOU 品牌色板 */
-  --aou-1: #0f1729;
-  --aou-2: #1e2a47;
-  --aou-3: #1e3a5a;
-  --aou-4: #2d4a6f;
-  --aou-5: #3d5a8f;
-  --aou-6: #60a5fa;
-  --aou-7: #93c5fd;
-  --aou-8: #bfdbfe;
-  --aou-9: #dbeafe;
-  --aou-10: #eff6ff;
+  /* Forjinn 品牌色板 */
+  --forjinn-1: #0f1729;
+  --forjinn-2: #1e2a47;
+  --forjinn-3: #1e3a5a;
+  --forjinn-4: #2d4a6f;
+  --forjinn-5: #3d5a8f;
+  --forjinn-6: #60a5fa;
+  --forjinn-7: #93c5fd;
+  --forjinn-8: #bfdbfe;
+  --forjinn-9: #dbeafe;
+  --forjinn-10: #eff6ff;
 
   /* 背景色 */
   --bg-base-color: #0f1729;

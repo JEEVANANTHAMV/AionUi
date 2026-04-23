@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,7 +12,7 @@ import { DETECTED_AGENTS_SWR_KEY, fetchDetectedAgents } from '@/renderer/utils/m
 import type { AvailableAgent } from '@/renderer/utils/model/agentTypes';
 
 export type UseConversationAgentsResult = {
-  /** Detected execution engines (acp, extension, remote, aionrs, gemini, etc.) */
+  /** Detected execution engines (acp, extension, remote, forjinnrs, gemini, etc.) */
   cliAgents: AvailableAgent[];
   /** Preset assistants from config layer */
   presetAssistants: AvailableAgent[];

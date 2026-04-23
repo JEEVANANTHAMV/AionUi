@@ -1,12 +1,12 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { ipcBridge } from '@/common';
 import type { IMessageSearchItem } from '@/common/types/database';
-import AionModal from '@/renderer/components/base/AionModal';
+import ForjinnModal from '@/renderer/components/base/ForjinnModal';
 import { usePresetAssistantInfo } from '@/renderer/hooks/agent/usePresetAssistantInfo';
 import { useOptionalConversationTabs } from '@/renderer/pages/conversation/hooks/ConversationTabsContext';
 import { getAgentLogo } from '@/renderer/utils/model/agentLogo';
@@ -463,7 +463,7 @@ const ConversationSearchPopover: React.FC<ConversationSearchPopoverProps> = ({
               'hover:bg-fill-3 active:bg-fill-4': !disabled && fullWidth,
               'hover:bg-fill-2 hover:border-[color:var(--color-border-2)]': !disabled && !fullWidth,
               'opacity-50 cursor-not-allowed': disabled,
-              'bg-aou-2 text-primary border-[color:var(--color-primary-light-3)]': visible && !disabled && !fullWidth,
+              'bg-forjinn-2 text-primary border-[color:var(--color-primary-light-3)]': visible && !disabled && !fullWidth,
             },
             buttonClassName
           )}
@@ -495,7 +495,7 @@ const ConversationSearchPopover: React.FC<ConversationSearchPopoverProps> = ({
         </button>
       )}
 
-      <AionModal
+      <ForjinnModal
         visible={visible}
         onCancel={handleClose}
         footer={null}
@@ -570,7 +570,7 @@ const ConversationSearchPopover: React.FC<ConversationSearchPopoverProps> = ({
 
           <div className='flex-1 min-h-0'>{resultContent}</div>
         </div>
-      </AionModal>
+      </ForjinnModal>
     </>
   );
 };

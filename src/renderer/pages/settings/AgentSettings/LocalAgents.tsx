@@ -1,13 +1,13 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { ipcBridge } from '@/common';
 import { ConfigStorage } from '@/common/config/storage';
 import type { AcpBackendConfig } from '@/common/types/acpTypes';
-import AionModal from '@/renderer/components/base/AionModal';
+import ForjinnModal from '@/renderer/components/base/ForjinnModal';
 import { Button, Typography } from '@arco-design/web-react';
 import { Home, Plus } from '@icon-park/react';
 import React, { useCallback, useState } from 'react';
@@ -78,9 +78,9 @@ const LocalAgents: React.FC = () => {
   );
 
   // Aion CLI and Gemini CLI first among detected agents
-  const aionrsAgent = detectedAgents?.find((a) => a.backend === 'aionrs');
+  const forjinnrsAgent = detectedAgents?.find((a) => a.backend === 'forjinnrs');
   const geminiAgent = detectedAgents?.find((a) => a.backend === 'gemini');
-  const otherDetected = detectedAgents?.filter((a) => a.backend !== 'gemini' && a.backend !== 'aionrs') ?? [];
+  const otherDetected = detectedAgents?.filter((a) => a.backend !== 'gemini' && a.backend !== 'forjinnrs') ?? [];
 
   const openCustomAgentEditor = useCallback(() => {
     setEditingAgent(null);
@@ -138,12 +138,12 @@ const LocalAgents: React.FC = () => {
         </Typography.Text>
       </div>
       <div className='grid grid-cols-2 gap-10px px-16px md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'>
-        {aionrsAgent && (
+        {forjinnrsAgent && (
           <AgentCard
             type='detected'
-            agent={aionrsAgent}
+            agent={forjinnrsAgent}
             settingsDisabled={false}
-            onSettings={() => navigate('/settings/aionrs')}
+            onSettings={() => navigate('/settings/forjinnrs')}
             variant='grid'
           />
         )}
@@ -175,7 +175,7 @@ const LocalAgents: React.FC = () => {
         </div>
       )}
 
-      <AionModal
+      <ForjinnModal
         visible={editorVisible}
         onCancel={() => {
           setEditorVisible(false);
@@ -204,7 +204,7 @@ const LocalAgents: React.FC = () => {
             setEditingAgent(null);
           }}
         />
-      </AionModal>
+      </ForjinnModal>
 
       <div className='flex flex-col gap-4px px-0'>
         {customAgents?.map((agent) => (

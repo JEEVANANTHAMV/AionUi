@@ -73,7 +73,7 @@ describe('MessageText attachment paths', () => {
       position: 'right',
       createdAt: Date.now(),
       content: {
-        content: 'look at this\n\n[[AION_FILES]]\nuploads/photo.png',
+        content: 'look at this\n\n[[FORJINN_FILES]]\nuploads/photo.png',
       },
     };
 

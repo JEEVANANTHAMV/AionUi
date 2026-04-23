@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1517,10 +1517,10 @@ export class AcpAgent {
     const resumeConversationId = this.extra.acpSessionConversationId;
     const mcpServers = await this.loadBuiltinSessionMcpServers();
 
-    // Derive teamId from injected team MCP server name (format: aionui-team-<teamId>)
+    // Derive teamId from injected team MCP server name (format: forjinn-desk-team-<teamId>)
     // Only emit MCP status events when running inside a team session.
     const teamMcpName = this.extra.teamMcpStdioConfig?.name;
-    const teamId = teamMcpName?.startsWith('aionui-team-') ? teamMcpName.slice('aionui-team-'.length) : undefined;
+    const teamId = teamMcpName?.startsWith('forjinn-desk-team-') ? teamMcpName.slice('forjinn-desk-team-'.length) : undefined;
     const slotId = this.id;
 
     const emitMcpStatus = teamId
@@ -1622,7 +1622,7 @@ export class AcpAgent {
 
       // Inject Aion team-guide MCP server for solo agents (not in team mode already).
       // Uses stdio bridge mode — same pattern as TeamMcpServer.
-      // AION_MCP_BACKEND env var tells the stdio bridge which backend this agent is,
+      // FORJINN_MCP_BACKEND env var tells the stdio bridge which backend this agent is,
       // so aion_create_team automatically creates a team with the correct agent type.
       if (!this.extra.teamMcpStdioConfig && (await shouldInjectTeamGuideMcp(this.extra.backend))) {
         const aionStdioConfig = getTeamGuideStdioConfig();
@@ -1631,8 +1631,8 @@ export class AcpAgent {
             ...aionStdioConfig,
             env: [
               ...aionStdioConfig.env,
-              { name: 'AION_MCP_BACKEND', value: this.extra.backend },
-              { name: 'AION_MCP_CONVERSATION_ID', value: this.id },
+              { name: 'FORJINN_MCP_BACKEND', value: this.extra.backend },
+              { name: 'FORJINN_MCP_CONVERSATION_ID', value: this.id },
             ],
           };
           servers.push(buildTeamMcpServer(configWithBackend)!);
@@ -1645,8 +1645,8 @@ export class AcpAgent {
       console.warn(`[ACP ${this.extra.backend}] Failed to load built-in MCP config for session/new:`, errMsg);
       const mcpName = this.extra.teamMcpStdioConfig?.name;
       const tId =
-        typeof mcpName === 'string' && mcpName.startsWith('aionui-team-')
-          ? mcpName.slice('aionui-team-'.length)
+        typeof mcpName === 'string' && mcpName.startsWith('forjinn-desk-team-')
+          ? mcpName.slice('forjinn-desk-team-'.length)
           : undefined;
       if (tId) {
         ipcBridge.team.mcpStatus.emit({ teamId: tId, slotId: this.id, phase: 'load_failed', error: errMsg });

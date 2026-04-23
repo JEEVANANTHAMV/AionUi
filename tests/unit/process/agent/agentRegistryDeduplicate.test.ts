@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -171,14 +171,14 @@ describe('AgentRegistry.deduplicate', () => {
     expect(claudeAgents[0].isExtension).toBeUndefined();
   });
 
-  it('returns aionrs + gemini for empty sub-detector results', async () => {
+  it('returns forjinnrs + gemini for empty sub-detector results', async () => {
     const registry = await createFreshRegistry();
     await registry.initialize();
     const agents = registry.getDetectedAgents();
 
     // Only the always-present agents
     expect(agents).toHaveLength(2);
-    expect(agents[0].backend).toBe('aionrs');
+    expect(agents[0].backend).toBe('forjinnrs');
     expect(agents[1].backend).toBe('gemini');
   });
 
@@ -191,7 +191,7 @@ describe('AgentRegistry.deduplicate', () => {
     await registry.initialize();
     const agents = registry.getDetectedAgents();
 
-    // aionrs + gemini + codex
+    // forjinnrs + gemini + codex
     expect(agents).toHaveLength(3);
     expect(agents[2]).toMatchObject({ id: 'codex', backend: 'codex' });
   });
@@ -209,7 +209,7 @@ describe('AgentRegistry.deduplicate', () => {
     await registry.initialize();
     const agents = registry.getDetectedAgents();
 
-    // aionrs + gemini + claude + 2 remotes
+    // forjinnrs + gemini + claude + 2 remotes
     expect(agents).toHaveLength(5);
     const remoteAgents = agents.filter((a) => a.kind === 'remote');
     expect(remoteAgents).toHaveLength(2);

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -18,7 +18,7 @@ export interface ConversationTab {
   /** 工作空间路径 / Workspace path */
   workspace: string;
   /** 会话类型 / Conversation type */
-  type: 'gemini' | 'acp' | 'codex' | 'openclaw-gateway' | 'nanobot' | 'remote' | 'aionrs';
+  type: 'gemini' | 'acp' | 'codex' | 'openclaw-gateway' | 'nanobot' | 'remote' | 'forjinnrs';
   /** 是否有未保存的修改 / Whether there are unsaved changes */
   isDirty?: boolean;
 }

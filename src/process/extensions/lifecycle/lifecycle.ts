@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,7 +15,7 @@ import { extensionEventBus, ExtensionSystemEvents, type ExtensionLifecyclePayloa
 /**
  * Lifecycle hook scripts that an extension can declare in its manifest.
  *
- * Example in aion-extension.json:
+ * Example in forjinn-extension.json:
  * ```json
  * {
  *   "lifecycle": {

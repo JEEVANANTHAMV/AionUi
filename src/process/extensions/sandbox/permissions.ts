@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,7 +12,7 @@ import { z } from 'zod';
  * Extensions declare what capabilities they need. The system validates these
  * declarations and can enforce them at runtime (P2: enforcement layer).
  *
- * Example in aion-extension.json:
+ * Example in forjinn-extension.json:
  * ```json
  * {
  *   "permissions": {

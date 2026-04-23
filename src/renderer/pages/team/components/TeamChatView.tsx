@@ -3,11 +3,11 @@ import type { IProvider, TChatConversation, TProviderWithModel } from '@/common/
 import { Spin } from '@arco-design/web-react';
 import React, { Suspense, useCallback } from 'react';
 import { useGeminiModelSelection } from '@/renderer/pages/conversation/platforms/gemini/useGeminiModelSelection';
-import { useAionrsModelSelection } from '@/renderer/pages/conversation/platforms/aionrs/useAionrsModelSelection';
+import { useForjinnrsModelSelection } from '@/renderer/pages/conversation/platforms/forjinnrs/useForjinnrsModelSelection';
 import TeamChatEmptyState from './TeamChatEmptyState';
 
 const AcpChat = React.lazy(() => import('@/renderer/pages/conversation/platforms/acp/AcpChat'));
-const AionrsChat = React.lazy(() => import('@/renderer/pages/conversation/platforms/aionrs/AionrsChat'));
+const ForjinnrsChat = React.lazy(() => import('@/renderer/pages/conversation/platforms/forjinnrs/ForjinnrsChat'));
 const GeminiChat = React.lazy(() => import('@/renderer/pages/conversation/platforms/gemini/GeminiChat'));
 const OpenClawChat = React.lazy(() => import('@/renderer/pages/conversation/platforms/openclaw/OpenClawChat'));
 const NanobotChat = React.lazy(() => import('@/renderer/pages/conversation/platforms/nanobot/NanobotChat'));
@@ -48,12 +48,12 @@ const GeminiTeamChat: React.FC<{
   );
 };
 
-// Narrow to Aionrs conversations so model field is always available
-type AionrsConversation = Extract<TChatConversation, { type: 'aionrs' }>;
+// Narrow to Forjinnrs conversations so model field is always available
+type ForjinnrsConversation = Extract<TChatConversation, { type: 'forjinnrs' }>;
 
-/** Aionrs sub-component manages model selection state without adding a ChatLayout wrapper */
-const AionrsTeamChat: React.FC<{
-  conversation: AionrsConversation;
+/** Forjinnrs sub-component manages model selection state without adding a ChatLayout wrapper */
+const ForjinnrsTeamChat: React.FC<{
+  conversation: ForjinnrsConversation;
   teamId?: string;
   agentSlotId?: string;
   emptySlot?: React.ReactNode;
@@ -67,10 +67,10 @@ const AionrsTeamChat: React.FC<{
     [conversation.id]
   );
 
-  const modelSelection = useAionrsModelSelection({ initialModel: conversation.model, onSelectModel });
+  const modelSelection = useForjinnrsModelSelection({ initialModel: conversation.model, onSelectModel });
 
   return (
-    <AionrsChat
+    <ForjinnrsChat
       conversation_id={conversation.id}
       workspace={conversation.extra.workspace}
       modelSelection={modelSelection}
@@ -131,11 +131,11 @@ const TeamChatView: React.FC<TeamChatViewProps> = ({ conversation, hideSendBox, 
             emptySlot={emptySlot}
           />
         );
-      case 'aionrs':
+      case 'forjinnrs':
         return (
-          <AionrsTeamChat
+          <ForjinnrsTeamChat
             key={conversation.id}
-            conversation={conversation as AionrsConversation}
+            conversation={conversation as ForjinnrsConversation}
             teamId={teamId}
             agentSlotId={agentSlotId}
             emptySlot={emptySlot}

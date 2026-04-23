@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -62,7 +62,7 @@ export const AGENT_MODES: Record<string, AgentModeOption[]> = {
     { value: 'autoEdit', label: 'Auto-Accept Edits' },
     { value: 'yolo', label: 'YOLO' },
   ],
-  aionrs: [
+  forjinnrs: [
     { value: 'default', label: 'Default' },
     { value: 'auto_edit', label: 'Auto-Accept Edits' },
     { value: 'yolo', label: 'YOLO' },

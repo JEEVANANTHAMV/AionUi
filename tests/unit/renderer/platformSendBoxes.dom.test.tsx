@@ -27,7 +27,7 @@ const mockUseCommandQueueEnabled = vi.fn(() => true);
 let mockConversationStatus: 'idle' | 'running' = 'idle';
 let mockAcpRunning = false;
 let mockGeminiRunning = false;
-let mockAionrsRunning = false;
+let mockForjinnrsRunning = false;
 const mockUseConversationCommandQueue = vi.fn(() => ({
   items: [] as QueueItem[],
   isPaused: false,
@@ -305,10 +305,10 @@ vi.mock('@/renderer/pages/conversation/platforms/gemini/useGeminiMessage', () =>
   })),
 }));
 
-vi.mock('@/renderer/pages/conversation/platforms/aionrs/useAionrsMessage', () => ({
-  useAionrsMessage: vi.fn(() => ({
+vi.mock('@/renderer/pages/conversation/platforms/forjinnrs/useForjinnrsMessage', () => ({
+  useForjinnrsMessage: vi.fn(() => ({
     thought: { subject: '', description: '' },
-    running: mockAionrsRunning,
+    running: mockForjinnrsRunning,
     hasHydratedRunningState: true,
     tokenUsage: 0,
     setActiveMsgId: vi.fn(),
@@ -387,7 +387,7 @@ vi.mock('react-i18next', () => ({
 }));
 
 import AcpSendBox from '@/renderer/pages/conversation/platforms/acp/AcpSendBox';
-import AionrsSendBox from '@/renderer/pages/conversation/platforms/aionrs/AionrsSendBox';
+import ForjinnrsSendBox from '@/renderer/pages/conversation/platforms/forjinnrs/ForjinnrsSendBox';
 import GeminiSendBox from '@/renderer/pages/conversation/platforms/gemini/GeminiSendBox';
 import NanobotSendBox from '@/renderer/pages/conversation/platforms/nanobot/NanobotSendBox';
 import OpenClawSendBox from '@/renderer/pages/conversation/platforms/openclaw/OpenClawSendBox';
@@ -407,7 +407,7 @@ describe('platform send box queue integration', () => {
     mockConversationStatus = 'idle';
     mockAcpRunning = false;
     mockGeminiRunning = false;
-    mockAionrsRunning = false;
+    mockForjinnrsRunning = false;
 
     mockShouldEnqueueConversationCommand.mockReturnValue(false);
     mockUseCommandQueueEnabled.mockReturnValue(true);
@@ -479,11 +479,11 @@ describe('platform send box queue integration', () => {
       />,
     ],
     [
-      'aionrs',
-      <AionrsSendBox
-        conversation_id='conv-aionrs'
+      'forjinnrs',
+      <ForjinnrsSendBox
+        conversation_id='conv-forjinnrs'
         modelSelection={{
-          currentModel: { useModel: 'aionrs-1' },
+          currentModel: { useModel: 'forjinnrs-1' },
           getDisplayModelName: (modelId: string) => modelId,
         }}
       />,
@@ -547,18 +547,18 @@ describe('platform send box queue integration', () => {
       },
     ],
     [
-      'aionrs',
-      <AionrsSendBox
-        conversation_id='conv-aionrs'
+      'forjinnrs',
+      <ForjinnrsSendBox
+        conversation_id='conv-forjinnrs'
         modelSelection={{
-          currentModel: { useModel: 'aionrs-1' },
+          currentModel: { useModel: 'forjinnrs-1' },
           getDisplayModelName: (modelId: string) => modelId,
         }}
       />,
       mockConversationSendInvoke,
       (payload: { input: string; conversation_id: string }) => {
         expect(payload.input).toContain('queued command');
-        expect(payload.conversation_id).toBe('conv-aionrs');
+        expect(payload.conversation_id).toBe('conv-forjinnrs');
       },
     ],
     [
@@ -661,11 +661,11 @@ describe('platform send box queue integration', () => {
       />,
     ],
     [
-      'aionrs',
-      <AionrsSendBox
-        conversation_id='conv-aionrs'
+      'forjinnrs',
+      <ForjinnrsSendBox
+        conversation_id='conv-forjinnrs'
         modelSelection={{
-          currentModel: { useModel: 'aionrs-1' },
+          currentModel: { useModel: 'forjinnrs-1' },
           getDisplayModelName: (modelId: string) => modelId,
         }}
       />,

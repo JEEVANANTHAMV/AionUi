@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -318,15 +318,15 @@ export const useGuidSend = (deps: GuidSendDeps): GuidSendResult => {
       return;
     }
 
-    // Aionrs path (direct selection or preset assistant with aionrs as main agent)
-    if (selectedAgent === 'aionrs' || (isPreset && finalEffectiveAgentType === 'aionrs')) {
+    // Forjinnrs path (direct selection or preset assistant with forjinnrs as main agent)
+    if (selectedAgent === 'forjinnrs' || (isPreset && finalEffectiveAgentType === 'forjinnrs')) {
       if (!currentModel) {
         Message.warning(t('conversation.noModelConfigured'));
         return;
       }
       try {
         const conversation = await ipcBridge.conversation.create.invoke({
-          type: 'aionrs',
+          type: 'forjinnrs',
           name: input,
           model: currentModel,
           extra: {
@@ -342,7 +342,7 @@ export const useGuidSend = (deps: GuidSendDeps): GuidSendResult => {
         });
 
         if (!conversation || !conversation.id) {
-          alert('Failed to create Aion CLI conversation. Please ensure aionrs is installed.');
+          alert('Failed to create Aion CLI conversation. Please ensure forjinnrs is installed.');
           return;
         }
 
@@ -358,7 +358,7 @@ export const useGuidSend = (deps: GuidSendDeps): GuidSendResult => {
           input,
           files: files.length > 0 ? files : undefined,
         };
-        sessionStorage.setItem(`aionrs_initial_message_${conversation.id}`, JSON.stringify(initialMessage));
+        sessionStorage.setItem(`forjinnrs_initial_message_${conversation.id}`, JSON.stringify(initialMessage));
 
         await navigate(`/conversation/${conversation.id}`);
       } catch (error: unknown) {

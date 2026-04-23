@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -45,12 +45,12 @@ const ChatSider: React.FC<{
         teamId={teamId}
       ></ChatWorkspace>
     );
-  } else if (conversation?.type === 'aionrs' && conversation.extra?.workspace) {
+  } else if (conversation?.type === 'forjinnrs' && conversation.extra?.workspace) {
     workspaceNode = (
       <ChatWorkspace
         conversation_id={conversation.id}
         workspace={conversation.extra.workspace}
-        eventPrefix='aionrs'
+        eventPrefix='forjinnrs'
         messageApi={messageApi}
         teamId={teamId}
       ></ChatWorkspace>

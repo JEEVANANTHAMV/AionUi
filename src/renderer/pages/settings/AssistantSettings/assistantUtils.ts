@@ -43,7 +43,7 @@ export const resolveAvatarImageSrc = (
 
   const resolved = resolveExtensionAssetUrl(value) || value;
   const isImage =
-    /\.(svg|png|jpe?g|webp|gif)$/i.test(resolved) || /^(https?:|aion-asset:\/\/|file:\/\/|data:)/i.test(resolved);
+    /\.(svg|png|jpe?g|webp|gif)$/i.test(resolved) || /^(https?:|forjinn-asset:\/\/|file:\/\/|data:)/i.test(resolved);
   return isImage ? resolved : undefined;
 };
 

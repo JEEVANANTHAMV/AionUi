@@ -34,7 +34,7 @@ vi.mock('util', () => ({ promisify: () => vi.fn(async () => ({ stdout: '', stder
 vi.mock('@process/utils', () => ({ getDataPath: () => '/data' }));
 
 vi.mock('@process/extensions/constants', () => ({
-  EXTENSION_MANIFEST_FILE: 'aion-extension.json',
+  EXTENSION_MANIFEST_FILE: 'forjinn-extension.json',
   HUB_REMOTE_URLS: ['https://mirror1.com', 'https://mirror2.com'],
   getHubResourcesDir: vi.fn(() => '/resources/hub'),
   getInstallTargetDir: vi.fn(() => '/ext-install-dir'),
@@ -93,7 +93,7 @@ function makeExtInfo(name: string, bundled = false) {
     description: 'test',
     author: 'test',
     dist: { tarball: `extensions/${name}.zip`, integrity: 'sha512-abc', unpackedSize: 100 },
-    engines: { aionui: '>=1.0.0' },
+    engines: { forjinn-desk: '>=1.0.0' },
     hubs: ['acpAdapters'],
     bundled,
   };
@@ -123,7 +123,7 @@ describe('HubInstaller', () => {
       mockedExistsSync.mockImplementation((p) => {
         const s = String(p);
         if (s.includes('bundled-ext.zip') && s.includes('resources')) return true;
-        if (s.includes('aion-extension.json')) return true;
+        if (s.includes('forjinn-extension.json')) return true;
         return false;
       });
 
@@ -135,7 +135,7 @@ describe('HubInstaller', () => {
 
     it('should download from remote when not bundled', async () => {
       mocks.getExtensionResult = makeExtInfo('remote-ext', false);
-      mockedExistsSync.mockImplementation((p) => String(p).includes('aion-extension.json'));
+      mockedExistsSync.mockImplementation((p) => String(p).includes('forjinn-extension.json'));
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -150,7 +150,7 @@ describe('HubInstaller', () => {
 
     it('should fall back to second mirror when first fails', async () => {
       mocks.getExtensionResult = makeExtInfo('mirror-ext', false);
-      mockedExistsSync.mockImplementation((p) => String(p).includes('aion-extension.json'));
+      mockedExistsSync.mockImplementation((p) => String(p).includes('forjinn-extension.json'));
 
       mockFetch.mockRejectedValueOnce(new Error('mirror1 down')).mockResolvedValueOnce({
         ok: true,
@@ -178,7 +178,7 @@ describe('HubInstaller', () => {
       });
       mockedExistsSync.mockReturnValue(false);
 
-      await expect(hubInstaller.install('bad-pkg')).rejects.toThrow('aion-extension.json missing');
+      await expect(hubInstaller.install('bad-pkg')).rejects.toThrow('forjinn-extension.json missing');
     });
   });
 
@@ -188,7 +188,7 @@ describe('HubInstaller', () => {
       mockedExistsSync.mockImplementation((p) => {
         const s = String(p);
         if (s.includes('retry-ext.zip') && s.includes('resources')) return true;
-        if (s.includes('aion-extension.json')) return true;
+        if (s.includes('forjinn-extension.json')) return true;
         return false;
       });
 
@@ -211,7 +211,7 @@ describe('HubInstaller', () => {
       mockedExistsSync.mockImplementation((p) => {
         const s = String(p);
         if (s.includes('reinstall-ext.zip') && s.includes('resources')) return true;
-        if (s.includes('aion-extension.json')) return true;
+        if (s.includes('forjinn-extension.json')) return true;
         return false;
       });
 
@@ -226,7 +226,7 @@ describe('HubInstaller', () => {
       mockedExistsSync.mockImplementation((p) => {
         const s = String(p);
         if (s === path.join('/ext-install-dir', 'retry-mark-ext')) return true;
-        if (s.includes('aion-extension.json')) return true;
+        if (s.includes('forjinn-extension.json')) return true;
         return false;
       });
 
@@ -246,7 +246,7 @@ describe('HubInstaller', () => {
       mockedExistsSync.mockImplementation((p) => {
         const s = String(p);
         if (s.includes('acp-ext.zip') && s.includes('resources')) return true;
-        if (s.includes('aion-extension.json')) return true;
+        if (s.includes('forjinn-extension.json')) return true;
         return false;
       });
 
@@ -263,7 +263,7 @@ describe('HubInstaller', () => {
       mockedExistsSync.mockImplementation((p) => {
         const s = String(p);
         if (s.includes('acp-ok-ext.zip') && s.includes('resources')) return true;
-        if (s.includes('aion-extension.json')) return true;
+        if (s.includes('forjinn-extension.json')) return true;
         return false;
       });
 
@@ -277,7 +277,7 @@ describe('HubInstaller', () => {
       mockedExistsSync.mockImplementation((p) => {
         const s = String(p);
         if (s.includes('no-contrib-ext.zip') && s.includes('resources')) return true;
-        if (s.includes('aion-extension.json')) return true;
+        if (s.includes('forjinn-extension.json')) return true;
         return false;
       });
 
@@ -294,7 +294,7 @@ describe('HubInstaller', () => {
       mockedExistsSync.mockImplementation((p) => {
         const s = String(p);
         if (s.includes('partial-ext.zip') && s.includes('resources')) return true;
-        if (s.includes('aion-extension.json')) return true;
+        if (s.includes('forjinn-extension.json')) return true;
         return false;
       });
 
@@ -318,7 +318,7 @@ describe('HubInstaller', () => {
       mockedExistsSync.mockImplementation((p) => {
         const s = String(p);
         if (s.includes('custom-acp-ext.zip') && s.includes('resources')) return true;
-        if (s.includes('aion-extension.json')) return true;
+        if (s.includes('forjinn-extension.json')) return true;
         return false;
       });
 

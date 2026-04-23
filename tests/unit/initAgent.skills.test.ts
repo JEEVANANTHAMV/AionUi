@@ -89,7 +89,7 @@ describe('initAgent — skill support', () => {
 
   describe('hasNativeSkillSupport', () => {
     it('should return true for all backends with verified native skill dirs', () => {
-      // Includes both ACP backends and non-ACP agents (gemini, aionrs) with native skill support
+      // Includes both ACP backends and non-ACP agents (gemini, forjinnrs) with native skill support
       const supported = [
         'claude',
         'codebuddy',
@@ -101,7 +101,7 @@ describe('initAgent — skill support', () => {
         'vibe',
         'cursor',
         'gemini',
-        'aionrs',
+        'forjinnrs',
         'opencode',
       ];
       for (const backend of supported) {
@@ -195,18 +195,18 @@ describe('initAgent — skill support', () => {
       expect(symlinkCalls[0].target).toBe('/tmp/workspace/.codebuddy/skills/morph-ppt');
     });
 
-    it('should create symlink in .aionrs/skills for aionrs backend', async () => {
+    it('should create symlink in .forjinnrs/skills for forjinnrs backend', async () => {
       statResults['/mock/user/skills/officecli-docx'] = true;
 
       await setupAssistantWorkspace('/tmp/workspace', {
-        agentType: 'aionrs',
+        agentType: 'forjinnrs',
         enabledSkills: ['officecli-docx'],
       });
 
-      // aionrs is a non-ACP agent but still supports native skill discovery
-      expect(mkdirCalls).toContain('/tmp/workspace/.aionrs/skills');
+      // forjinnrs is a non-ACP agent but still supports native skill discovery
+      expect(mkdirCalls).toContain('/tmp/workspace/.forjinnrs/skills');
       expect(symlinkCalls).toHaveLength(1);
-      expect(symlinkCalls[0].target).toBe('/tmp/workspace/.aionrs/skills/officecli-docx');
+      expect(symlinkCalls[0].target).toBe('/tmp/workspace/.forjinnrs/skills/officecli-docx');
     });
 
     it('should create symlink in .factory/skills for droid backend', async () => {

@@ -9,14 +9,14 @@
 #   nohup ./scripts/fix-sentry-daemon.sh &      # survives terminal close
 #
 # Logs:
-#   Main log:    ~/.aionui-fix-sentry/daemon.log
-#   Session logs: ~/.aionui-fix-sentry/tmp/session-<uuid>.log
+#   Main log:    ~/.forjinn-desk-fix-sentry/daemon.log
+#   Session logs: ~/.forjinn-desk-fix-sentry/tmp/session-<uuid>.log
 
 set -euo pipefail
 
 # ─── Stop command ───
 
-LOG_DIR="${HOME}/.aionui-fix-sentry"
+LOG_DIR="${HOME}/.forjinn-desk-fix-sentry"
 LOCK_FILE="${LOG_DIR}/daemon.lock"
 
 if [ "${1:-}" = "stop" ]; then

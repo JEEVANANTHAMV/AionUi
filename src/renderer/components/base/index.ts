@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * AionUi 基础组件库统一导出 / AionUi base components unified exports
+ * Forjinn-Desk 基础组件库统一导出 / Forjinn-Desk base components unified exports
  *
  * 提供所有基础组件和类型的统一导出入口
  * Provides unified export entry for all base components and types
@@ -13,29 +13,29 @@
 
 // ==================== 组件导出 / Component Exports ====================
 
-export { default as AionModal } from './AionModal';
-export { default as AionCollapse } from './AionCollapse';
-export { default as AionSelect } from './AionSelect';
-export { default as AionScrollArea } from './AionScrollArea';
-export { default as AionSteps } from './AionSteps';
+export { default as ForjinnModal } from './ForjinnModal';
+export { default as ForjinnCollapse } from './ForjinnCollapse';
+export { default as ForjinnSelect } from './ForjinnSelect';
+export { default as ForjinnScrollArea } from './ForjinnScrollArea';
+export { default as ForjinnSteps } from './ForjinnSteps';
 
 // ==================== 类型导出 / Type Exports ====================
 
-// AionModal 类型 / AionModal types
+// ForjinnModal 类型 / ForjinnModal types
 export type {
   ModalSize,
   ModalHeaderConfig,
   ModalFooterConfig,
   ModalContentStyleConfig,
-  AionModalProps,
-} from './AionModal';
-export { MODAL_SIZES } from './AionModal';
+  ForjinnModalProps,
+} from './ForjinnModal';
+export { MODAL_SIZES } from './ForjinnModal';
 
-// AionCollapse 类型 / AionCollapse types
-export type { AionCollapseProps, AionCollapseItemProps } from './AionCollapse';
+// ForjinnCollapse 类型 / ForjinnCollapse types
+export type { ForjinnCollapseProps, ForjinnCollapseItemProps } from './ForjinnCollapse';
 
-// AionSelect 类型 / AionSelect types
-export type { AionSelectProps } from './AionSelect';
+// ForjinnSelect 类型 / ForjinnSelect types
+export type { ForjinnSelectProps } from './ForjinnSelect';
 
-// AionSteps 类型 / AionSteps types
-export type { AionStepsProps } from './AionSteps';
+// ForjinnSteps 类型 / ForjinnSteps types
+export type { ForjinnStepsProps } from './ForjinnSteps';

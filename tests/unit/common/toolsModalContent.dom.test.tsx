@@ -42,7 +42,7 @@ const testState = vi.hoisted(() => ({
   BUILTIN_IMAGE_GEN_ID: 'builtin-image-gen',
   initialBuiltinServer: (): MockServer => ({
     id: 'builtin-image-gen',
-    name: 'aionui-image-generation',
+    name: 'forjinn-desk-image-generation',
     builtin: true,
     enabled: false,
     updatedAt: 1,
@@ -51,10 +51,10 @@ const testState = vi.hoisted(() => ({
       command: 'node',
       args: ['/abs/builtin-mcp-image-gen.js'],
       env: {
-        AIONUI_IMG_PLATFORM: 'new-api',
-        AIONUI_IMG_BASE_URL: 'https://example.com',
-        AIONUI_IMG_API_KEY: 'key',
-        AIONUI_IMG_MODEL: 'grok-imagine-1.0',
+        FORJINN_DESK_IMG_PLATFORM: 'new-api',
+        FORJINN_DESK_IMG_BASE_URL: 'https://example.com',
+        FORJINN_DESK_IMG_API_KEY: 'key',
+        FORJINN_DESK_IMG_MODEL: 'grok-imagine-1.0',
       },
     },
   }),
@@ -341,7 +341,7 @@ describe('ToolsModalContent image generation status refresh', () => {
     await waitFor(() => {
       expect(testState.mockCheckSingleServerInstallStatus).toHaveBeenCalledOnce();
     });
-    expect(testState.mockCheckSingleServerInstallStatus).toHaveBeenCalledWith('aionui-image-generation');
+    expect(testState.mockCheckSingleServerInstallStatus).toHaveBeenCalledWith('forjinn-desk-image-generation');
   });
 
   it('persists speech-to-text provider settings when the user switches provider and updates credentials', async () => {

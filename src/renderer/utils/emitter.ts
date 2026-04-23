@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -21,10 +21,10 @@ interface EventTypes {
   'gemini.selected.file.append': [Array<string | FileOrFolderItem>];
   'gemini.selected.file.clear': void;
   'gemini.workspace.refresh': void;
-  'aionrs.selected.file': [Array<string | FileOrFolderItem>];
-  'aionrs.selected.file.append': [Array<string | FileOrFolderItem>];
-  'aionrs.selected.file.clear': void;
-  'aionrs.workspace.refresh': void;
+  'forjinnrs.selected.file': [Array<string | FileOrFolderItem>];
+  'forjinnrs.selected.file.append': [Array<string | FileOrFolderItem>];
+  'forjinnrs.selected.file.clear': void;
+  'forjinnrs.workspace.refresh': void;
   'acp.selected.file': [Array<string | FileOrFolderItem>];
   'acp.selected.file.append': [Array<string | FileOrFolderItem>];
   'acp.selected.file.clear': void;

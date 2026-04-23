@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,7 +8,7 @@ export { ExtensionLoader } from './ExtensionLoader';
 export { ExtensionRegistry } from './ExtensionRegistry';
 export { ExtensionWatcher } from './lifecycle/hotReload';
 
-export { AION_ASSET_PROTOCOL, AION_ASSET_HOST, toAssetUrl } from './protocol/assetProtocol';
+export { FORJINN_ASSET_PROTOCOL, FORJINN_ASSET_HOST, toAssetUrl } from './protocol/assetProtocol';
 
 export { resolveThemes } from './resolvers/ThemeResolver';
 
@@ -46,7 +46,7 @@ export type { ExtPermissions, PermissionSummary, PermissionLevel } from './sandb
 export {
   validateEngineCompatibility,
   filterByEngineCompatibility,
-  AIONUI_VERSION,
+  FORJINN_DESK_VERSION,
   EXTENSION_API_VERSION,
 } from './resolvers/utils/engineValidator';
 

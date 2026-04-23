@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -17,7 +17,7 @@ import AcpAgentManager from './AcpAgentManager';
 import OpenClawAgentManager from './OpenClawAgentManager';
 import NanoBotAgentManager from './NanoBotAgentManager';
 import RemoteAgentManager from './RemoteAgentManager';
-import { AionrsManager } from './AionrsManager';
+import { ForjinnrsManager } from './ForjinnrsManager';
 
 const agentFactory = new AgentFactory();
 
@@ -71,9 +71,9 @@ agentFactory.register('remote', (conv, opts) => {
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-agentFactory.register('aionrs', (conv, opts) => {
+agentFactory.register('forjinnrs', (conv, opts) => {
   const c = conv as any;
-  return new AionrsManager(
+  return new ForjinnrsManager(
     { ...c.extra, conversation_id: c.id, yoloMode: opts?.yoloMode },
     c.model
   ) as unknown as ReturnType<typeof agentFactory.create>;

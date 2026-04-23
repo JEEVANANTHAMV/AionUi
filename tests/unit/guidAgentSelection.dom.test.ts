@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -172,9 +172,9 @@ function setupMocks(overrides?: {
         return geminiConfig;
       case 'gemini.defaultModel':
         return null;
-      case 'aionrs.config':
+      case 'forjinnrs.config':
         return null;
-      case 'aionrs.defaultModel':
+      case 'forjinnrs.defaultModel':
         return null;
       default:
         return null;
@@ -360,8 +360,8 @@ describe('useGuidAgentSelection – preset agent config resolution', () => {
         case 'acp.config':
         case 'gemini.config':
         case 'gemini.defaultModel':
-        case 'aionrs.config':
-        case 'aionrs.defaultModel':
+        case 'forjinnrs.config':
+        case 'forjinnrs.defaultModel':
           return null;
         default:
           return null;

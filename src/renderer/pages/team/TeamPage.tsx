@@ -13,8 +13,8 @@ import { useTeamPendingPermissions } from './hooks/useTeamPendingPermissions';
 import AcpModelSelector from '@/renderer/components/agent/AcpModelSelector';
 import GeminiModelSelector from '@/renderer/pages/conversation/platforms/gemini/GeminiModelSelector';
 import { useGeminiModelSelection } from '@/renderer/pages/conversation/platforms/gemini/useGeminiModelSelection';
-import AionrsModelSelector from '@/renderer/pages/conversation/platforms/aionrs/AionrsModelSelector';
-import { useAionrsModelSelection } from '@/renderer/pages/conversation/platforms/aionrs/useAionrsModelSelection';
+import ForjinnrsModelSelector from '@/renderer/pages/conversation/platforms/forjinnrs/ForjinnrsModelSelector';
+import { useForjinnrsModelSelection } from '@/renderer/pages/conversation/platforms/forjinnrs/useForjinnrsModelSelection';
 import TeamTabs from './components/TeamTabs';
 import TeamChatView from './components/TeamChatView';
 import TeamAgentIdentity from './components/TeamAgentIdentity';
@@ -32,8 +32,8 @@ type TeamPageContentProps = {
   onRenameTeam: (newName: string) => Promise<boolean>;
 };
 
-/** Compact aionrs model selector for the agent header */
-const AionrsHeaderModelSelector: React.FC<{ conversationId: string; initialModel?: TProviderWithModel }> = ({
+/** Compact forjinnrs model selector for the agent header */
+const ForjinnrsHeaderModelSelector: React.FC<{ conversationId: string; initialModel?: TProviderWithModel }> = ({
   conversationId,
   initialModel,
 }) => {
@@ -45,8 +45,8 @@ const AionrsHeaderModelSelector: React.FC<{ conversationId: string; initialModel
     },
     [conversationId]
   );
-  const modelSelection = useAionrsModelSelection({ initialModel, onSelectModel });
-  return <AionrsModelSelector selection={modelSelection} />;
+  const modelSelection = useForjinnrsModelSelection({ initialModel, onSelectModel });
+  return <ForjinnrsModelSelector selection={modelSelection} />;
 };
 
 /** Fetches conversation for a single agent and renders TeamChatView */
@@ -62,7 +62,7 @@ const AgentChatSlot: React.FC<{
     ipcBridge.conversation.get.invoke({ id: agent.conversationId })
   );
 
-  const isAionrs = conversation?.type === 'aionrs';
+  const isForjinnrs = conversation?.type === 'forjinnrs';
   const initialModelId = (conversation?.extra as { currentModelId?: string })?.currentModelId;
   const isAcpLike = agent.conversationType === 'acp' || agent.conversationType === 'codex';
   const isGemini = agent.conversationType === 'gemini';
@@ -111,7 +111,7 @@ const AgentChatSlot: React.FC<{
           nameClassName='text-13px text-[color:var(--color-text-2)] font-medium'
         />
         <div className='flex items-center gap-8px shrink-0'>
-          {agent.conversationId && !isAionrs && isAcpLike && (
+          {agent.conversationId && !isForjinnrs && isAcpLike && (
             <div className='min-w-0 max-w-140px [&_button]:max-w-full [&_button_span]:truncate'>
               <AcpModelSelector
                 key={agent.conversationId}
@@ -126,9 +126,9 @@ const AgentChatSlot: React.FC<{
               <GeminiModelSelector selection={geminiModelSelection} />
             </div>
           )}
-          {isAionrs && agent.conversationId && (
+          {isForjinnrs && agent.conversationId && (
             <div className='min-w-0 max-w-140px [&_button]:max-w-full [&_button_span]:truncate'>
-              <AionrsHeaderModelSelector
+              <ForjinnrsHeaderModelSelector
                 key={agent.conversationId}
                 conversationId={agent.conversationId}
                 initialModel={conversation?.model as TProviderWithModel | undefined}

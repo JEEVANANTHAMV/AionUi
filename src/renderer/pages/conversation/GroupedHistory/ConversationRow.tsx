@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -188,8 +188,8 @@ const ConversationRow: React.FC<ConversationRowProps> = (props) => {
             )}
             style={{
               backgroundImage: selected
-                ? `linear-gradient(to right, transparent, var(--aou-2) 100%)`
-                : `linear-gradient(to right, transparent, var(--aou-1) 100%)`,
+                ? `linear-gradient(to right, transparent, var(--forjinn-2) 100%)`
+                : `linear-gradient(to right, transparent, var(--forjinn-1) 100%)`,
             }}
             onClick={(event) => {
               event.stopPropagation();

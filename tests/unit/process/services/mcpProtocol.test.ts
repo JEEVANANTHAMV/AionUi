@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('@/common/platform', () => ({
   getPlatformServices: () => ({
     paths: {
-      getName: () => 'AionUi',
+      getName: () => 'Forjinn-Desk',
       getVersion: () => '1.0.0',
     },
   }),
@@ -67,7 +67,7 @@ describe('AbstractMcpAgent', () => {
     // Create a minimal concrete subclass
     class ConcreteAgent extends AbstractMcpAgent {
       constructor() {
-        super('aionui', 5000);
+        super('forjinn-desk', 5000);
       }
       detectMcpServers(): Promise<IMcpServer[]> {
         return Promise.resolve([]);

@@ -1,6 +1,6 @@
 # ACP 重构 — 技术文档
 
-AionUi ACP 层全面重构的设计文档，供实现阶段的开发者和新加入团队的成员参考。
+Forjinn-Desk ACP 层全面重构的设计文档，供实现阶段的开发者和新加入团队的成员参考。
 
 ## 文档导航
 
@@ -22,7 +22,7 @@ AionUi ACP 层全面重构的设计文档，供实现阶段的开发者和新加
 **启用新路径：**
 
 ```bash
-AION_ACP_V2=1 bun run start
+FORJINN_ACP_V2=1 bun run start
 ```
 
 **回滚到旧路径：**

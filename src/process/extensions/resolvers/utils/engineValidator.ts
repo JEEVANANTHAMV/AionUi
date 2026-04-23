@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,10 +9,10 @@ import fs from 'fs';
 import path from 'path';
 
 /**
- * Current AionUI extension API version.
+ * Current Forjinn-Desk extension API version.
  * Increment major for breaking changes, minor for new features, patch for fixes.
  */
-export const AIONUI_VERSION = getAionUIVersion();
+export const FORJINN_DESK_VERSION = getForjinnDeskVersion();
 export const EXTENSION_API_VERSION = '1.0.0';
 
 type ParsedVersion = { major: number; minor: number; patch: number };
@@ -65,10 +65,10 @@ function satisfiesVersion(version: string, range: string): boolean {
 }
 
 /**
- * Get the AionUI version from package.json.
+ * Get the Forjinn-Desk version from package.json.
  * Falls back to '0.0.0' if not available.
  */
-function getAionUIVersion(): string {
+function getForjinnDeskVersion(): string {
   // Prefer Electron runtime version when available (desktop / packaged mode).
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
@@ -111,10 +111,10 @@ export interface EngineValidationResult {
 }
 
 /**
- * Validate that an extension's engine requirements are satisfied by the current AionUI version.
+ * Validate that an extension's engine requirements are satisfied by the current Forjinn-Desk version.
  *
  * Checks:
- * 1. engine.aionui — does the running AionUI version satisfy the required range?
+ * 1. engine.forjinnDesk — does the running Forjinn-Desk version satisfy the required range?
  * 2. engine.extensionApi — (future) does the extension API version match?
  */
 export function validateEngineCompatibility(extension: LoadedExtension): EngineValidationResult {
@@ -127,12 +127,12 @@ export function validateEngineCompatibility(extension: LoadedExtension): EngineV
   const engine = extension.manifest.engine;
   const apiVersion = extension.manifest.apiVersion;
 
-  // Check AionUI core version compatibility
-  if (engine?.aionui) {
-    if (!satisfiesVersion(AIONUI_VERSION, engine.aionui)) {
+  // Check Forjinn-Desk core version compatibility
+  if (engine?.forjinnDesk) {
+    if (!satisfiesVersion(FORJINN_DESK_VERSION, engine.forjinnDesk)) {
       result.valid = false;
       result.issues.push(
-        `Extension "${extension.manifest.name}" requires AionUI ${engine.aionui} but current version is ${AIONUI_VERSION}`
+        `Extension "${extension.manifest.name}" requires Forjinn-Desk ${engine.forjinnDesk} but current version is ${FORJINN_DESK_VERSION}`
       );
     }
   }

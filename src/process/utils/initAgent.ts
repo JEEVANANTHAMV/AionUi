@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -340,19 +340,19 @@ export const createRemoteAgent = async (options: ICreateConversationParams): Pro
   };
 };
 
-export const createAionrsAgent = async (options: ICreateConversationParams): Promise<TChatConversation> => {
+export const createForjinnrsAgent = async (options: ICreateConversationParams): Promise<TChatConversation> => {
   const { extra } = options;
   const { workspace, customWorkspace } = await buildWorkspaceWidthFiles(
-    `aionrs-temp-${Date.now()}`,
+    `forjinnrs-temp-${Date.now()}`,
     extra.workspace,
     extra.defaultFiles,
     extra.customWorkspace
   );
 
-  // Set up skill symlinks for native discovery by aionrs CLI
+  // Set up skill symlinks for native discovery by forjinnrs CLI
   if (!customWorkspace) {
     await setupAssistantWorkspace(workspace, {
-      agentType: 'aionrs',
+      agentType: 'forjinnrs',
       enabledSkills: extra.enabledSkills,
       extraSkillPaths: extra.extraSkillPaths,
       excludeBuiltinSkills: extra.excludeBuiltinSkills,
@@ -360,7 +360,7 @@ export const createAionrsAgent = async (options: ICreateConversationParams): Pro
   }
 
   return {
-    type: 'aionrs',
+    type: 'forjinnrs',
     model: options.model,
     extra: {
       workspace,

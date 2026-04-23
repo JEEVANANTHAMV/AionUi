@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -36,8 +36,8 @@ export function getConversationTypeForBackend(backend: string): ICreateConversat
   switch (backend) {
     case 'gemini':
       return 'gemini';
-    case 'aionrs':
-      return 'aionrs';
+    case 'forjinnrs':
+      return 'forjinnrs';
     case 'openclaw-gateway':
     case 'openclaw':
       return 'openclaw-gateway';

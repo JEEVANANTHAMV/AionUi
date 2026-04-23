@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  *
  * Tests for the team guide MCP injection capability check and prompt wording.
@@ -54,8 +54,8 @@ describe('team guide MCP injection capability check', () => {
       expect(await shouldInjectTeamGuideMcp('gemini')).toBe(true);
     });
 
-    it('injects for aionrs backend (known team-capable)', async () => {
-      expect(await shouldInjectTeamGuideMcp('aionrs')).toBe(true);
+    it('injects for forjinnrs backend (known team-capable)', async () => {
+      expect(await shouldInjectTeamGuideMcp('forjinnrs')).toBe(true);
     });
   });
 

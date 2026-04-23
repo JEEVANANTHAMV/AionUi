@@ -1,12 +1,12 @@
-appId: com.aionui.app
-productName: AionUi
-executableName: AionUi
-copyright: Copyright © 2024 AionUi
+appId: com.forjinn.desk
+productName: Forjinn-Desk
+executableName: Forjinn-Desk
+copyright: Copyright © 2024 Forjinn-Desk
 
 protocols:
-  - name: AionUi Protocol
+  - name: Forjinn-Desk Protocol
     schemes:
-      - aionui
+      - forjinn
 
 asar:
   smartUnpack: true
@@ -109,9 +109,9 @@ extraResources:
     to: app.png
   - from: resources/bundled-bun
     to: bundled-bun
-  # aionrs binary (pre-compiled per platform/arch)
-  - from: resources/bundled-aionrs
-    to: bundled-aionrs
+  # forjinnrs binary (pre-compiled per platform/arch)
+  - from: resources/bundled-forjinnrs
+    to: bundled-forjinnrs
   - from: resources/hub
     to: hub
 win:
@@ -172,17 +172,17 @@ linux:
   icon: resources/app.png
   artifactName: ${productName}-${version}-${os}-${arch}.${ext}
   category: Utility
-  maintainer: aionui
-  vendor: aionui
+  maintainer: Forjinn-Desk
+  vendor: Forjinn-Desk
   synopsis: ${description}
   description: ${description}
   desktop:
     entry:
-      Name: AionUi
+      Name: Forjinn-Desk
       Comment: ${description}
-      Icon: aionui
+      Icon: forjinn-desk
       Categories: Office;Utility;
-      MimeType: x-scheme-handler/aionui;
+      MimeType: x-scheme-handler/forjinn;
 
 npmRebuild: false
 buildDependenciesFromSource: false
@@ -224,7 +224,7 @@ electronDownload:
 
 publish:
   provider: github
-  owner: iOfficeAI
-  repo: AionUi
+  owner: Forjinn
+  repo: Forjinn-Desk
   publishAutoUpdate: true
   releaseType: release

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -79,8 +79,8 @@ const getProcessedItemAnchorId = (item: IMessageVO): string => {
 };
 
 const highlightStyle: React.CSSProperties = {
-  backgroundColor: 'var(--color-aou-1)',
-  boxShadow: '0 0 0 1px var(--color-aou-6-brand) inset',
+  backgroundColor: 'var(--color-forjinn-1)',
+  boxShadow: '0 0 0 1px var(--color-forjinn-6-brand) inset',
   borderRadius: '12px',
 };
 

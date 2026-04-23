@@ -1,13 +1,13 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * Default Codex model list maintained by AionUi.
+ * Default Codex model list maintained by Forjinn-Desk.
  * These are known models that Codex CLI supports.
- * Validation is done by Codex CLI itself — AionUi only passes the model name.
+ * Validation is done by Codex CLI itself — Forjinn-Desk only passes the model name.
  *
  * The first entry is used as the default when the user hasn't made a selection.
  */

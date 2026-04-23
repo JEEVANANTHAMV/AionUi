@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -802,9 +802,9 @@ const SendBox: React.FC<{
     [conversationContext?.type, handleExternalSelectionAppend]
   );
   useAddEventListener(
-    'aionrs.selected.file.append',
+    'forjinnrs.selected.file.append',
     (items: FileSelectionItem[]) => {
-      if (conversationContext?.type === 'aionrs') {
+      if (conversationContext?.type === 'forjinnrs') {
         handleExternalSelectionAppend(items);
       }
     },
@@ -862,8 +862,8 @@ const SendBox: React.FC<{
         case 'gemini':
           emitter.emit('gemini.selected.file.append', [item]);
           break;
-        case 'aionrs':
-          emitter.emit('aionrs.selected.file.append', [item]);
+        case 'forjinnrs':
+          emitter.emit('forjinnrs.selected.file.append', [item]);
           break;
         case 'acp':
           emitter.emit('acp.selected.file.append', [item]);

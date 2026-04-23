@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 AionUi (aionui.com)
+ * Copyright 2025 Forjinn-Desk (forjinn-desk.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -99,7 +99,7 @@ function normalizeAvatar(avatar: string | undefined): { logo: string; isEmoji: b
 
   const resolved = resolveExtensionAssetUrl(value) || value;
   const isImage =
-    /\.(svg|png|jpe?g|webp|gif)$/i.test(resolved) || /^(https?:|aion-asset:\/\/|file:\/\/|data:)/i.test(resolved);
+    /\.(svg|png|jpe?g|webp|gif)$/i.test(resolved) || /^(https?:|forjinn-asset:\/\/|file:\/\/|data:)/i.test(resolved);
   if (isImage) {
     return { logo: resolved, isEmoji: false };
   }

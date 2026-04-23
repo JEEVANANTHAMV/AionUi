@@ -18,16 +18,16 @@
   --color-brand-fill: #7a5898;
   --color-brand-bg: #f2ecfa;
 
-  --aou-1: #f4f0fa;
-  --aou-2: #e8e0f4;
-  --aou-3: #d4c8ec;
-  --aou-4: #b8a8dc;
-  --aou-5: #9a84c8;
-  --aou-6: #7a5898;
-  --aou-7: #5c3c78;
-  --aou-8: #402258;
-  --aou-9: #260c38;
-  --aou-10: #0e0018;
+  --forjinn-1: #f4f0fa;
+  --forjinn-2: #e8e0f4;
+  --forjinn-3: #d4c8ec;
+  --forjinn-4: #b8a8dc;
+  --forjinn-5: #9a84c8;
+  --forjinn-6: #7a5898;
+  --forjinn-7: #5c3c78;
+  --forjinn-8: #402258;
+  --forjinn-9: #260c38;
+  --forjinn-10: #0e0018;
 
   --bg-base: #fefbf2;
   --bg-1: #f8f3e6;
@@ -110,16 +110,16 @@
   --color-brand-fill: #c090e0;
   --color-brand-bg: #38204e;
 
-  --aou-1: #1c1028;
-  --aou-2: #2c1c3e;
-  --aou-3: #402854;
-  --aou-4: #58386c;
-  --aou-5: #745088;
-  --aou-6: #9870a8;
-  --aou-7: #b890c4;
-  --aou-8: #d0b4dc;
-  --aou-9: #e4d4ec;
-  --aou-10: #f4ecf8;
+  --forjinn-1: #1c1028;
+  --forjinn-2: #2c1c3e;
+  --forjinn-3: #402854;
+  --forjinn-4: #58386c;
+  --forjinn-5: #745088;
+  --forjinn-6: #9870a8;
+  --forjinn-7: #b890c4;
+  --forjinn-8: #d0b4dc;
+  --forjinn-9: #e4d4ec;
+  --forjinn-10: #f4ecf8;
 
   --bg-base: #1e201f;
   --bg-1: #272b29;
@@ -448,7 +448,7 @@ body::after {
 .chat-history__item--active,
 .chat-history__item[aria-selected='true'],
 .chat-history__item[class~='!bg-active'],
-.settings-sider__item[class~='!bg-aou-2'] {
+.settings-sider__item[class~='!bg-forjinn-2'] {
   background: var(--retroma-accent-gradient) !important;
   border-color: #c9b3de !important;
   box-shadow:
@@ -459,7 +459,7 @@ body::after {
 .chat-history__item--active::before,
 .chat-history__item[aria-selected='true']::before,
 .chat-history__item[class~='!bg-active']::before,
-.settings-sider__item[class~='!bg-aou-2']::before {
+.settings-sider__item[class~='!bg-forjinn-2']::before {
   content: '';
   position: absolute;
   left: 0;
@@ -477,7 +477,7 @@ body::after {
 [data-theme='dark'] .chat-history__item--active,
 [data-theme='dark'] .chat-history__item[aria-selected='true'],
 [data-theme='dark'] .chat-history__item[class~='!bg-active'],
-[data-theme='dark'] .settings-sider__item[class~='!bg-aou-2'] {
+[data-theme='dark'] .settings-sider__item[class~='!bg-forjinn-2'] {
   background: var(--retroma-accent-gradient) !important;
   border-color: #839086 !important;
   box-shadow:
@@ -492,7 +492,7 @@ body::after {
 [data-theme='dark'] .chat-history__item--active::before,
 [data-theme='dark'] .chat-history__item[aria-selected='true']::before,
 [data-theme='dark'] .chat-history__item[class~='!bg-active']::before,
-[data-theme='dark'] .settings-sider__item[class~='!bg-aou-2']::before {
+[data-theme='dark'] .settings-sider__item[class~='!bg-forjinn-2']::before {
   background: var(--retroma-accent-vertical) !important;
 }
 
@@ -655,7 +655,7 @@ body::after {
 .chat-history--collapsed .chat-history__item--active::before,
 .chat-history--collapsed .chat-history__item[aria-selected='true']::before,
 .chat-history--collapsed .chat-history__item[class~='!bg-active']::before,
-.settings-sider--collapsed .settings-sider__item[class~='!bg-aou-2']::before {
+.settings-sider--collapsed .settings-sider__item[class~='!bg-forjinn-2']::before {
   top: 6px;
   bottom: 6px;
   width: 2px;
@@ -665,14 +665,14 @@ body::after {
 .chat-history--collapsed .chat-history__item--active,
 .chat-history--collapsed .chat-history__item[aria-selected='true'],
 .chat-history--collapsed .chat-history__item[class~='!bg-active'],
-.settings-sider--collapsed .settings-sider__item[class~='!bg-aou-2'] {
+.settings-sider--collapsed .settings-sider__item[class~='!bg-forjinn-2'] {
   box-shadow: inset 0 0 0 1px rgba(176, 156, 202, 0.58) !important;
 }
 
 .chat-history--collapsed .chat-history__item--active::before,
 .chat-history--collapsed .chat-history__item[aria-selected='true']::before,
 .chat-history--collapsed .chat-history__item[class~='!bg-active']::before,
-.settings-sider--collapsed .settings-sider__item[class~='!bg-aou-2']::before {
+.settings-sider--collapsed .settings-sider__item[class~='!bg-forjinn-2']::before {
   display: none !important;
 }
 
@@ -686,14 +686,14 @@ body::after {
   background: transparent !important;
 }
 
-.layout-sider.collapsed .settings-sider [data-settings-id][class*='!bg-aou-2'],
-.layout-sider.arco-layout-sider-collapsed .settings-sider [data-settings-id][class*='!bg-aou-2'] {
+.layout-sider.collapsed .settings-sider [data-settings-id][class*='!bg-forjinn-2'],
+.layout-sider.arco-layout-sider-collapsed .settings-sider [data-settings-id][class*='!bg-forjinn-2'] {
   box-shadow: inset 0 0 0 1px rgba(176, 156, 202, 0.58) !important;
   transform: none !important;
 }
 
-[data-theme='dark'] .layout-sider.collapsed .settings-sider [data-settings-id][class*='!bg-aou-2'],
-[data-theme='dark'] .layout-sider.arco-layout-sider-collapsed .settings-sider [data-settings-id][class*='!bg-aou-2'] {
+[data-theme='dark'] .layout-sider.collapsed .settings-sider [data-settings-id][class*='!bg-forjinn-2'],
+[data-theme='dark'] .layout-sider.arco-layout-sider-collapsed .settings-sider [data-settings-id][class*='!bg-forjinn-2'] {
   box-shadow: inset 0 0 0 1px rgba(177, 136, 212, 0.44) !important;
   transform: none !important;
 }
@@ -701,7 +701,7 @@ body::after {
 [data-theme='dark'] .chat-history--collapsed .chat-history__item--active,
 [data-theme='dark'] .chat-history--collapsed .chat-history__item[aria-selected='true'],
 [data-theme='dark'] .chat-history--collapsed .chat-history__item[class~='!bg-active'],
-[data-theme='dark'] .settings-sider--collapsed .settings-sider__item[class~='!bg-aou-2'] {
+[data-theme='dark'] .settings-sider--collapsed .settings-sider__item[class~='!bg-forjinn-2'] {
   box-shadow: inset 0 0 0 1px rgba(177, 136, 212, 0.44) !important;
 }
 
@@ -977,15 +977,15 @@ body::after {
 }
 
 .rd-20px.text-14px.pb-40px .arco-tag {
-  background: var(--aou-2) !important;
+  background: var(--forjinn-2) !important;
   color: var(--brand) !important;
-  border-color: var(--aou-3) !important;
+  border-color: var(--forjinn-3) !important;
 }
 
 [data-theme='dark'] .rd-20px.text-14px.pb-40px .arco-tag {
-  background: var(--aou-3) !important;
-  color: var(--aou-8) !important;
-  border-color: var(--aou-4) !important;
+  background: var(--forjinn-3) !important;
+  color: var(--forjinn-8) !important;
+  border-color: var(--forjinn-4) !important;
 }
 
 .arco-btn-primary {
@@ -1041,7 +1041,7 @@ body::after {
 .arco-btn-outline:hover {
   border-color: var(--brand) !important;
   box-shadow:
-    4px 4px 0 var(--aou-3),
+    4px 4px 0 var(--forjinn-3),
     5px 5px 10px rgba(100, 70, 140, 0.15) !important;
   transform: translate(-1px, -1px) !important;
 }
@@ -1150,13 +1150,13 @@ body::after {
     10px 10px 30px rgba(80, 50, 120, 0.2) !important;
 }
 
-.aionui-modal:not(.conversation-search-modal) .arco-modal-content {
+.forjinn-desk-modal:not(.conversation-search-modal) .arco-modal-content {
   overflow: visible !important;
   max-height: calc(100vh - 32px) !important;
   box-sizing: border-box !important;
 }
 
-.aionui-modal:not(.conversation-search-modal) .aionui-modal-body-content {
+.forjinn-desk-modal:not(.conversation-search-modal) .forjinn-desk-modal-body-content {
   overflow: auto !important;
   max-height: calc(100vh - 148px) !important;
   box-sizing: border-box !important;
@@ -1278,7 +1278,7 @@ body::after {
 [class*='markdown'] code:not(pre code) {
   background: var(--brand-light) !important;
   color: var(--brand) !important;
-  border: 1px solid var(--aou-3) !important;
+  border: 1px solid var(--forjinn-3) !important;
   border-radius: 4px !important;
   padding: 1px 5px !important;
   font-size: 0.88em !important;
@@ -1288,10 +1288,10 @@ body::after {
 [data-theme='dark'] [class*='markdown'] code:not(pre code) {
   background: var(--brand-light) !important;
   color: var(--brand) !important;
-  border-color: var(--aou-4) !important;
+  border-color: var(--forjinn-4) !important;
 }
 
-.aion-file-changes-panel {
+.forjinn-file-changes-panel {
   border: 1.5px solid #ccb8e0 !important;
   border-radius: 12px !important;
   box-shadow:
@@ -1299,18 +1299,18 @@ body::after {
     0 8px 18px rgba(152, 120, 184, 0.16) !important;
 }
 
-.aion-file-changes-panel > div:first-child {
+.forjinn-file-changes-panel > div:first-child {
   box-shadow: inset 0 -1px 0 rgba(184, 156, 210, 0.5);
 }
 
-[data-theme='dark'] .aion-file-changes-panel {
+[data-theme='dark'] .forjinn-file-changes-panel {
   border-color: #7f61a0 !important;
   box-shadow:
     0 0 0 1px rgba(177, 136, 212, 0.26),
     0 10px 22px rgba(58, 34, 88, 0.5) !important;
 }
 
-[data-theme='dark'] .aion-file-changes-panel > div:first-child {
+[data-theme='dark'] .forjinn-file-changes-panel > div:first-child {
   box-shadow: inset 0 -1px 0 rgba(148, 112, 186, 0.44);
 }
 
@@ -1438,6 +1438,6 @@ body::after {
   background: rgba(192, 144, 224, 0.32);
 }
 
-/* AionUi Theme Background Start */
+/* Forjinn-Desk Theme Background Start */
 /* Preview cover only: do not auto-inject full-page background image */
-/* AionUi Theme Background End */
+/* Forjinn-Desk Theme Background End */

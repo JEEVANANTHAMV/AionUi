@@ -22,7 +22,7 @@ vi.mock('fs', () => ({
 }));
 
 vi.mock('../../src/process/extensions/constants', () => ({
-  EXTENSION_MANIFEST_FILE: 'aion-extension.json',
+  EXTENSION_MANIFEST_FILE: 'forjinn-extension.json',
   HUB_REMOTE_URLS: ['https://example.com/hub/'],
   HUB_INDEX_FILE: 'index.json',
   HUB_SUPPORTED_SCHEMA_VERSION: 1,
@@ -38,7 +38,7 @@ function makeExt(overrides: Partial<IHubExtension> & { name: string }): IHubExte
     description: 'test',
     author: 'test',
     dist: { tarball: `${overrides.name}.zip`, integrity: 'sha512-abc', unpackedSize: 100 },
-    engines: { aionui: '>=1.0.0' },
+    engines: { forjinn-desk: '>=1.0.0' },
     hubs: ['acpAdapters'],
     ...overrides,
   };

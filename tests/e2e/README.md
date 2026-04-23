@@ -193,10 +193,10 @@ Variables set automatically during test launch:
 
 | Variable                     | Value | Purpose                  |
 | ---------------------------- | ----- | ------------------------ |
-| `AIONUI_E2E_TEST`            | `1`   | App recognizes test mode |
-| `AIONUI_DISABLE_AUTO_UPDATE` | `1`   | No update checks         |
-| `AIONUI_DISABLE_DEVTOOLS`    | `1`   | No DevTools windows      |
-| `AIONUI_CDP_PORT`            | `0`   | CDP disabled             |
+| `FORJINN_DESK_E2E_TEST`            | `1`   | App recognizes test mode |
+| `FORJINN_DESK_DISABLE_AUTO_UPDATE` | `1`   | No update checks         |
+| `FORJINN_DESK_DISABLE_DEVTOOLS`    | `1`   | No DevTools windows      |
+| `FORJINN_DESK_CDP_PORT`            | `0`   | CDP disabled             |
 
 ---
 
@@ -268,7 +268,7 @@ bunx electron-vite build
 
 ```bash
 # Clean via database
-sqlite3 "~/Library/Application Support/AionUi-Dev/aionui/aionui.db" \
+sqlite3 "~/Library/Application Support/Forjinn-Desk-Dev/forjinn-desk/forjinn-desk.db" \
   "DELETE FROM teams WHERE name LIKE 'E2E%';"
 ```
 
