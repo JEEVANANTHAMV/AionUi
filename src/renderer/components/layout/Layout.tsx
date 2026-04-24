@@ -460,20 +460,18 @@ const Layout: React.FC<{
                     viewBox='0 0 80 80'
                     fill='none'
                   >
+                    <defs>
+                      <linearGradient id='forjinnGradient' x1='0%' y1='0%' x2='100%' y2='100%'>
+                        <stop offset='0%' style={{ stopColor: '#6366f1', stopOpacity: 1 }} />
+                        <stop offset='100%' style={{ stopColor: '#a855f7', stopOpacity: 1 }} />
+                      </linearGradient>
+                    </defs>
                     <path
-                      key='logo-path-1'
-                      d='M40 20 Q38 22 25 40 Q23 42 26 42 L30 42 Q32 40 40 30 Q48 40 50 42 L54 42 Q57 42 55 40 Q42 22 40 20'
-                      fill='white'
-                    ></path>
-                    <circle key='logo-circle' cx='40' cy='46' r='3' fill='white'></circle>
-                    <path
-                      key='logo-path-2'
-                      d='M18 50 Q40 70 62 50'
-                      stroke='white'
-                      strokeWidth='3.5'
-                      fill='none'
-                      strokeLinecap='round'
-                    ></path>
+                      key='forjinn-logo-path'
+                      d='M28 28 H52 V32 H34 V42 H48 V46 H34 V58 H28 V28 Z'
+                      fill='url(#forjinnGradient)'
+                    />
+                    <circle key='forjinn-logo-circle' cx='40' cy='62' r='2.5' fill='url(#forjinnGradient)' />
                   </svg>
                 </div>
                 <div className='flex-1 text-20px text-1 collapsed-hidden font-bold'>Forjinn-Desk</div>

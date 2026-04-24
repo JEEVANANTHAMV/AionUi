@@ -25,16 +25,13 @@ import { getSiderTooltipProps } from '@/renderer/utils/ui/siderTooltip';
 
 /** Builtin settings tab IDs in display order (must match router paths). */
 export const BUILTIN_TAB_IDS = [
-  'gemini',
   'agent',
   'model',
   'assistants',
   'capabilities',
   'display',
-  'webui',
   'pet',
   'system',
-  'about',
 ] as const;
 
 /**
@@ -53,9 +50,7 @@ export const LEGACY_ANCHOR_REMAP: Record<string, string> = {
  * Extension tabs anchored between these builtins inherit the enclosing group visually.
  */
 const GROUP_HEADER_BEFORE: Record<string, string> = {
-  gemini: 'settings.groupAiCore',
   display: 'settings.groupApp',
-  about: 'settings.groupAbout',
 };
 
 type SiderItem = {
@@ -137,7 +132,6 @@ const SettingsSider: React.FC<{ collapsed?: boolean; tooltipEnabled?: boolean }>
   const { menus, groupHeaderAt } = useMemo(() => {
     // Build builtin items
     const builtinMap: Record<string, SiderItem> = {
-      gemini: { id: 'gemini', label: t('settings.gemini'), icon: <Gemini />, path: 'gemini' },
       model: { id: 'model', label: t('settings.model'), icon: <LinkCloud />, path: 'model' },
       assistants: {
         id: 'assistants',
@@ -158,15 +152,8 @@ const SettingsSider: React.FC<{ collapsed?: boolean; tooltipEnabled?: boolean }>
         path: 'capabilities',
       },
       display: { id: 'display', label: t('settings.display'), icon: <Computer />, path: 'display' },
-      webui: {
-        id: 'webui',
-        label: t('settings.webui'),
-        icon: isDesktop ? <Earth /> : <Communication />,
-        path: 'webui',
-      },
       pet: { id: 'pet', label: t('pet.desktopPet'), icon: <Cat />, path: 'pet' },
       system: { id: 'system', label: t('settings.system'), icon: <System />, path: 'system' },
-      about: { id: 'about', label: t('settings.about'), icon: <Info />, path: 'about' },
     };
 
     // Start with ordered builtin IDs, hiding desktop-only tabs in browser mode
