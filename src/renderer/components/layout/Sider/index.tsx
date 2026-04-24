@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import React, { Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { usePreviewContext } from '@renderer/pages/conversation/Preview/context/PreviewContext';
 import { cleanupSiderTooltips, getSiderTooltipProps } from '@renderer/utils/ui/siderTooltip';
@@ -14,6 +15,11 @@ import CronJobSiderSection from './CronJobSiderSection';
 import TeamSiderSection from './TeamSiderSection';
 import siderStyles from './Sider.module.css';
 
+import AgentModeSelector from '@renderer/components/agent/AgentModeSelector';
+import { Shield } from '@icon-park/react';
+import { iconColors } from '@renderer/styles/colors';
+import { useConversationContextSafe } from '@renderer/hooks/context/ConversationContext';
+
 const WorkspaceGroupedHistory = React.lazy(() => import('@renderer/pages/conversation/GroupedHistory'));
 const SettingsSider = React.lazy(() => import('@renderer/pages/settings/components/SettingsSider'));
 
@@ -27,11 +33,13 @@ const Sider: React.FC<SiderProps> = ({ onSessionClick, collapsed = false }) => {
   const isMobile = layout?.isMobile ?? false;
   const location = useLocation();
   const { pathname, search, hash } = location;
+  const conversationContext = useConversationContextSafe();
 
   const navigate = useNavigate();
   const { closePreview } = usePreviewContext();
   const { logout, status } = useAuth();
   const { theme, setTheme } = useThemeContext();
+  const { t } = useTranslation();
   const [isBatchMode, setIsBatchMode] = useState(false);
   const { jobs: cronJobs } = useAllCronJobs();
   const isSettings = pathname.startsWith('/settings');
@@ -168,6 +176,23 @@ const Sider: React.FC<SiderProps> = ({ onSessionClick, collapsed = false }) => {
               onNewChat={handleNewChat}
               onToggleBatchMode={() => setIsBatchMode((prev) => !prev)}
             />
+            {conversationContext && (
+              <div className={classNames('px-10px py-4px', collapsed && 'px-6px')}>
+                <AgentModeSelector
+                  backend={
+                    conversationContext.type === 'acp'
+                      ? (conversationContext as any).backend || 'claude'
+                      : conversationContext.type
+                  }
+                  conversationId={conversationContext.conversationId}
+                  compact={collapsed}
+                  compactLeadingIcon={<Shield theme='outline' size='14' fill={iconColors.secondary} />}
+                  modeLabelFormatter={(mode) => t(`agentMode.${mode.value}`, { defaultValue: mode.label })}
+                  compactLabelPrefix={t('agentMode.permission')}
+                  hideCompactLabelPrefixOnMobile
+                />
+              </div>
+            )}
             {/* Search entry */}
             <SiderSearchEntry
               isMobile={isMobile}
@@ -193,13 +218,6 @@ const Sider: React.FC<SiderProps> = ({ onSessionClick, collapsed = false }) => {
             />
             {/* Scrollable content: team + scheduled tasks + conversation history */}
             <div className={classNames('flex-1 min-h-0 overflow-y-auto', siderStyles.scrollArea)}>
-              {/* Team section */}
-              <TeamSiderSection
-                collapsed={collapsed}
-                pathname={pathname}
-                siderTooltipProps={siderTooltipProps}
-                onSessionClick={onSessionClick}
-              />
               {/* Scheduled section */}
               {!collapsed && (
                 <CronJobSiderSection jobs={cronJobs} pathname={pathname} onNavigate={handleCronNavigate} />

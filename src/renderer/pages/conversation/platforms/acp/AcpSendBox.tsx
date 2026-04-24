@@ -368,19 +368,6 @@ Please check your local CLI tool authentication status`,
         tools={
           <div className='flex items-center gap-4px'>
             <FileAttachButton openFileSelector={openFileSelector} onLocalFilesAdded={handleFilesAdded} />
-            {showModeSelector && (
-              <AgentModeSelector
-                backend={backend}
-                conversationId={conversation_id}
-                compact
-                initialMode={sessionMode}
-                compactLeadingIcon={<Shield theme='outline' size='14' fill={iconColors.secondary} />}
-                modeLabelFormatter={(mode) => t(`agentMode.${mode.value}`, { defaultValue: mode.label })}
-                compactLabelPrefix={t('agentMode.permission')}
-                hideCompactLabelPrefixOnMobile
-                onModeChanged={isLeaderInTeam ? teamPermission?.propagateMode : undefined}
-              />
-            )}
             <AcpConfigSelector
               conversationId={conversation_id}
               backend={backend}

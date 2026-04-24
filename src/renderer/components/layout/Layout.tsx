@@ -86,7 +86,7 @@ const Layout: React.FC<{
   sider: React.ReactNode;
   onSessionClick?: () => void;
 }> = ({ sider, onSessionClick: _onSessionClick }) => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [viewportWidth, setViewportWidth] = useState<number>(() =>
     typeof window === 'undefined' ? 390 : window.innerWidth
@@ -375,7 +375,7 @@ const Layout: React.FC<{
       const dragState = dragStateRef.current;
       if (!dragState.active) return;
 
-      const draggedWidth = dragState.startWidth + (event.clientX - dragState.startX);
+      const draggedWidth = dragState.startWidth - (event.clientX - dragState.startX);
       // Add a small hysteresis zone to avoid rapid toggling near the snap threshold.
       const shouldCollapse = collapsedRef.current
         ? draggedWidth < SIDER_DRAG_SNAP_THRESHOLD + SIDER_DRAG_HYSTERESIS
@@ -407,9 +407,9 @@ const Layout: React.FC<{
   const siderStyle = isMobile
     ? {
         position: 'fixed' as const,
-        left: 0,
+        right: 0,
         zIndex: 100,
-        transform: collapsed ? 'translateX(-100%)' : 'translateX(0)',
+        transform: collapsed ? 'translateX(100%)' : 'translateX(0)',
         transition: 'none',
         pointerEvents: collapsed ? ('none' as const) : ('auto' as const),
       }
@@ -423,12 +423,34 @@ const Layout: React.FC<{
       <NavigationHistoryProvider>
         <div className='app-shell flex flex-col size-full min-h-0'>
           <Titlebar workspaceAvailable={workspaceAvailable} />
-          {/* 移动端左侧边栏蒙板 / Mobile left sider backdrop */}
+          {/* 移动端右侧边栏蒙板 / Mobile right sider backdrop */}
           {isMobile && !collapsed && (
             <div className='fixed inset-0 bg-black/30 z-90' onClick={() => setCollapsed(true)} aria-hidden='true' />
           )}
 
           <ArcoLayout className={'size-full layout flex-1 min-h-0'}>
+            <ArcoLayout.Content
+              className={'bg-1 layout-content flex flex-col min-h-0'}
+              onClick={() => {
+                if (isMobile && !collapsed) setCollapsed(true);
+              }}
+              style={
+                isMobile
+                  ? {
+                      width: '100%',
+                    }
+                  : undefined
+              }
+            >
+              <Outlet />
+              {multiAgentContextHolder}
+              {directorySelectionContextHolder}
+              <PwaPullToRefresh />
+              <Suspense fallback={null}>
+                <UpdateModal />
+              </Suspense>
+            </ArcoLayout.Content>
+
             <ArcoLayout.Sider
               collapsedWidth={isMobile ? 0 : 64}
               collapsed={collapsed}
@@ -438,6 +460,16 @@ const Layout: React.FC<{
               })}
               style={siderStyle}
             >
+              {!isMobile && (
+                <div
+                  className='absolute top-0 h-full w-8px z-20 cursor-col-resize group'
+                  style={{ left: '-4px' }}
+                  onMouseDown={beginSiderResizeDrag}
+                  aria-hidden='true'
+                >
+                  <div className='absolute top-0 left-1/2 h-full w-1px -translate-x-1/2 bg-transparent group-hover:bg-[var(--color-border-2)] transition-colors duration-150' />
+                </div>
+              )}
               <ArcoLayout.Header
                 className={classNames(
                   'flex items-center justify-start py-8px px-16px pl-20px gap-12px layout-sider-header',
@@ -502,43 +534,12 @@ const Layout: React.FC<{
                     } as any)
                   : sider}
               </ArcoLayout.Content>
-              {!isMobile && (
-                <div
-                  className='absolute top-0 h-full w-8px z-20 cursor-col-resize group'
-                  style={{ right: '-4px' }}
-                  onMouseDown={beginSiderResizeDrag}
-                  aria-hidden='true'
-                >
-                  <div className='absolute top-0 left-1/2 h-full w-1px -translate-x-1/2 bg-transparent group-hover:bg-[var(--color-border-2)] transition-colors duration-150' />
-                </div>
-              )}
             </ArcoLayout.Sider>
-
-            <ArcoLayout.Content
-              className={'bg-1 layout-content flex flex-col min-h-0'}
-              onClick={() => {
-                if (isMobile && !collapsed) setCollapsed(true);
-              }}
-              style={
-                isMobile
-                  ? {
-                      width: '100%',
-                    }
-                  : undefined
-              }
-            >
-              <Outlet />
-              {multiAgentContextHolder}
-              {directorySelectionContextHolder}
-              <PwaPullToRefresh />
-              <Suspense fallback={null}>
-                <UpdateModal />
-              </Suspense>
-            </ArcoLayout.Content>
           </ArcoLayout>
         </div>
       </NavigationHistoryProvider>
     </LayoutContext.Provider>
+
   );
 };
 

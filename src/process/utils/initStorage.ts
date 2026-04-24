@@ -628,6 +628,22 @@ const getDefaultMcpServers = (): IMcpServer[] => {
         command: 'npx',
         args: ['-y', 'chrome-devtools-mcp@latest'],
       },
+      'fetch': {
+        command: 'npx',
+        args: ['-y', '@modelcontextprotocol/server-fetch@latest'],
+      },
+      'github': {
+        command: 'npx',
+        args: ['-y', '@modelcontextprotocol/server-github@latest'],
+      },
+      'google-maps': {
+        command: 'npx',
+        args: ['-y', '@modelcontextprotocol/server-google-maps@latest'],
+      },
+      'sequentialthinking': {
+        command: 'npx',
+        args: ['-y', '@modelcontextprotocol/server-sequentialthinking@latest'],
+      },
     },
   };
 

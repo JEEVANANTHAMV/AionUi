@@ -388,17 +388,6 @@ const ForjinnrsSendBox: React.FC<{
         tools={
           <div className='flex items-center gap-4px'>
             <FileAttachButton openFileSelector={openFileSelector} onLocalFilesAdded={handleFilesAdded} />
-            <AgentModeSelector
-              backend='forjinnrs'
-              conversationId={conversation_id}
-              compact
-              initialMode={sessionMode}
-              dynamicModes={dynamicModes}
-              compactLeadingIcon={<Shield theme='outline' size='14' fill={iconColors.secondary} />}
-              modeLabelFormatter={(mode) => t(`agentMode.${mode.value}`, { defaultValue: mode.label })}
-              compactLabelPrefix={t('agentMode.permission')}
-              hideCompactLabelPrefixOnMobile
-            />
           </div>
         }
         sendButtonPrefix={
