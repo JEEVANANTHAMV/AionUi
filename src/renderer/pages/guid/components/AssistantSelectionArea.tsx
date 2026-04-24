@@ -21,7 +21,14 @@ import { CUSTOM_AVATAR_IMAGE_MAP } from '../constants';
 import styles from '../index.module.css';
 import type { AcpBackendConfig, AvailableAgent, EffectiveAgentInfo } from '../types';
 import { Message } from '@arco-design/web-react';
-import { Plus, Robot } from '@icon-park/react';
+import {
+  Plus,
+  Robot,
+  DocDetail,
+  Ppt,
+  TableReport,
+  Cube,
+} from '@icon-park/react';
 import React, { useCallback, useLayoutEffect, useMemo } from 'react';
 import { resolveExtensionAssetUrl } from '@/renderer/utils/platform';
 import { useTranslation } from 'react-i18next';
@@ -43,6 +50,14 @@ type AssistantSelectionAreaProps = {
 const resolveAssistantCandidateIds = (assistantId: string): string[] => {
   const stripped = assistantId.replace(/^builtin-/, '');
   return Array.from(new Set([assistantId, `builtin-${stripped}`, stripped]));
+};
+
+const ICON_MAP: Record<string, React.FC<any>> = {
+  DocDetail,
+  Ppt,
+  TableReport,
+  Cube,
+  Robot,
 };
 
 const AssistantSelectionArea: React.FC<AssistantSelectionAreaProps> = ({
@@ -294,7 +309,7 @@ const AssistantSelectionArea: React.FC<AssistantSelectionAreaProps> = ({
   // Assistant List View
   return (
     <div className='mt-12px w-full'>
-      <div className='flex flex-wrap gap-8px justify-center'>
+      <div className='flex flex-wrap gap-12px justify-center items-center'>
         {customAgents
           .filter((a) => a.isPreset && a.enabled !== false)
           .toSorted((a, b) => {
@@ -312,25 +327,31 @@ const AssistantSelectionArea: React.FC<AssistantSelectionAreaProps> = ({
               (/\.(svg|png|jpe?g|webp|gif)$/i.test(avatarImage) ||
                 /^(https?:|forjinn-asset:\/\/|file:\/\/|data:)/i.test(avatarImage))
             );
+            const IconComponent = ICON_MAP[avatarValue || ''] || null;
+
             return (
               <div
                 key={assistant.id}
                 data-testid={`preset-pill-${assistant.id}`}
-                className='h-28px group flex items-center gap-8px px-16px rd-100px cursor-pointer transition-all b-1 b-solid bg-fill-0 hover:bg-fill-1 select-none'
+                className='h-36px group flex items-center gap-0 px-10px rd-100px cursor-pointer transition-all duration-300 ease-in-out b-1 b-solid bg-fill-0 hover:bg-white hover:gap-8px hover:px-16px hover:shadow-lg hover:border-[#007AFF] select-none overflow-hidden max-w-36px hover:max-w-240px'
                 style={{
                   borderWidth: '1px',
                   borderColor: 'color-mix(in srgb, var(--color-border-2) 70%, transparent)',
                 }}
                 onClick={() => onSelectAssistant(`custom:${assistant.id}`)}
               >
-                {isImageAvatar ? (
-                  <img src={avatarImage} alt='' width={16} height={16} style={{ objectFit: 'contain' }} />
-                ) : avatarValue ? (
-                  <span style={{ fontSize: 16, lineHeight: '18px' }}>{avatarValue}</span>
-                ) : (
-                  <Robot theme='outline' size={16} />
-                )}
-                <span className='text-14px text-2 hover:text-1'>
+                <div className='flex-shrink-0 flex items-center justify-center w-16px h-16px text-[#007AFF] group-hover:scale-110 transition-transform duration-300'>
+                  {IconComponent ? (
+                    <IconComponent theme='outline' size={16} fill='currentColor' />
+                  ) : isImageAvatar ? (
+                    <img src={avatarImage} alt='' width={16} height={16} style={{ objectFit: 'contain' }} />
+                  ) : avatarValue ? (
+                    <span style={{ fontSize: 16, lineHeight: '18px' }}>{avatarValue}</span>
+                  ) : (
+                    <Robot theme='outline' size={16} />
+                  )}
+                </div>
+                <span className='text-13px font-medium text-t-primary opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-300'>
                   {assistant.nameI18n?.[localeKey] || assistant.name}
                 </span>
               </div>
@@ -338,7 +359,7 @@ const AssistantSelectionArea: React.FC<AssistantSelectionAreaProps> = ({
           })}
         <div
           data-testid='btn-add-preset'
-          className='flex items-center justify-center h-28px w-28px rd-50% bg-fill-0 hover:bg-fill-2 cursor-pointer b-1 b-dashed select-none transition-colors'
+          className='flex items-center justify-center h-36px w-36px rd-50% bg-fill-0 hover:bg-white hover:shadow-md cursor-pointer b-1 b-dashed select-none transition-all duration-300'
           style={{ borderWidth: '1px', borderColor: 'color-mix(in srgb, var(--color-border-2) 70%, transparent)' }}
           onClick={() => navigate('/settings/assistants')}
         >

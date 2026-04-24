@@ -57,7 +57,7 @@ const SidebarIcon: React.FC<{ size?: number; strokeWidth?: number }> = ({ size =
     focusable='false'
   >
     <rect x='6' y='10' width='36' height='28' rx='5' />
-    <line x1='18' y1='10' x2='18' y2='38' />
+    <line x1='30' y1='10' x2='30' y2='38' />
   </svg>
 );
 
@@ -256,14 +256,14 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
     : undefined;
 
   const menuStyle: React.CSSProperties = useMemo(() => {
-    if (!isMacRuntime || !showSiderToggle) return {};
+    if (!isMacRuntime) return {};
     // macOS: sit the menu buttons right next to the traffic lights (which occupy ~70px).
     // Mobile keeps its own layout (no traffic lights).
     const marginLeft = layout?.isMobile ? '0px' : '76px';
     return {
       marginLeft,
     };
-  }, [isMacRuntime, showSiderToggle, layout?.isMobile]);
+  }, [isMacRuntime, layout?.isMobile]);
 
   return (
     <div
@@ -285,24 +285,6 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
             aria-label={backToChatTooltip}
           >
             <ArrowCircleLeft theme='outline' size={iconSize} fill='currentColor' />
-          </button>
-        )}
-        {showSiderToggle && (
-          <button
-            type='button'
-            className={classNames('app-titlebar__button', layout?.isMobile && 'app-titlebar__button--mobile')}
-            onClick={handleSiderToggle}
-            aria-label={siderTooltip}
-          >
-            {layout?.isMobile ? (
-              layout?.siderCollapsed ? (
-                <MenuUnfold theme='outline' size={iconSize} fill='currentColor' />
-              ) : (
-                <MenuFold theme='outline' size={iconSize} fill='currentColor' />
-              )
-            ) : (
-              <SidebarIcon size={iconSize} strokeWidth={desktopIconStroke} />
-            )}
           </button>
         )}
         {showHistoryNav && (
@@ -345,6 +327,24 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
         )}
       </div>
       <div ref={toolbarRef} className='app-titlebar__toolbar'>
+        {showSiderToggle && (
+          <button
+            type='button'
+            className={classNames('app-titlebar__button', layout?.isMobile && 'app-titlebar__button--mobile')}
+            onClick={handleSiderToggle}
+            aria-label={siderTooltip}
+          >
+            {layout?.isMobile ? (
+              layout?.siderCollapsed ? (
+                <MenuUnfold theme='outline' size={iconSize} fill='currentColor' />
+              ) : (
+                <MenuFold theme='outline' size={iconSize} fill='currentColor' />
+              )
+            ) : (
+              <SidebarIcon size={iconSize} strokeWidth={desktopIconStroke} />
+            )}
+          </button>
+        )}
         {showNewConversationButton && (
           <button
             type='button'

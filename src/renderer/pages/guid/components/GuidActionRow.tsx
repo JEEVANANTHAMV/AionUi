@@ -274,18 +274,6 @@ const GuidActionRow: React.FC<GuidActionRowProps> = ({
         >
           {modelSelectorNode}
 
-          {showModeSwitch && (
-            <AgentModeSelector
-              backend={modeBackend}
-              compact
-              initialMode={selectedMode}
-              onModeSelect={onModeSelect}
-              compactLeadingIcon={<Shield theme='outline' size='14' fill={iconColors.secondary} />}
-              modeLabelFormatter={getModeDisplayLabel}
-              compactLabelPrefix={t('agentMode.permission')}
-              hideCompactLabelPrefixOnMobile
-            />
-          )}
           <AcpConfigSelector
             backend={configOptionsBackend}
             buttonClassName='guid-config-btn'

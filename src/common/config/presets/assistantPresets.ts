@@ -2,6 +2,7 @@ export type AssistantPreset = {
   id: string;
   avatar: string;
   presetAgentType?: string;
+  enabled?: boolean;
   /**
    * Directory containing all resources for this preset (relative to project root).
    * If set, both ruleFiles and skillFiles will be resolved from this directory.
@@ -23,7 +24,8 @@ export type AssistantPreset = {
 export const ASSISTANT_PRESETS: AssistantPreset[] = [
   {
     id: 'word-creator',
-    avatar: '📝',
+    avatar: 'DocDetail',
+    enabled: true,
     presetAgentType: 'gemini',
     resourceDir: 'src/process/resources/assistant/word-creator',
     ruleFiles: {
@@ -72,7 +74,8 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   },
   {
     id: 'ppt-creator',
-    avatar: '📊',
+    avatar: 'Ppt',
+    enabled: true,
     presetAgentType: 'gemini',
     resourceDir: 'src/process/resources/assistant/ppt-creator',
     ruleFiles: {
@@ -120,7 +123,8 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   },
   {
     id: 'excel-creator',
-    avatar: '📈',
+    avatar: 'TableReport',
+    enabled: true,
     presetAgentType: 'gemini',
     resourceDir: 'src/process/resources/assistant/excel-creator',
     ruleFiles: {
@@ -168,7 +172,8 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   },
   {
     id: 'morph-ppt',
-    avatar: '✨',
+    avatar: 'Presentation',
+    enabled: true,
     presetAgentType: 'gemini',
     resourceDir: 'src/process/resources/assistant/morph-ppt',
     ruleFiles: {
@@ -216,7 +221,8 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   },
   {
     id: 'morph-ppt-3d',
-    avatar: '🎬',
+    avatar: 'Cube',
+    enabled: true,
     presetAgentType: 'gemini',
     resourceDir: 'src/process/resources/assistant/morph-ppt-3d',
     ruleFiles: {
@@ -249,7 +255,8 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   },
   {
     id: 'pitch-deck-creator',
-    avatar: '🎯',
+    avatar: 'Presentation',
+    enabled: true,
     presetAgentType: 'gemini',
     resourceDir: 'src/process/resources/assistant/pitch-deck-creator',
     ruleFiles: {
@@ -489,6 +496,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   {
     id: 'openclaw-setup',
     avatar: '🦞',
+    enabled: false,
     presetAgentType: 'gemini',
     resourceDir: 'src/process/resources/assistant/openclaw-setup',
     ruleFiles: {
@@ -863,7 +871,8 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   },
   {
     id: 'moltbook',
-    avatar: '🦞',
+    avatar: '📖',
+    enabled: false,
     presetAgentType: 'gemini',
     resourceDir: 'src/process/resources/assistant/moltbook',
     ruleFiles: {
