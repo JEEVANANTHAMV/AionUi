@@ -78,6 +78,8 @@ export interface LoadCliConfigOptions {
   skillsDir?: string;
   /** 启用的 skills 列表，用于过滤加载的 skills / Enabled skills list for filtering loaded skills */
   enabledSkills?: string[];
+  /** 排除使用的工具列表 / List of tools to exclude */
+  excludeTools?: string[];
 }
 
 export async function loadCliConfig({

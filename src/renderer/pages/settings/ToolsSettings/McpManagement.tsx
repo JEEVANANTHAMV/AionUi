@@ -73,6 +73,7 @@ const McpManagement: React.FC<McpManagementProps> = ({ message }) => {
     handleEditMcpServer,
     handleDeleteMcpServer,
     handleToggleMcpServer,
+    handleToggleTool,
   } = useMcpServerCRUD(
     mcpServers,
     saveMcpServers,
@@ -287,6 +288,7 @@ const McpManagement: React.FC<McpManagementProps> = ({ message }) => {
                 onEditServer={showEditMcpModal}
                 onDeleteServer={showDeleteConfirm}
                 onToggleServer={handleToggleMcpServer}
+                onToggleTool={handleToggleTool}
                 onOAuthLogin={handleOAuthLogin}
               />
             ))

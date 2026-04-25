@@ -10,7 +10,7 @@ export { GeminiApprovalStore } from './GeminiApprovalStore';
 // src/core/ConfigManager.ts
 import { FORJINN_DESK_FILES_MARKER } from '@/common/config/constants';
 import { NavigationInterceptor } from '@/common/chat/navigation';
-import type { TProviderWithModel } from '@/common/config/storage';
+import type { TProviderWithModel, ICustomHttpTool } from '@/common/config/storage';
 import { uuid } from '@/common/utils';
 import { getProviderAuthType } from '@/common/utils/platformAuthType';
 import { isNewApiPlatform } from '@/common/utils/platformConstants';
@@ -98,6 +98,10 @@ interface GeminiAgent2Options {
   skillsDir?: string;
   /** 启用的 skills 列表，用于过滤 SkillManager 中的 skills / Enabled skills list for filtering skills in SkillManager */
   enabledSkills?: string[];
+  /** 排除使用的工具列表 / List of tools to exclude */
+  excludeTools?: string[];
+  /** 自定义 HTTP 工具列表 / List of custom HTTP tools */
+  customHttpTools?: ICustomHttpTool[];
 }
 
 export class GeminiAgent {
@@ -109,6 +113,7 @@ export class GeminiAgent {
   private yoloMode: boolean = false;
   private googleCloudProject: string | null = null;
   private mcpServers: Record<string, unknown> = {};
+  private excludeTools: string[] = [];
   private geminiClient: GeminiClient | null = null;
   private authType: AuthType | null = null;
   private scheduler: CoreToolScheduler | null = null;
@@ -130,6 +135,10 @@ export class GeminiAgent {
   private skillsDir?: string;
   /** 启用的 skills 列表 / Enabled skills list */
   private enabledSkills?: string[];
+  /** 排除使用的工具列表 / List of tools to exclude */
+  private _excludeTools?: string[];
+  /** 自定义 HTTP 工具列表 / List of custom HTTP tools */
+  private customHttpTools: ICustomHttpTool[] = [];
   bootstrap: Promise<void>;
   static buildFileServer(workspace: string) {
     return new FileDiscoveryService(workspace);
@@ -142,19 +151,26 @@ export class GeminiAgent {
     this.yoloMode = options.yoloMode || false;
     this.googleCloudProject = options.GOOGLE_CLOUD_PROJECT;
     this.mcpServers = options.mcpServers || {};
+    this.excludeTools = options.excludeTools || [];
     this.contextFileName = options.contextFileName;
     // 使用统一的工具函数获取认证类型
     this.authType = getProviderAuthType(options.model);
     this.onStreamEvent = options.onStreamEvent;
     this.presetRules = options.presetRules;
+    this.mcpServers = options.mcpServers || {};
+    this.excludeTools = options.excludeTools || [];
+    this.customHttpTools = options.customHttpTools || [];
+    this.onStreamEvent = options.onStreamEvent;
+    this.presetRules = options.presetRules;
+    this.contextContent = options.contextContent || options.presetRules;
     this.skillsDir = options.skillsDir;
     this.enabledSkills = options.enabledSkills;
-    // 向后兼容：优先使用 presetRules，其次 contextContent / Backward compatible: prefer presetRules, fallback to contextContent
-    this.contextContent = options.contextContent || options.presetRules;
-    this.initClientEnv();
+    this._excludeTools = options.excludeTools;
+
     this.toolConfig = new ConversationToolConfig({
-      proxy: this.proxy,
-      webSearchEngine: this.webSearchEngine,
+      proxy: this.proxy || '',
+      webSearchEngine: this.webSearchEngine || 'default',
+      customHttpTools: this.customHttpTools,
     });
 
     // Register as current agent for flashFallbackHandler access
@@ -373,6 +389,7 @@ export class GeminiAgent {
       conversationToolConfig: this.toolConfig,
       yoloMode,
       mcpServers: this.mcpServers,
+      excludeTools: this.excludeTools,
       skillsDir: this.skillsDir,
       enabledSkills: this.enabledSkills,
     });

@@ -305,7 +305,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   },
   {
     id: 'dashboard-creator',
-    avatar: '📊',
+    avatar: 'ChartGraph',
     presetAgentType: 'gemini',
     resourceDir: 'src/process/resources/assistant/dashboard-creator',
     ruleFiles: {
@@ -354,7 +354,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   },
   {
     id: 'academic-paper',
-    avatar: '📚',
+    avatar: 'BookOpen',
     presetAgentType: 'gemini',
     resourceDir: 'src/process/resources/assistant/academic-paper',
     ruleFiles: {
@@ -403,7 +403,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   },
   {
     id: 'financial-model-creator',
-    avatar: '💰',
+    avatar: 'Finance',
     presetAgentType: 'gemini',
     resourceDir: 'src/process/resources/assistant/financial-model-creator',
     ruleFiles: {
@@ -452,7 +452,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   },
   {
     id: 'star-office-helper',
-    avatar: '📺',
+    avatar: 'Tv',
     presetAgentType: 'gemini',
     resourceDir: 'src/process/resources/assistant/star-office-helper',
     ruleFiles: {
@@ -646,7 +646,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   // },
   {
     id: 'game-3d',
-    avatar: '🎮',
+    avatar: 'GameHandle',
     presetAgentType: 'gemini',
     resourceDir: 'src/process/resources/assistant/game-3d',
     ruleFiles: {
@@ -686,7 +686,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   },
   {
     id: 'ui-ux-pro-max',
-    avatar: '🎨',
+    avatar: 'GraphicDesign',
     presetAgentType: 'gemini',
     resourceDir: 'src/process/resources/assistant/ui-ux-pro-max',
     ruleFiles: {
@@ -729,7 +729,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   },
   {
     id: 'planning-with-files',
-    avatar: '📋',
+    avatar: 'Plan',
     presetAgentType: 'gemini',
     resourceDir: 'src/process/resources/assistant/planning-with-files',
     ruleFiles: {
@@ -772,7 +772,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   },
   {
     id: 'human-3-coach',
-    avatar: '🧭',
+    avatar: 'Compass',
     presetAgentType: 'gemini',
     resourceDir: 'src/process/resources/assistant/human-3-coach',
     ruleFiles: {

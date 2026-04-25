@@ -36,6 +36,8 @@ export interface IConfigStorageRefer {
     preferredMode?: string;
     /** Preferred model ID for new conversations / 新会话的默认模型 */
     preferredModelId?: string;
+    /** Web search engine preference / 网页搜索引擎偏好 */
+    webSearchEngine?: 'google' | 'default';
   };
   'codex.config'?: {
     cliPath?: string;
@@ -196,6 +198,28 @@ export interface IConfigStorageRefer {
   // Desktop Pet: whether tool-call confirmations are routed to the pet's bubble
   // (true) or remain in the main chat window (false). Default true.
   'pet.confirmEnabled'?: boolean;
+  /** Custom HTTP tools defined by the user / 用户定义的自定义 HTTP 工具 */
+  'custom.http.tools'?: ICustomHttpTool[];
+}
+
+/**
+ * Custom HTTP tool configuration
+ * 用户自定义的 HTTP 工具配置
+ */
+export interface ICustomHttpTool {
+  id: string;
+  name: string;
+  description: string;
+  url: string;
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  headers?: string;
+  /** JSON Schema for input arguments / 输入参数的 JSON Schema */
+  inputSchema: string;
+  /** Sample JSON for input arguments / 输入参数的示例 JSON */
+  sampleArgs?: string;
+  enabled: boolean;
+  createdAt: number;
+  updatedAt: number;
 }
 
 export interface IEnvStorageRefer {
@@ -619,6 +643,7 @@ export interface IMcpTool {
   name: string;
   description?: string;
   inputSchema?: unknown;
+  enabled?: boolean; // 新增：是否启用该工具
   _meta?: Record<string, unknown>;
 }
 

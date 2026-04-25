@@ -1,13 +1,14 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tooltip } from '@arco-design/web-react';
+import { Tooltip, Switch } from '@arco-design/web-react';
 import type { IMcpServer } from '@/common/config/storage';
 
 interface McpServerToolsListProps {
   server: IMcpServer;
+  onToggleTool?: (serverId: string, toolName: string, enabled: boolean) => void;
 }
 
-const McpServerToolsList: React.FC<McpServerToolsListProps> = ({ server }) => {
+const McpServerToolsList: React.FC<McpServerToolsListProps> = ({ server, onToggleTool }) => {
   const { t } = useTranslation();
 
   if (!server.tools || server.tools.length === 0) {
@@ -19,8 +20,8 @@ const McpServerToolsList: React.FC<McpServerToolsListProps> = ({ server }) => {
       <div>
         <div className='space-y-2'>
           {server.tools.map((tool, index) => (
-            <div key={index} className='border border-3 rounded p-3'>
-              <div className='flex gap-4'>
+            <div key={index} className='border border-3 rounded p-3 bg-fill-1'>
+              <div className='flex items-center justify-between gap-4'>
                 <div className='flex-shrink-0 min-w-0 w-1/3'>
                   <div className='font-medium text-sm text-blue-600 break-words'>{tool.name}</div>
                 </div>
@@ -30,6 +31,13 @@ const McpServerToolsList: React.FC<McpServerToolsListProps> = ({ server }) => {
                       {tool.description || t('settings.mcpNoDescription')}
                     </div>
                   </Tooltip>
+                </div>
+                <div className='flex-shrink-0'>
+                  <Switch
+                    size='small'
+                    checked={tool.enabled !== false} // 默认开启
+                    onChange={(checked) => onToggleTool?.(server.id, tool.name, checked)}
+                  />
                 </div>
               </div>
             </div>

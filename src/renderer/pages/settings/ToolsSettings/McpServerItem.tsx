@@ -20,6 +20,7 @@ interface McpServerItemProps {
   onEditServer: (server: IMcpServer) => void;
   onDeleteServer: (serverId: string) => void;
   onToggleServer: (serverId: string, enabled: boolean) => void;
+  onToggleTool?: (serverId: string, toolName: string, enabled: boolean) => void;
   onOAuthLogin?: (server: IMcpServer) => void;
 }
 
@@ -37,6 +38,7 @@ const McpServerItem: React.FC<McpServerItemProps> = ({
   onEditServer,
   onDeleteServer,
   onToggleServer,
+  onToggleTool,
   onOAuthLogin,
 }) => {
   return (
@@ -66,7 +68,7 @@ const McpServerItem: React.FC<McpServerItemProps> = ({
         name='1'
         className={'[&_div.arco-collapse-item-content-box]:py-3'}
       >
-        <McpServerToolsList server={server} />
+        <McpServerToolsList server={server} onToggleTool={onToggleTool} />
       </Collapse.Item>
     </Collapse>
   );

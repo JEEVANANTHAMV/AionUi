@@ -32,6 +32,7 @@ import {
   useMcpOAuth,
 } from '@/renderer/hooks/mcp';
 import classNames from 'classnames';
+import CustomHttpToolsSection from '@/renderer/pages/settings/ToolsSettings/CustomHttpToolsSection';
 import { useSettingsViewMode } from '../settingsViewContext';
 
 type MessageInstance = ReturnType<typeof Message.useMessage>[0];
@@ -263,6 +264,7 @@ const ModalMcpManagementSection: React.FC<{
     handleEditMcpServer,
     handleDeleteMcpServer,
     handleToggleMcpServer,
+    handleToggleTool,
   } = useMcpServerCRUD(
     mcpServers,
     saveMcpServers,
@@ -458,6 +460,7 @@ const ModalMcpManagementSection: React.FC<{
                   onEditServer={showEditMcpModal}
                   onDeleteServer={showDeleteConfirm}
                   onToggleServer={handleToggleMcpServer}
+                  onToggleTool={handleToggleTool}
                   onOAuthLogin={handleOAuthLogin}
                 />
               ))}
@@ -746,6 +749,7 @@ const ToolsModalContent: React.FC = () => {
       {/* Content Area */}
       <ForjinnScrollArea className='flex-1 min-h-0 pb-16px' disableOverflow={isPageMode}>
         <div className='space-y-16px'>
+
           {/* MCP 工具配置 */}
           <div className='px-[12px] md:px-[32px] py-[24px] bg-2 rd-12px md:rd-16px flex flex-col min-h-0 border border-border-2'>
             <div className='flex-1 min-h-0'>
@@ -762,6 +766,10 @@ const ToolsModalContent: React.FC = () => {
                 />
               </ForjinnScrollArea>
             </div>
+          </div>
+          {/* 自定义 HTTP 工具 */}
+          <div className='px-[12px] md:px-[32px] py-[24px] bg-2 rd-12px md:rd-16px border border-border-2'>
+            <CustomHttpToolsSection />
           </div>
           {/* 图像生成 */}
           <div className='px-[12px] md:px-[32px] py-[24px] bg-2 rd-12px md:rd-16px border border-border-2'>

@@ -9,7 +9,7 @@ import { ipcBridge } from '@/common';
 import type { CronMessageMeta, IMessageText, IMessageToolGroup, TMessage } from '@/common/chat/chatLib';
 import { transformMessage } from '@/common/chat/chatLib';
 import type { IResponseMessage } from '@/common/adapter/ipcBridge';
-import type { IMcpServer, TProviderWithModel } from '@/common/config/storage';
+import type { IMcpServer, TProviderWithModel, ICustomHttpTool } from '@/common/config/storage';
 import { ProcessConfig, getSkillsDir } from '@process/utils/initStorage';
 import { ExtensionRegistry } from '@process/extensions';
 import { buildSystemInstructionsWithSkillsIndex } from './agentUtils';
@@ -45,6 +45,21 @@ type UiMcpServerConfig = {
   description?: string;
 };
 
+interface BootstrapAgentConfig {
+  workspace: string;
+  conversation_id: string;
+  mcpServers: Record<string, UiMcpServerConfig>;
+  customHttpTools: ICustomHttpTool[];
+  excludeTools: string[];
+  model: TProviderWithModel;
+  proxy: string;
+  projectId?: string;
+  rules?: string;
+  enabledSkills: string[];
+  yoloMode: boolean;
+  webSearchEngine: 'google' | 'default';
+}
+
 export class GeminiAgentManager extends BaseAgentManager<
   {
     workspace: string;
@@ -62,6 +77,8 @@ export class GeminiAgentManager extends BaseAgentManager<
     enabledSkills?: string[];
     /** Yolo mode: auto-approve all tool calls / 自动允许模式 */
     yoloMode?: boolean;
+    /** 排除使用的工具列表 / List of tools to exclude */
+    excludeTools?: string[];
   },
   string
 > {
@@ -195,8 +212,12 @@ export class GeminiAgentManager extends BaseAgentManager<
    * Extracted to allow re-bootstrapping when MCP config changes.
    */
   private createBootstrap(): Promise<void> {
-    return Promise.all([ProcessConfig.get('gemini.config'), this.getMcpServers()])
-      .then(async ([config, mcpServers]) => {
+    return Promise.all([
+      ProcessConfig.get('gemini.config'),
+      this.getMcpServersAndExcludedTools(),
+      ProcessConfig.get('custom.http.tools'),
+    ])
+      .then(async ([config, { mcpServers, excludedTools }, customHttpTools]) => {
         let projectId: string | undefined;
         const authType = getProviderAuthType(this.model);
         const needsGoogleOAuth = authType === AuthType.LOGIN_WITH_GOOGLE || authType === AuthType.USE_VERTEX_AI;
@@ -255,25 +276,22 @@ export class GeminiAgentManager extends BaseAgentManager<
           effectivePresetRules = effectivePresetRules ? `${effectivePresetRules}\n\n${teamGuide}` : teamGuide;
         }
 
-        return this.start({
-          ...config,
-          GOOGLE_CLOUD_PROJECT: projectId,
+        const bootstrapConfig: BootstrapAgentConfig = {
           workspace: this.workspace,
-          model: this.model,
-          webSearchEngine: this.webSearchEngine,
+          conversation_id: this.conversation_id,
           mcpServers,
-          contextFileName: this.contextFileName,
-          // presetRules are no longer injected here — they are in GEMINI.md
-          // Keep for backward compatibility with existing conversations
-          presetRules: effectivePresetRules,
-          contextContent: this.contextContent,
-          skillsDir: getSkillsDir(),
-          // 启用的 skills 列表（含内置 skills），用于 worker 的 SkillManager
-          // Enabled skills list (including builtins) for worker's SkillManager
+          customHttpTools: Array.isArray(customHttpTools) ? customHttpTools : [],
+          excludeTools: excludedTools,
+          model: this.model,
+          proxy: config?.proxy || '',
+          projectId,
+          rules: effectivePresetRules,
           enabledSkills: allEnabledSkills,
-          // Yolo mode: derived from currentMode, not directly from legacy config
           yoloMode: effectiveYoloMode,
-        });
+          webSearchEngine: config?.webSearchEngine || 'default',
+        };
+
+        return this.start(bootstrapConfig);
       })
       .then(async () => {
         await this.injectHistoryFromDatabase();
@@ -286,27 +304,42 @@ export class GeminiAgentManager extends BaseAgentManager<
    * any add / remove / toggle / reconnect / config-change is detected —
    * even when a server is deleted and re-added with the same name.
    */
-  private static computeMcpFingerprint(mcpServers: IMcpServer[] | undefined | null): string {
-    if (!mcpServers || !Array.isArray(mcpServers)) return '[]';
-    const entries = mcpServers
-      .map((s: IMcpServer) => {
-        // Include transport identity so config changes (e.g. different command/url) are detected
+  private static computeMcpFingerprint(mcpServers: any, customTools: any = []): string {
+    const servers = Array.isArray(mcpServers) ? mcpServers : [];
+    const httpTools = Array.isArray(customTools) ? customTools : [];
+
+    const entries = [
+      ...servers.map((s) => {
         const transportKey =
           s.transport.type === 'stdio'
-            ? `${s.transport.command}|${(s.transport.args || []).join(',')}`
+            ? `${s.transport.command} ${s.transport.args?.join(' ')}`
             : 'url' in s.transport
               ? s.transport.url
               : '';
-        return { n: s.name, e: s.enabled, st: s.status, t: transportKey };
-      })
-      .toSorted((a, b) => a.n.localeCompare(b.n));
+        const toolsState = (s.tools || []).map((t: any) => `${t.name}:${t.enabled !== false}`).join(',');
+        return { n: s.name, e: s.enabled, st: s.status, t: transportKey, ts: toolsState };
+      }),
+      ...httpTools.map((t: ICustomHttpTool) => ({
+        id: t.id,
+        n: t.name,
+        e: t.enabled,
+        ts: t.updatedAt,
+      })),
+    ].toSorted((a, b) => ('n' in a && 'n' in b ? String(a.n).localeCompare(String(b.n)) : 0));
     return JSON.stringify(entries);
   }
 
-  private async getMcpServers(): Promise<Record<string, UiMcpServerConfig>> {
+  private async getMcpServersAndExcludedTools(): Promise<{
+    mcpServers: Record<string, UiMcpServerConfig>;
+    excludedTools: string[];
+  }> {
     try {
-      const mcpServers = await ProcessConfig.get('mcp.config');
+      const [mcpServers, customHttpTools] = await Promise.all([
+        ProcessConfig.get('mcp.config'),
+        ProcessConfig.get('custom.http.tools'),
+      ]);
       const allServers: IMcpServer[] = Array.isArray(mcpServers) ? mcpServers : [];
+      const excludedTools: string[] = [];
 
       // Merge extension-contributed MCP servers
       // 合并扩展贡献的 MCP servers
@@ -334,48 +367,51 @@ export class GeminiAgentManager extends BaseAgentManager<
         console.warn('[GeminiAgentManager] Failed to load extension MCP servers:', extError);
       }
 
-      // Only skip when we have NOTHING to inject: no user MCP, no team MCP, and no
-      // aion team-guide MCP. Previously this shortcut fired whenever the user had
-      // no custom MCP and wasn't in a team, which silently dropped the aion_* tools
-      // (aion_create_team / aion_list_models) for every plain preset-assistant chat.
-      const hasAionGuide = !this.teamMcpStdioConfig?.command && Boolean(getTeamGuideStdioConfig()?.command);
-      if (allServers.length === 0 && !this.teamMcpStdioConfig?.command && !hasAionGuide) {
-        this.mcpFingerprint = '[]';
-        return {};
-      }
-
       // Store fingerprint for later change detection
       // 保存指纹用于后续变更检测
-      this.mcpFingerprint = GeminiAgentManager.computeMcpFingerprint(allServers);
+      this.mcpFingerprint = GeminiAgentManager.computeMcpFingerprint(mcpServers, customHttpTools);
 
-      // 转换为 aioncli-core 期望的格式
-      // MCPServerConfig supports: stdio (command/args/env), sse/http (url/type/headers)
       const mcpConfig: Record<string, UiMcpServerConfig> = {};
-      allServers
-        .filter((server: IMcpServer) => server.enabled && server.status === 'connected') // 只使用启用且连接成功的服务器
-        .forEach((server: IMcpServer) => {
-          if (server.transport.type === 'stdio') {
+      const enabledServers = allServers.filter(
+        (server: IMcpServer) => server.enabled && server.status === 'connected'
+      );
+
+      enabledServers.forEach((server: IMcpServer) => {
+        const isStdio = server.transport.type === 'stdio';
+        const isSseOrHttp =
+          server.transport.type === 'sse' ||
+          server.transport.type === 'http' ||
+          server.transport.type === 'streamable_http';
+
+        if (isStdio || isSseOrHttp) {
+          if (isStdio) {
             mcpConfig[server.name] = {
-              command: server.transport.command,
-              args: server.transport.args || [],
-              env: server.transport.env || {},
+              command: (server.transport as any).command,
+              args: (server.transport as any).args || [],
+              env: (server.transport as any).env || {},
               description: server.description,
             };
-          } else if (
-            server.transport.type === 'sse' ||
-            server.transport.type === 'http' ||
-            server.transport.type === 'streamable_http'
-          ) {
-            // aioncli-core MCPServerConfig.type only accepts "sse" | "http"
-            const type = server.transport.type === 'streamable_http' ? 'http' : server.transport.type;
+          } else {
+            const type = server.transport.type === 'streamable_http' ? 'http' : (server.transport.type as any);
             mcpConfig[server.name] = {
-              url: server.transport.url,
+              url: (server.transport as any).url,
               type,
-              headers: server.transport.headers || {},
+              headers: (server.transport as any).headers || {},
               description: server.description,
             };
           }
-        });
+
+          // 收集被禁用的工具 / Collect disabled tools
+          if (server.tools && Array.isArray(server.tools)) {
+            server.tools.forEach((tool) => {
+              if (tool.enabled === false) {
+                // MCP tools are prefixed with mcp__serverName__
+                excludedTools.push(`mcp__${server.name}__${tool.name}`);
+              }
+            });
+          }
+        }
+      });
 
       // Inject team MCP server if this agent belongs to a team (stdio mode)
       if (this.teamMcpStdioConfig && this.teamMcpStdioConfig.command) {
@@ -390,12 +426,7 @@ export class GeminiAgentManager extends BaseAgentManager<
         };
         mainLog('[GeminiAgentManager]', 'getMcpServers: injected team MCP server:', this.teamMcpStdioConfig.name);
       } else {
-        mainLog('[GeminiAgentManager]', 'getMcpServers: no teamMcpStdioConfig, skipping team MCP injection');
-
         // Inject Aion team-guide MCP server for solo agents (not in team mode)
-        // so Gemini can call aion_create_team after the user requests a Team
-        // or explicitly approves Team for an exceptionally hard task.
-        // FORJINN_MCP_BACKEND tells the stdio bridge this is a gemini agent.
         const aionStdioConfig = getTeamGuideStdioConfig();
         if (aionStdioConfig) {
           const aionEnvObj: Record<string, string> = {};
@@ -409,14 +440,13 @@ export class GeminiAgentManager extends BaseAgentManager<
             args: aionStdioConfig.args || [],
             env: aionEnvObj,
           };
-          mainLog('[GeminiAgentManager]', 'getMcpServers: injected aion team-guide MCP server');
         }
       }
 
-      return mcpConfig;
+      return { mcpServers: mcpConfig, excludedTools };
     } catch (error) {
       this.mcpFingerprint = '[]';
-      return {};
+      return { mcpServers: {}, excludedTools: [] };
     }
   }
 
@@ -521,8 +551,11 @@ export class GeminiAgentManager extends BaseAgentManager<
    */
   private async refreshWorkerIfMcpChanged(): Promise<void> {
     try {
-      const mcpServers = await ProcessConfig.get('mcp.config');
-      const currentFingerprint = GeminiAgentManager.computeMcpFingerprint(mcpServers);
+      const [mcpServers, customHttpTools] = await Promise.all([
+        ProcessConfig.get('mcp.config'),
+        ProcessConfig.get('custom.http.tools'),
+      ]);
+      const currentFingerprint = GeminiAgentManager.computeMcpFingerprint(mcpServers, customHttpTools);
 
       if (currentFingerprint !== this.mcpFingerprint) {
         mainLog(

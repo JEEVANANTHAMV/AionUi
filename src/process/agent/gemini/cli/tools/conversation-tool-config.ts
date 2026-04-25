@@ -13,6 +13,8 @@ import { mkdirSync } from 'fs';
 import path from 'path';
 import { WebFetchTool } from './web-fetch';
 import { WebSearchTool } from './web-search';
+import { CustomHttpTool } from './custom-http-tool';
+import type { ICustomHttpTool } from '@/common/config/storage';
 
 interface ConversationToolConfigOptions {
   proxy: string;
@@ -37,9 +39,11 @@ export class ConversationToolConfig {
   private dedicatedConfig: Config | null = null; // 缓存专门的Config（用于OAuth认证）
   private webSearchEngine: 'google' | 'default' = 'default';
   private proxy: string = '';
-  constructor(options: ConversationToolConfigOptions) {
+  private customHttpTools: ICustomHttpTool[] = [];
+  constructor(options: ConversationToolConfigOptions & { customHttpTools?: ICustomHttpTool[] }) {
     this.proxy = options.proxy;
     this.webSearchEngine = options.webSearchEngine ?? 'default';
+    this.customHttpTools = options.customHttpTools || [];
   }
 
   /**
@@ -176,6 +180,20 @@ export class ConversationToolConfig {
       } catch (error) {
         console.warn('Failed to register gemini_web_search tool:', error);
         // 异常时也不影响其他工具的注册
+      }
+    }
+
+    // 注册自定义 HTTP 工具
+    if (this.customHttpTools.length > 0) {
+      for (const toolConfig of this.customHttpTools) {
+        if (toolConfig.enabled) {
+          try {
+            const customTool = new CustomHttpTool(toolConfig, config.getMessageBus());
+            toolRegistry.registerTool(customTool);
+          } catch (error) {
+            console.error(`Failed to register custom tool ${toolConfig.name}:`, error);
+          }
+        }
       }
     }
 

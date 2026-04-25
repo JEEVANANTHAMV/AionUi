@@ -644,6 +644,24 @@ const getDefaultMcpServers = (): IMcpServer[] => {
         command: 'npx',
         args: ['-y', '@modelcontextprotocol/server-sequentialthinking@latest'],
       },
+      'windows-mcp': {
+        command: 'uvx',
+        args: ['windows-mcp'],
+        env: {
+          WINDOWS_MCP_SCREENSHOT_SCALE: '0.5',
+          WINDOWS_MCP_SCREENSHOT_BACKEND: 'auto',
+          WINDOWS_MCP_PROFILE_SNAPSHOT: 'false',
+          WINDOWS_MCP_DEBUG: 'false',
+        },
+      },
+      'filesystem': {
+        command: 'npx',
+        args: ['-y', '@modelcontextprotocol/server-filesystem@latest'],
+      },
+      'memory': {
+        command: 'npx',
+        args: ['-y', '@modelcontextprotocol/server-memory@latest'],
+      },
     },
   };
 
@@ -656,6 +674,7 @@ const getDefaultMcpServers = (): IMcpServer[] => {
       type: 'stdio' as const,
       command: config.command,
       args: config.args,
+      env: (config as any).env,
     },
     createdAt: now,
     updatedAt: now,

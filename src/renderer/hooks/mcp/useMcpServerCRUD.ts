@@ -236,11 +236,30 @@ export const useMcpServerCRUD = (
     [saveMcpServers, syncMcpToAgents, removeMcpFromAgents, checkSingleServerInstallStatus, setAgentInstallStatus, t]
   );
 
+  // 启用/禁用MCP服务器中的特定工具
+  const handleToggleTool = useCallback(
+    async (serverId: string, toolName: string, enabled: boolean) => {
+      await saveMcpServers((prevServers) => {
+        return prevServers.map((server) => {
+          if (server.id === serverId) {
+            const updatedTools = (server.tools || []).map((tool) =>
+              tool.name === toolName ? { ...tool, enabled } : tool
+            );
+            return { ...server, tools: updatedTools, updatedAt: Date.now() };
+          }
+          return server;
+        });
+      });
+    },
+    [saveMcpServers]
+  );
+
   return {
     handleAddMcpServer,
     handleBatchImportMcpServers,
     handleEditMcpServer,
     handleDeleteMcpServer,
     handleToggleMcpServer,
+    handleToggleTool,
   };
 };
