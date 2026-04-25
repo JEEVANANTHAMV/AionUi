@@ -28,6 +28,18 @@ import {
   Ppt,
   TableReport,
   Cube,
+  Slide,
+  ChartGraph,
+  BookOpen,
+  Finance,
+  Tv,
+  GameHandle,
+  GraphicDesign,
+  Plan,
+  Compass,
+  Speaker,
+  Book,
+  ChartLine,
 } from '@icon-park/react';
 import React, { useCallback, useLayoutEffect, useMemo } from 'react';
 import { resolveExtensionAssetUrl } from '@/renderer/utils/platform';
@@ -58,6 +70,18 @@ const ICON_MAP: Record<string, React.FC<any>> = {
   TableReport,
   Cube,
   Robot,
+  Slide,
+  ChartGraph,
+  BookOpen,
+  Finance,
+  Tv,
+  GameHandle,
+  GraphicDesign,
+  Plan,
+  Compass,
+  Speaker,
+  Book,
+  ChartLine,
 };
 
 const AssistantSelectionArea: React.FC<AssistantSelectionAreaProps> = ({
@@ -333,25 +357,37 @@ const AssistantSelectionArea: React.FC<AssistantSelectionAreaProps> = ({
               <div
                 key={assistant.id}
                 data-testid={`preset-pill-${assistant.id}`}
-                className='h-36px group flex items-center gap-0 px-10px rd-100px cursor-pointer transition-all duration-300 ease-in-out b-1 b-solid bg-fill-0 hover:bg-white hover:gap-8px hover:px-16px hover:shadow-lg hover:border-[#007AFF] select-none overflow-hidden max-w-36px hover:max-w-240px'
+                className='h-36px group flex items-center gap-0 px-10px rd-100px cursor-pointer transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] b-1 b-solid bg-fill-0 hover:bg-white hover:gap-8px hover:px-16px hover:shadow-lg hover:border-[#007AFF] select-none overflow-hidden max-w-36px hover:max-w-280px'
                 style={{
                   borderWidth: '1px',
                   borderColor: 'color-mix(in srgb, var(--color-border-2) 70%, transparent)',
                 }}
                 onClick={() => onSelectAssistant(`custom:${assistant.id}`)}
               >
-                <div className='flex-shrink-0 flex items-center justify-center w-16px h-16px text-[#007AFF] group-hover:scale-110 transition-transform duration-300'>
+                <div className='flex-shrink-0 flex items-center justify-center w-16px h-16px text-[#007AFF] group-hover:scale-110 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]'>
                   {IconComponent ? (
                     <IconComponent theme='outline' size={16} fill='currentColor' />
                   ) : isImageAvatar ? (
-                    <img src={avatarImage} alt='' width={16} height={16} style={{ objectFit: 'contain' }} />
+                    <img
+                      src={avatarImage}
+                      alt=''
+                      width={16}
+                      height={16}
+                      style={{ objectFit: 'contain' }}
+                      className='transition-opacity duration-500 ease-in-out'
+                    />
                   ) : avatarValue ? (
-                    <span style={{ fontSize: 16, lineHeight: '18px' }}>{avatarValue}</span>
+                    <span
+                      className='transition-opacity duration-500 ease-in-out'
+                      style={{ fontSize: 16, lineHeight: '18px' }}
+                    >
+                      {avatarValue}
+                    </span>
                   ) : (
                     <Robot theme='outline' size={16} />
                   )}
                 </div>
-                <span className='text-13px font-medium text-t-primary opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-300'>
+                <span className='text-13px font-medium text-t-primary opacity-0 group-hover:opacity-100 whitespace-nowrap overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] max-w-0 group-hover:max-w-200px'>
                   {assistant.nameI18n?.[localeKey] || assistant.name}
                 </span>
               </div>

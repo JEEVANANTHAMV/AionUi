@@ -99,7 +99,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   },
   {
     id: 'morph-ppt',
-    avatar: 'Presentation',
+    avatar: 'Slide',
     enabled: true,
     presetAgentType: 'forjinnrs',
     resourceDir: 'src/process/resources/assistant/morph-ppt',
@@ -149,7 +149,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   },
   {
     id: 'pitch-deck-creator',
-    avatar: 'Presentation',
+    avatar: 'Slide',
     enabled: true,
     presetAgentType: 'forjinnrs',
     resourceDir: 'src/process/resources/assistant/pitch-deck-creator',
@@ -264,31 +264,6 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
         'Set up Star Office on my machine',
         'Fix Unauthorized on Star Office page',
         'Connect Aion preview to http://127.0.0.1:19000',
-      ],
-    },
-  },
-  {
-    id: 'openclaw-setup',
-    avatar: '🦞',
-    enabled: false,
-    presetAgentType: 'forjinnrs',
-    resourceDir: 'src/process/resources/assistant/openclaw-setup',
-    ruleFiles: {
-      'en-US': 'openclaw-setup.md',
-    },
-    defaultEnabledSkills: ['openclaw-setup', 'forjinn-desk-webui-setup'],
-    nameI18n: {
-      'en-US': 'OpenClaw Setup Expert',
-    },
-    descriptionI18n: {
-      'en-US':
-        'Expert guide for installing, deploying, configuring, and troubleshooting OpenClaw. Proactively helps with setup, diagnoses issues, and provides security best practices.',
-    },
-    promptsI18n: {
-      'en-US': [
-        'Help me install OpenClaw step by step',
-        "My OpenClaw isn't working, please diagnose the issue",
-        'Configure Telegram channel for OpenClaw integration',
       ],
     },
   },
@@ -469,7 +444,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   },
   {
     id: 'social-job-publisher',
-    avatar: '📣',
+    avatar: 'Speaker',
     presetAgentType: 'forjinnrs',
     resourceDir: 'src/process/resources/assistant/social-job-publisher',
     ruleFiles: {
@@ -495,7 +470,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   },
   {
     id: 'moltbook',
-    avatar: '📖',
+    avatar: 'Book',
     enabled: false,
     presetAgentType: 'forjinnrs',
     resourceDir: 'src/process/resources/assistant/moltbook',
@@ -522,7 +497,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   },
   {
     id: 'beautiful-mermaid',
-    avatar: '📈',
+    avatar: 'ChartLine',
     presetAgentType: 'forjinnrs',
     resourceDir: 'src/process/resources/assistant/beautiful-mermaid',
     ruleFiles: {
@@ -546,7 +521,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   },
   {
     id: 'story-roleplay',
-    avatar: '📖',
+    avatar: 'Book',
     presetAgentType: 'forjinnrs',
     resourceDir: 'src/process/resources/assistant/story-roleplay',
     ruleFiles: {

@@ -587,7 +587,6 @@ const getBuiltinAssistants = (): AcpBackendConfig[] => {
       preset.id === 'academic-paper' ||
       preset.id === 'morph-ppt' ||
       preset.id === 'cowork' ||
-      preset.id === 'openclaw-setup' ||
       preset.id === 'star-office-helper' ||
       preset.id === 'story-roleplay' ||
       preset.id === 'moltbook' ||
@@ -628,11 +627,11 @@ const getDefaultMcpServers = (): IMcpServer[] => {
         command: 'npx',
         args: ['-y', 'chrome-devtools-mcp@latest'],
       },
-      'fetch': {
+      fetch: {
         command: 'npx',
         args: ['-y', '@modelcontextprotocol/server-fetch@latest'],
       },
-      'github': {
+      github: {
         command: 'npx',
         args: ['-y', '@modelcontextprotocol/server-github@latest'],
       },
@@ -640,7 +639,7 @@ const getDefaultMcpServers = (): IMcpServer[] => {
         command: 'npx',
         args: ['-y', '@modelcontextprotocol/server-google-maps@latest'],
       },
-      'sequentialthinking': {
+      sequentialthinking: {
         command: 'npx',
         args: ['-y', '@modelcontextprotocol/server-sequentialthinking@latest'],
       },
@@ -654,11 +653,11 @@ const getDefaultMcpServers = (): IMcpServer[] => {
           WINDOWS_MCP_DEBUG: 'false',
         },
       },
-      'filesystem': {
+      filesystem: {
         command: 'npx',
         args: ['-y', '@modelcontextprotocol/server-filesystem@latest'],
       },
-      'memory': {
+      memory: {
         command: 'npx',
         args: ['-y', '@modelcontextprotocol/server-memory@latest'],
       },

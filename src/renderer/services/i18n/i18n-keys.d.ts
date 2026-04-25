@@ -411,7 +411,6 @@ export type I18nKey =
   | 'conversation.welcome.selectModel'
   | 'conversation.welcome.skillsMarket'
   | 'conversation.welcome.skillsMarketDesc'
-  | 'conversation.welcome.skillsMarketDetails'
   | 'conversation.welcome.specifyWorkspace'
   | 'conversation.welcome.title'
   | 'conversation.welcome.uploadFile'
