@@ -78,7 +78,7 @@ export const ExtensionMetaSchema = z
      * i18n configuration for the extension.
      * Follows the same structure as src/renderer/services/i18n/locales:
      *   i18n/{locale}/{module}.json
-     * e.g. i18n/en-US/extension.json, i18n/zh-CN/assistants.json
+     * e.g. i18n/en-US/extension.json, i18n/zh-TW/assistants.json
      *
      * `localesDir` — relative path to the locales directory (default: "i18n")
      * `defaultLocale` — fallback locale code (default: "en-US")

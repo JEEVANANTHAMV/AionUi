@@ -36,7 +36,6 @@ import '@arco-design/web-react/es/_util/react-19-adapter';
 import '@arco-design/web-react/dist/css/arco.css';
 import enUS from '@arco-design/web-react/es/locale/en-US';
 import jaJP from '@arco-design/web-react/es/locale/ja-JP';
-import zhCN from '@arco-design/web-react/es/locale/zh-CN';
 import zhTW from '@arco-design/web-react/es/locale/zh-TW';
 import koKR from '@arco-design/web-react/es/locale/ko-KR';
 import { useTranslation } from 'react-i18next';
@@ -79,7 +78,6 @@ const koKRComplete = {
 };
 
 const arcoLocales: Record<string, typeof enUS> = {
-  'zh-CN': zhCN,
   'zh-TW': zhTW,
   'ja-JP': jaJP,
   'ko-KR': koKRComplete,

@@ -173,7 +173,7 @@ export const useGuidAgentSelection = ({
       const assistant = customAgents.find((a) => a.id === customAgentId);
       if (assistant) {
         return {
-          backend: assistant.presetAgentType || 'gemini',
+          backend: assistant.presetAgentType || 'forjinnrs',
           name: assistant.name,
           customAgentId: assistant.id,
           isPreset: true,

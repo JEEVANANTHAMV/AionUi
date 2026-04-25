@@ -415,7 +415,7 @@ const GuidPage: React.FC = () => {
     return () => observer.disconnect();
   }, [agentSelection.isPresetAgent, selectedAssistantDescription]);
 
-  const currentPresetAgentType = selectedAssistantRecord?.presetAgentType || 'gemini';
+  const currentPresetAgentType = selectedAssistantRecord?.presetAgentType || 'forjinnrs';
   const agentSwitcherItems = useMemo(() => {
     if (!agentSelection.availableAgents) return [];
     // Build from detected execution engines, excluding preset assistants and remote agents

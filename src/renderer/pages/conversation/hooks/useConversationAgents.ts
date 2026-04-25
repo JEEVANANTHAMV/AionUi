@@ -27,7 +27,7 @@ export type UseConversationAgentsResult = {
  */
 function configToAvailableAgent(config: AcpBackendConfig): AvailableAgent {
   return {
-    backend: config.presetAgentType || 'gemini',
+    backend: config.presetAgentType || 'forjinnrs',
     name: config.name,
     customAgentId: config.id,
     isPreset: true,

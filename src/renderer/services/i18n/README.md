@@ -4,7 +4,7 @@
 
 ## 支持的语言
 
-- 中文 (zh-CN) - 默认语言
+- 繁體中文 (zh-TW) - 默认语言
 - 英文 (en-US)
 
 ## 文件结构
@@ -13,7 +13,7 @@
 src/renderer/i18n/
 ├── index.ts              # i18next 配置文件
 ├── locales/
-│   ├── zh-CN.json        # 中文语言包
+│   ├── zh-TW.json        # 繁體中文语言包
 │   └── en-US.json        # 英文语言包
 └── README.md             # 说明文档
 ```
@@ -51,7 +51,7 @@ const LanguageSwitcher = () => {
 
   return (
     <div>
-      <button onClick={() => changeLanguage('zh-CN')}>中文</button>
+      <button onClick={() => changeLanguage('zh-TW')}>繁體中文</button>
       <button onClick={() => changeLanguage('en-US')}>English</button>
     </div>
   );
@@ -60,7 +60,7 @@ const LanguageSwitcher = () => {
 
 ## 添加新的翻译
 
-1. 在 `src/renderer/i18n/locales/zh-CN.json` 中添加中文翻译
+1. 在 `src/renderer/i18n/locales/zh-TW.json` 中添加繁體中文翻译
 2. 在 `src/renderer/i18n/locales/en-US.json` 中添加对应的英文翻译
 3. 在组件中使用 `t('key')` 来获取翻译
 

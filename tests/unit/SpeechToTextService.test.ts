@@ -66,7 +66,7 @@ describe('SpeechToTextService', () => {
     it('converts BCP 47 config language to ISO 639-1', async () => {
       processConfigGetMock.mockResolvedValue({
         ...baseConfig,
-        openai: { ...baseConfig.openai, language: 'zh-CN' },
+        openai: { ...baseConfig.openai, language: 'zh-TW' },
       });
       fetchMock.mockResolvedValue({
         ok: true,

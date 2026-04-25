@@ -198,7 +198,7 @@ describe('i18n Build Safety Tests', () => {
   it('renderer i18n should use static locale imports (packaged-safe)', () => {
     const content = fs.readFileSync(rendererI18nFile, 'utf-8');
     expect(content).toMatch(/import\s+enUS\s+from\s+['"]\.\/locales\/en-US\/index['"]/);
-    expect(content).toMatch(/import\s+zhCN\s+from\s+['"]\.\/locales\/zh-CN\/index['"]/);
+    expect(content).toMatch(/import\s+zhCN\s+from\s+['"]\.\/locales\/zh-TW\/index['"]/);
     expect(content).toMatch(/import\s+jaJP\s+from\s+['"]\.\/locales\/ja-JP\/index['"]/);
     expect(content).toMatch(/import\s+zhTW\s+from\s+['"]\.\/locales\/zh-TW\/index['"]/);
     expect(content).toMatch(/import\s+koKR\s+from\s+['"]\.\/locales\/ko-KR\/index['"]/);

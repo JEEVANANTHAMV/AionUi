@@ -118,7 +118,7 @@ describe('SpeechToTextService', () => {
     const result = await SpeechToTextService.transcribe({
       audioBuffer: { 0: 1, 1: 2, 2: 3 },
       fileName: 'sample.webm',
-      languageHint: 'zh-CN',
+      languageHint: 'zh-TW',
       mimeType: 'audio/webm;codecs=opus',
     });
 

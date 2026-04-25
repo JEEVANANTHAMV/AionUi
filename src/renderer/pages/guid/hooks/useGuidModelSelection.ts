@@ -55,7 +55,7 @@ export type GuidModelSelectionResult = {
  * Hook that manages Gemini model list and selection state for the Guid page.
  * @param agentKey - current provider-based agent ('gemini' | 'forjinnrs'), defaults to 'gemini'
  */
-export const useGuidModelSelection = (agentKey: ProviderAgentKey = 'gemini'): GuidModelSelectionResult => {
+export const useGuidModelSelection = (agentKey: ProviderAgentKey = 'forjinnrs'): GuidModelSelectionResult => {
   const { geminiModeOptions, isGoogleAuth } = useGeminiGoogleAuthModels();
   const { data: modelConfig } = useSWR('model.config.welcome', () => {
     return ipcBridge.mode.getModelConfig.invoke().then((data) => {

@@ -253,7 +253,7 @@ After confirming a match, call team_spawn_agent with the same custom_agent_id.`,
     locale: z
       .string()
       .optional()
-      .describe('Locale like "zh-CN" or "en-US". Defaults to the user\'s current UI language when omitted.'),
+      .describe('Locale like "zh-TW" or "en-US". Defaults to the user\'s current UI language when omitted.'),
   },
   TEAM_MCP_PORT,
   TEAM_AGENT_SLOT_ID,

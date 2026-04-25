@@ -144,7 +144,7 @@ describe('migrateFromElectronConfig', () => {
     const sourceData = {
       'model.config': [{ id: 'openai', name: 'OpenAI' }],
       'gemini.config': { authType: 'oauth', proxy: '' },
-      language: 'zh-CN', // not whitelisted — should be ignored
+      language: 'zh-TW', // not whitelisted — should be ignored
     };
     const encodedSource = Buffer.from(encodeURIComponent(JSON.stringify(sourceData))).toString('base64');
 

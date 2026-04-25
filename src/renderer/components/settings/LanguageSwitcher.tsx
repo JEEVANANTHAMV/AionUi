@@ -30,13 +30,10 @@ const LanguageSwitcher: React.FC = () => {
   return (
     <div className='flex items-center gap-8px'>
       <ForjinnSelect ref={selectRef} className='w-160px' value={i18n.language} onChange={handleLanguageChange}>
-        <ForjinnSelect.Option value='zh-CN'>简体中文</ForjinnSelect.Option>
         <ForjinnSelect.Option value='zh-TW'>繁體中文</ForjinnSelect.Option>
         <ForjinnSelect.Option value='ja-JP'>日本語</ForjinnSelect.Option>
         <ForjinnSelect.Option value='ko-KR'>한국어</ForjinnSelect.Option>
         <ForjinnSelect.Option value='tr-TR'>Türkçe</ForjinnSelect.Option>
-        <ForjinnSelect.Option value='ru-RU'>Русский</ForjinnSelect.Option>
-        <ForjinnSelect.Option value='uk-UA'>Українська</ForjinnSelect.Option>
         <ForjinnSelect.Option value='en-US'>English</ForjinnSelect.Option>
       </ForjinnSelect>
     </div>

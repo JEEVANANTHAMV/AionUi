@@ -121,7 +121,7 @@ describe('handleDescribeAssistant', () => {
     const server = buildServer();
     const zh = await server.handleDescribeAssistant({
       custom_agent_id: 'builtin-word-creator',
-      locale: 'zh-CN',
+      locale: 'zh-TW',
     });
     // The Chinese example prompt distinctly contains "季度报告".
     expect(zh).toContain('季度报告');

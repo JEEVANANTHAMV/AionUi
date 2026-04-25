@@ -271,7 +271,7 @@ export const handleSessionNew: ActionHandler = async (context) => {
   const backend = (
     savedAgent && typeof savedAgent === 'object' && typeof (savedAgent as any).backend === 'string'
       ? (savedAgent as any).backend
-      : 'gemini'
+      : 'forjinnrs'
   ) as string;
   const customAgentId =
     savedAgent && typeof savedAgent === 'object'
@@ -647,7 +647,7 @@ export const handleAgentShow: ActionHandler = async (context) => {
   // Get current agent type from session (scoped by chatId)
   const userId = context.channelUser?.id;
   const session = userId ? sessionManager.getSession(userId, context.chatId) : null;
-  const currentAgent = session?.agentType || 'gemini';
+  const currentAgent = session?.agentType || 'forjinnrs';
 
   // Get available agents dynamically
   const availableAgents = getAvailableChannelAgents();
@@ -777,6 +777,7 @@ function getAgentDisplayName(agentType: ChannelAgentType): string {
     acp: '🧠 Claude',
     codex: '⚡ Codex',
     'openclaw-gateway': '🦞 OpenClaw',
+    forjinnrs: '🚀 Forjinn',
   };
   return names[agentType] || agentType;
 }
@@ -791,6 +792,7 @@ function backendToChannelAgentType(backend: string): ChannelAgentType | null {
     claude: 'acp',
     codex: 'codex',
     'openclaw-gateway': 'openclaw-gateway',
+    forjinnrs: 'forjinnrs',
   };
   return mapping[backend] || null;
 }
@@ -804,6 +806,7 @@ function getAgentEmoji(backend: string): string {
     claude: '🧠',
     codex: '⚡',
     'openclaw-gateway': '🦞',
+    forjinnrs: '🚀',
   };
   return emojis[backend] || '🤖';
 }
@@ -816,6 +819,10 @@ function getAvailableChannelAgents(): AgentDisplayInfo[] {
   const detectedAgents = agentRegistry.getDetectedAgents();
   const availableAgents: AgentDisplayInfo[] = [];
   const seenTypes = new Set<ChannelAgentType>();
+
+  // Always include Forjinn as it's the new default
+  availableAgents.push({ type: 'forjinnrs', emoji: '🚀', name: 'Forjinn' });
+  seenTypes.add('forjinnrs');
 
   // Always include Gemini as it's built-in
   availableAgents.push({ type: 'gemini', emoji: '🤖', name: 'Gemini' });

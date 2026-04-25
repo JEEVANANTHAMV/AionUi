@@ -15,7 +15,7 @@
  * Translations are namespaced under `ext.{extensionName}` to avoid key collisions
  * with the core app or other extensions.
  *
- * Example: `i18n/zh-CN/extension.json` with `{ "displayName": "你好世界" }`
+ * Example: `i18n/zh-TW/extension.json` with `{ "displayName": "你好世界" }`
  * becomes accessible as `ext.hello-world.extension.displayName` in i18next.
  */
 
@@ -28,7 +28,7 @@ import { isPathWithinDirectory } from '../sandbox/pathSafety';
 
 /**
  * Resolved i18n data for a single extension.
- * Keys are locale codes (e.g. 'en-US', 'zh-CN'), values are flattened module objects.
+ * Keys are locale codes (e.g. 'en-US', 'zh-TW'), values are flattened module objects.
  */
 export type ExtensionLocaleData = Record<string, Record<string, unknown>>;
 
@@ -65,7 +65,7 @@ export async function loadExtensionLocales(ext: LoadedExtension): Promise<Extens
     for (const entry of localeDirs) {
       if (!entry.isDirectory()) continue;
 
-      const locale = entry.name; // e.g. 'en-US', 'zh-CN'
+      const locale = entry.name; // e.g. 'en-US', 'zh-TW'
       const localeDir = path.resolve(localesRoot, locale);
 
       if (!isPathWithinDirectory(localeDir, localesRoot)) continue;
@@ -135,7 +135,7 @@ async function loadLocaleDir(localeDir: string): Promise<Record<string, unknown>
  *   "en-US": {
  *     "ext.hello-world": { "extension": { "displayName": "Hello World" }, ... }
  *   },
- *   "zh-CN": {
+ *   "zh-TW": {
  *     "ext.hello-world": { "extension": { "displayName": "你好世界" }, ... }
  *   }
  * }

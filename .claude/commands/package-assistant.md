@@ -85,7 +85,7 @@ After work completes, explicitly tell the user:
 > Your <output type> is ready. Please open it now to review.
 ```
 
-**`<assistant-id>.zh-CN.md`** (Chinese):
+**`<assistant-id>.zh-TW.md`** (Chinese):
 Same structure translated to natural Chinese. Keep the tone friendly and professional, not overly formal.
 
 ## Step 4 — Add Preset Entry (New Mode Only)
@@ -104,22 +104,22 @@ Add a new entry to `ASSISTANT_PRESETS` array in `forjinn-desk/src/common/config/
   resourceDir: 'src/process/resources/assistant/<assistant-id>',
   ruleFiles: {
     'en-US': '<assistant-id>.md',
-    'zh-CN': '<assistant-id>.zh-CN.md',
+    'zh-TW': '<assistant-id>.zh-TW.md',
   },
   defaultEnabledSkills: ['<skill-name>'],
   nameI18n: {
     'en-US': '<English Name>',
-    'zh-CN': '<Chinese Name>',
+    'zh-TW': '<Chinese Name>',
   },
   descriptionI18n: {
     'en-US': '<English description — MUST clearly differentiate from other assistants>',
-    'zh-CN': '<Chinese description — same differentiation requirement>',
+    'zh-TW': '<Chinese description — same differentiation requirement>',
   },
   promptsI18n: {
     'en-US': [
       '<3 example prompts — prefer high-scoring prompts from iteration tests>',
     ],
-    'zh-CN': [
+    'zh-TW': [
       '<3 Chinese example prompts — translated from the same high-scoring sources>',
     ],
   },
@@ -146,7 +146,7 @@ Add a new entry to `ASSISTANT_PRESETS` array in `forjinn-desk/src/common/config/
 1. Confirm SKILL.md frontmatter starts with `---` on line 1 (no content before it)
 2. Confirm frontmatter contains `name:` and `description:` fields
 3. Confirm no `# officecli:` version comment remains in the frontmatter
-4. Confirm assistant rule files exist in both en-US and zh-CN (new mode only)
+4. Confirm assistant rule files exist in both en-US and zh-TW (new mode only)
 5. Confirm preset entry is added to assistantPresets.ts with correct paths (new mode only)
 
 ---

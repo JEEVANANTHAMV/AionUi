@@ -215,7 +215,7 @@ export class TeamSessionService {
     locale: string
   ): Promise<string> {
     const assistantsDir = getAssistantsDir();
-    const locales = [locale, 'en-US', 'zh-CN'].filter((value, index, values) => values.indexOf(value) === index);
+    const locales = [locale, 'en-US', 'zh-TW'].filter((value, index, values) => values.indexOf(value) === index);
     const fileName = (targetLocale: string) =>
       resourceType === 'rules' ? `${assistantId}.${targetLocale}.md` : `${assistantId}-skills.${targetLocale}.md`;
 

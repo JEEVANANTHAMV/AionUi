@@ -11,7 +11,7 @@ This document defines the coding standards and best practices for the AionUI pro
 - **Language**: TypeScript (strict mode)
 - **Styling**: Tailwind CSS + Arco Design
 - **State Management**: React hooks + SWR
-- **i18n**: react-i18next (support: en-US, zh-CN, zh-TW, ja-JP, ko-KR)
+- **i18n**: react-i18next (support: en-US, zh-TW, zh-TW, ja-JP, ko-KR)
 
 ## Code Quality Standards
 

@@ -110,7 +110,7 @@ describe('normalizeExtensionAssistants', () => {
       {
         id: 'ext-test',
         name: 'Test Extension',
-        nameI18n: { 'en-US': 'Test Extension', 'zh-CN': 'Test Extension ZH' },
+        nameI18n: { 'en-US': 'Test Extension', 'zh-TW': 'Test Extension ZH' },
         description: 'A test extension assistant',
         descriptionI18n: { 'en-US': 'A test extension assistant' },
         avatar: 'icon.png',

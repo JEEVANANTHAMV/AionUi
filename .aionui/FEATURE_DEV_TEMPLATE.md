@@ -232,11 +232,9 @@ export const [功能名] = {
 
 **支持的语言文件:**
 
-- `zh-CN.json` - 简体中文 (必须)
+- `zh-TW.json` - 简体中文 (必须)
 - `en-US.json` - English (必须)
-- `zh-TW.json` - 繁體中文
-- `ja-JP.json` - 日本語
-- `ko-KR.json` - 한국어
+
 
 ---
 

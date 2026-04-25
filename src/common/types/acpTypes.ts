@@ -128,13 +128,13 @@ export interface AcpBackendConfig {
   /** UI 显示名称 / Display name shown in the UI (e.g., 'Goose', 'Claude Code') */
   name: string;
 
-  /** 本地化名称 / Localized names (e.g., { 'zh-CN': '...', 'en-US': '...' }) */
+  /** 本地化名称 / Localized names (e.g., { 'zh-TW': '...', 'en-US': '...' }) */
   nameI18n?: Record<string, string>;
 
   /** 助手列表或设置中显示的简短描述 / Short description shown in assistant lists or settings */
   description?: string;
 
-  /** 本地化描述 / Localized descriptions (e.g., { 'zh-CN': '...', 'en-US': '...' }) */
+  /** 本地化描述 / Localized descriptions (e.g., { 'zh-TW': '...', 'en-US': '...' }) */
   descriptionI18n?: Record<string, string>;
 
   /** 助手头像 - 可以是 emoji 或图片路径 / Avatar for the assistant - can be an emoji string or image path */
@@ -233,7 +233,7 @@ export interface AcpBackendConfig {
   /** 此预设的系统提示词或规则上下文 / The system prompt or rule context for this preset */
   context?: string;
 
-  /** 此预设的本地化提示词 / Localized prompts for this preset (e.g., { 'zh-CN': '...', 'en-US': '...' }) */
+  /** 此预设的本地化提示词 / Localized prompts for this preset (e.g., { 'zh-TW': '...', 'en-US': '...' }) */
   contextI18n?: Record<string, string>;
 
   /** 此预设的示例 prompts / Example prompts for this preset */

@@ -98,7 +98,7 @@ describe('i18n Performance Tests', () => {
 
       await Promise.all(
         MODULES.map(async (module) => {
-          const modulePath = path.join(LOCALES_DIR, 'zh-CN', `${module}.json`);
+          const modulePath = path.join(LOCALES_DIR, 'zh-TW', `${module}.json`);
           const content = await fs.promises.readFile(modulePath, 'utf-8');
           return JSON.parse(content);
         })
@@ -114,11 +114,11 @@ describe('i18n Performance Tests', () => {
 
       const zhCNTranslations: Record<string, unknown> = {};
       for (const module of MODULES) {
-        const modulePath = path.join(LOCALES_DIR, 'zh-CN', `${module}.json`);
+        const modulePath = path.join(LOCALES_DIR, 'zh-TW', `${module}.json`);
         const content = await fs.promises.readFile(modulePath, 'utf-8');
         zhCNTranslations[module] = JSON.parse(content);
       }
-      loadedTranslations.set('zh-CN', zhCNTranslations);
+      loadedTranslations.set('zh-TW', zhCNTranslations);
 
       const start = performance.now();
 

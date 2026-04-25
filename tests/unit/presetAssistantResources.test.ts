@@ -30,7 +30,7 @@ describe('loadPresetAssistantResources', () => {
     await expect(
       loadPresetAssistantResources(
         {
-          localeKey: 'zh-CN',
+          localeKey: 'en-US',
           fallbackRules: 'fallback rules',
         },
         deps
@@ -54,7 +54,7 @@ describe('loadPresetAssistantResources', () => {
       loadPresetAssistantResources(
         {
           customAgentId: 'assistant-1',
-          localeKey: 'zh-CN',
+          localeKey: 'en-US',
           fallbackRules: 'fallback rules',
         },
         deps
@@ -83,7 +83,7 @@ describe('loadPresetAssistantResources', () => {
     const result = await loadPresetAssistantResources(
       {
         customAgentId: 'builtin-cowork',
-        localeKey: 'zh-CN',
+        localeKey: 'en-US',
         fallbackRules: 'fallback rules',
       },
       deps

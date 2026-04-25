@@ -240,7 +240,7 @@ this.ws = new WebSocket(url, {
 
 ### 4.2 中文
 
-**文件**：`src/renderer/services/i18n/locales/zh-CN/settings.json`
+**文件**：`src/renderer/services/i18n/locales/zh-TW/settings.json`
 
 ```json
 "allowInsecure": "允许不安全连接",
@@ -266,7 +266,7 @@ this.ws = new WebSocket(url, {
 | 7   | `src/process/services/database/index.ts`                              | CRUD 字段映射      |
 | 8   | `src/renderer/pages/settings/AgentSettings/RemoteAgentManagement.tsx` | UI 表单            |
 | 9   | `src/renderer/services/i18n/locales/en-US/settings.json`              | i18n               |
-| 10  | `src/renderer/services/i18n/locales/zh-CN/settings.json`              | i18n               |
+| 10  | `src/renderer/services/i18n/locales/zh-TW/settings.json`              | i18n               |
 
 ---
 

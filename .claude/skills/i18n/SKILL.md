@@ -119,7 +119,7 @@ Match the module to the feature area. If no module fits, consider whether a new 
 **CRITICAL:** Every new key must be added to **every** locale in `supportedLanguages`. Use this checklist for each key:
 
 - [ ] `en-US/<module>.json` — reference language (added in Step 3)
-- [ ] `zh-CN/<module>.json` — added
+- [ ] `zh-TW/<module>.json` — added
 - [ ] `zh-TW/<module>.json` — added
 - [ ] Any other language listed in `src/common/config/i18n-config.json` → `supportedLanguages` — added
 
@@ -211,9 +211,9 @@ import { Trans } from 'react-i18next';
 
 ## zh-TW Maintenance
 
-Most terms can be auto-converted from zh-CN, but some need manual review:
+Most terms can be auto-converted from zh-TW, but some need manual review:
 
-| zh-CN | zh-TW | Notes          |
+| zh-TW | zh-TW | Notes          |
 | ----- | ----- | -------------- |
 | 视频  | 影片  | Different term |
 | 软件  | 軟體  | Different term |

@@ -184,7 +184,7 @@ export interface IChannelUserRow {
 /**
  * Agent types supported in assistant sessions
  */
-export type ChannelAgentType = 'gemini' | 'acp' | 'codex' | 'openclaw-gateway';
+export type ChannelAgentType = 'gemini' | 'acp' | 'codex' | 'openclaw-gateway' | 'forjinnrs';
 
 /**
  * User session in the assistant system

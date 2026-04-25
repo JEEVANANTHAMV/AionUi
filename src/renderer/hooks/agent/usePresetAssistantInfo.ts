@@ -197,7 +197,7 @@ function buildCustomAgentInfo(
   customAgent: { name?: string; nameI18n?: Record<string, string>; avatar?: string },
   locale: string
 ): PresetAssistantInfo {
-  const localeKey = locale.startsWith('zh') ? 'zh-CN' : 'en-US';
+  const localeKey = locale.startsWith('zh') ? 'zh-TW' : 'en-US';
   const normalized = normalizeAvatar(typeof customAgent.avatar === 'string' ? customAgent.avatar : '');
 
   return {
@@ -211,7 +211,7 @@ function buildExtensionAssistantInfo(
   extensionAssistant: { name?: string; nameI18n?: Record<string, string>; avatar?: string },
   locale: string
 ): PresetAssistantInfo {
-  const localeKey = locale.startsWith('zh') ? 'zh-CN' : 'en-US';
+  const localeKey = locale.startsWith('zh') ? 'zh-TW' : 'en-US';
   const normalized = normalizeAvatar(typeof extensionAssistant.avatar === 'string' ? extensionAssistant.avatar : '');
   const name =
     extensionAssistant.nameI18n?.[localeKey] ||
@@ -236,7 +236,7 @@ function inferLegacyAssistantInfo(
   const extractedName = extractAssistantNameFromRules(rules);
 
   const builtinByName = ASSISTANT_PRESETS.find((preset) =>
-    matchesAssistantName(extractedName, [preset.id, preset.nameI18n['zh-CN'], preset.nameI18n['en-US']])
+    matchesAssistantName(extractedName, [preset.id, preset.nameI18n['zh-TW'], preset.nameI18n['en-US']])
   );
   if (builtinByName) {
     return buildPresetInfo(builtinByName.id, locale);
@@ -250,7 +250,7 @@ function inferLegacyAssistantInfo(
   }
 
   const customByName = customAgents?.find((agent) =>
-    matchesAssistantName(extractedName, [agent.id, agent.name, agent.nameI18n?.['zh-CN'], agent.nameI18n?.['en-US']])
+    matchesAssistantName(extractedName, [agent.id, agent.name, agent.nameI18n?.['zh-TW'], agent.nameI18n?.['en-US']])
   );
   if (customByName) {
     return buildCustomAgentInfo(customByName, locale);
@@ -265,7 +265,7 @@ function inferLegacyAssistantInfo(
     matchesAssistantName(extractedName, [
       assistant.id,
       assistant.name,
-      assistant.nameI18n?.['zh-CN'],
+      assistant.nameI18n?.['zh-TW'],
       assistant.nameI18n?.['en-US'],
     ])
   );
