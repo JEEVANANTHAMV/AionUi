@@ -38,7 +38,7 @@ export class McpService {
   private withServiceLock<T>(operation: () => Promise<T>): Promise<T> {
     const queued = this.operationQueue.then(operation, () => operation());
     // Keep the queue moving even if the operation rejects
-    this.operationQueue = queued.catch(() => {});
+    this.operationQueue = queued.catch(() => { });
     return queued;
   }
 
@@ -89,7 +89,7 @@ export class McpService {
       ['forjinn-desk', new ForjinnDeskMcpAgent()], // Forjinn-Desk 本地 @office-ai/aioncli-core
       ['codex', new CodexMcpAgent()],
       ['opencode', new OpencodeMcpAgent()],
-      ['forjinnrs', new ForjinnrsMcpAgent()], // Aion CLI (Rust binary, TOML config)
+      ['forjinnrs', new ForjinnrsMcpAgent()], // Forjinn CLI (Rust binary, TOML config)
     ]);
   }
 

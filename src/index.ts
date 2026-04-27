@@ -7,12 +7,6 @@
 // configureChromium sets app name (dev isolation) and Chromium flags — must run before
 // ANY module that calls app.getPath('userData'), because Electron caches the path on first call.
 import './process/utils/configureChromium';
-import * as Sentry from '@sentry/electron/main';
-
-Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-});
-
 import './process/utils/configureConsoleLog';
 import { app, BrowserWindow, nativeImage, net, powerMonitor, protocol, screen } from 'electron';
 import fixPath from 'fix-path';
@@ -443,8 +437,6 @@ const handleAppReady = async (): Promise<void> => {
     }
   }
 
-  Sentry.setUser({ id: getOrCreateAnalyticsId() });
-
   try {
     await initializeProcess();
     mark('initializeProcess');
@@ -452,6 +444,17 @@ const handleAppReady = async (): Promise<void> => {
     console.error('Failed to initialize process:', error);
     app.exit(1);
     return;
+  }
+
+  // Initialize Sentry after Electron is ready
+  try {
+    const { init } = await import('@sentry/electron/main');
+    init({ dsn: process.env.SENTRY_DSN });
+    const analyticsId = getOrCreateAnalyticsId();
+    const { setUser } = await import('@sentry/electron/main');
+    setUser({ id: analyticsId });
+  } catch (error) {
+    console.error('[Forjinn-Desk] Failed to initialize Sentry:', error);
   }
 
   try {

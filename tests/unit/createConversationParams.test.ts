@@ -165,7 +165,7 @@ describe('createConversationParams', () => {
     const params = await buildCliAgentParams(
       {
         backend: 'forjinnrs',
-        name: 'Aion CLI Agent',
+        name: 'Forjinn CLI Agent',
       },
       '/tmp/workspace'
     );
@@ -182,7 +182,7 @@ describe('createConversationParams', () => {
       buildCliAgentParams(
         {
           backend: 'forjinnrs',
-          name: 'Aion CLI Agent',
+          name: 'Forjinn CLI Agent',
         },
         '/tmp/workspace'
       )
@@ -301,7 +301,7 @@ describe('createConversationParams', () => {
   it('throws error for forjinnrs if no enabled provider', async () => {
     configGet.mockResolvedValue([{ id: 'p1', enabled: false, model: ['m1'] }]);
     await expect(buildCliAgentParams({ backend: 'forjinnrs', name: 'Agent' }, '/tmp')).rejects.toThrow(
-      'No enabled model provider for Aion CLI'
+      'No enabled model provider for Forjinn CLI'
     );
   });
 

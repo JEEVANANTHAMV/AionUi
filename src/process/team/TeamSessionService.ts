@@ -34,7 +34,7 @@ export class TeamSessionService {
     private readonly repo: ITeamRepository,
     private readonly workerTaskManager: IWorkerTaskManager,
     private readonly conversationService: IConversationService
-  ) {}
+  ) { }
 
   /**
    * Returns the workspace path as-is, or empty string when not specified.
@@ -141,7 +141,7 @@ export class TeamSessionService {
 
     const provider = providers[0];
     if (!provider) {
-      throw new Error('No enabled model provider for Aion CLI');
+      throw new Error('No enabled model provider for Forjinn CLI');
     }
 
     const enabledModel = provider.model?.find((m: string) => provider.modelEnabled?.[m] !== false);

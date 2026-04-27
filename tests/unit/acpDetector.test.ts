@@ -106,7 +106,7 @@ describe('AgentRegistry', () => {
       const agents = registry.getDetectedAgents();
 
       expect(agents).toHaveLength(2); // forjinnrs + gemini
-      expect(agents[0]).toMatchObject({ backend: 'forjinnrs', name: 'Aion CLI' });
+      expect(agents[0]).toMatchObject({ backend: 'forjinnrs', name: 'Forjinn CLI' });
       expect(agents[1]).toMatchObject({ backend: 'gemini', name: 'Gemini CLI' });
     });
 

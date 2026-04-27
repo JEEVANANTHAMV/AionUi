@@ -201,7 +201,7 @@
   "deleteInvalidKeys": "Delete Invalid Keys",
   "testAllKeys": "Test All Keys",
   "addModelPlaceholder": "Select or enter model ID",
-  "customModelSupportNote": "Note: Aion CLI and Gemini CLI Agent currently support custom models.",
+  "customModelSupportNote": "Note: Forjinn CLI and Gemini CLI Agent currently support custom models.",
   "addModelHint": "Pick or type a model ID and it will be appended to this provider.",
   "addModelSelectedHint": "Ready to add model: {{model}}",
   "currentModelsLabel": "Current Models",
@@ -930,7 +930,7 @@
     "notFound": "Not Found",
     "version": "Version",
     "path": "Path",
-    "providerNote": "Provider and API key settings are managed in the Models page. Aion CLI supports: Anthropic, OpenAI, AWS Bedrock."
+    "providerNote": "Provider and API key settings are managed in the Models page. Forjinn CLI supports: Anthropic, OpenAI, AWS Bedrock."
   },
   "attachedAgents": "Attached Agents",
   "attachedAgentsTitle": {

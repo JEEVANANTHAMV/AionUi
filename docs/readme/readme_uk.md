@@ -142,7 +142,7 @@ Forjinn-Desk постачається з повноцінним рушієм AI-
 
 Якщо ви вже використовуєте Claude Code, Codex або Qwen Code, Forjinn-Desk автоматично виявить їх і дозволить працювати з усіма ними разом із вбудованим агентом.
 
-**Підтримувані агенти:** Вбудований агент • Claude Code • Codex • Qwen Code • Goose AI • OpenClaw • Augment Code • CodeBuddy • Kimi CLI • OpenCode • Factory Droid • GitHub Copilot • Qoder CLI • Mistral Vibe • Nanobot • Aion CLI (forjinnrs, Rust-бекенд-сервіс у складі Forjinn-Desk) • Snow CLI • Kiro • Hermes Agent • Cursor Agent та інші
+**Підтримувані агенти:** Вбудований агент • Claude Code • Codex • Qwen Code • Goose AI • OpenClaw • Augment Code • CodeBuddy • Kimi CLI • OpenCode • Factory Droid • GitHub Copilot • Qoder CLI • Mistral Vibe • Nanobot • Forjinn CLI (forjinnrs, Rust-бекенд-сервіс у складі Forjinn-Desk) • Snow CLI • Kiro • Hermes Agent • Cursor Agent та інші
 
 <p align="center">
   <img src="../../resources/multi-agent支持openclaw.gif" alt="Мульти-агентний режим" width="800">
@@ -163,7 +163,7 @@ Forjinn-Desk постачається з повноцінним рушієм AI-
 </p>
 
 - **Паралельне виконання кількох агентів** — Leader ділить завдання на підзадачі і делегує паралельно працюючим Teammate-агентам; кожен Teammate використовує свою модель через ACP (Agent Communication Protocol, шар координації мульти-агентності Forjinn-Desk), Gemini або Forjinnrs
-- **Оркестрація Leader** — Leader призначає, відстежує та агрегує результати; підтримувані бекенди: Claude Code, Codex, Gemini, Snow CLI, Aion CLI
+- **Оркестрація Leader** — Leader призначає, відстежує та агрегує результати; підтримувані бекенди: Claude Code, Codex, Gemini, Snow CLI, Forjinn CLI
 - **Ізольований робочий простір команди** — всі агенти спільно використовують одну папку; кожен має свій діалог підтвердження дозволів із значком на бічній панелі для очікуваних підтверджень
 
 <details>
@@ -172,7 +172,7 @@ Forjinn-Desk постачається з повноцінним рушієм AI-
 <br>
 
 - **Спільний робочий простір** — всі агенти читають/записують одну папку; файлова панель залишається видимою протягом усього процесу
-- **Підтримувані бекенди** — Claude Code, Codex, Gemini, Snow CLI, Aion CLI (forjinnrs); інші ACP-бекенди з `mcpCapabilities.stdio` підтримуються автоматично
+- **Підтримувані бекенди** — Claude Code, Codex, Gemini, Snow CLI, Forjinn CLI (forjinnrs); інші ACP-бекенди з `mcpCapabilities.stdio` підтримуються автоматично
 - **Динамічне масштабування** — додавайте або видаляйте Teammate-агентів під час роботи команди; мовчазні агенти автоматично переходять у статус failed із можливістю видалення в один клік
 - **Детальні дозволи** — кожен агент має свій діалог підтвердження дозволів; значок на бічній панелі показує очікувані підтвердження
 - **Обмін файлами** — Leader може передавати вкладення файлів Teammate-агентам

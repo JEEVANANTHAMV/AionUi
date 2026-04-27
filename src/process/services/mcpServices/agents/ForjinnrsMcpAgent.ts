@@ -84,16 +84,16 @@ function toMcpServer(name: string, config: ForjinnrsServerConfig): IMcpServer {
   const transport: IMcpServerTransport =
     transportType === 'stdio'
       ? {
-          type: 'stdio',
-          command: config.command || '',
-          args: config.args || [],
-          env: config.env || {},
-        }
+        type: 'stdio',
+        command: config.command || '',
+        args: config.args || [],
+        env: config.env || {},
+      }
       : {
-          type: transportType,
-          url: config.url || '',
-          headers: config.headers || {},
-        };
+        type: transportType,
+        url: config.url || '',
+        headers: config.headers || {},
+      };
 
   return {
     id: `forjinnrs_${name}`,
@@ -138,7 +138,7 @@ function toForjinnrsConfig(server: IMcpServer): ForjinnrsServerConfig {
 }
 
 /**
- * Aion CLI (forjinnrs) MCP agent implementation
+ * Forjinn CLI (forjinnrs) MCP agent implementation
  *
  * Manages MCP server configuration in the platform config directory (see getForjinnrsConfigPath())
  * forjinnrs uses TOML format with [mcp.servers.*] sections

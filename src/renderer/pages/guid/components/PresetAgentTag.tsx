@@ -82,13 +82,22 @@ const PresetAgentTag: React.FC<PresetAgentTagProps> = ({
           <Down theme='outline' size={12} fill='currentColor' />
         </span>
       ) : null}
-      {isImageAvatar ? (
-        <img src={avatarImage} alt='' width={15} height={15} style={{ objectFit: 'contain', flexShrink: 0 }} />
-      ) : avatarValue ? (
-        <span style={{ fontSize: 14, lineHeight: '15px', flexShrink: 0 }}>{avatarValue}</span>
-      ) : (
-        <Robot theme='outline' size={15} style={{ flexShrink: 0 }} />
-      )}
+      {(() => {
+        // Try ID-based logo first
+        const strippedId = agentInfo.customAgentId?.replace(/^builtin-/, '');
+        const idLogo = strippedId ? CUSTOM_AVATAR_IMAGE_MAP[strippedId] : undefined;
+        if (idLogo) {
+          return <img src={idLogo} alt='' width={15} height={15} style={{ objectFit: 'contain', flexShrink: 0 }} />;
+        }
+
+        if (isImageAvatar) {
+          return <img src={avatarImage} alt='' width={15} height={15} style={{ objectFit: 'contain', flexShrink: 0 }} />;
+        }
+        if (avatarValue) {
+          return <span style={{ fontSize: 14, lineHeight: '15px', flexShrink: 0 }}>{avatarValue}</span>;
+        }
+        return <Robot theme='multi-color' size={15} fill={['#333', '#2F88FF', '#FFF', '#43CCF8']} style={{ flexShrink: 0 }} />;
+      })()}
       <span className={styles.presetAgentTagName}>{name}</span>
     </div>
   );

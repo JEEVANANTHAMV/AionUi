@@ -90,7 +90,7 @@ Forjinn-Desk tam bir AI Agent motoru ile birlikte gelir. CLI Agent'ları ayrı o
 
 Zaten Claude Code, Codex veya Qwen Code kullanıyorsanız, Forjinn-Desk bunları otomatik olarak algılar ve hepsiyle Cowork yapmanıza izin verir — yerleşik Agent ile birlikte.
 
-**Desteklenen Agents:** Yerleşik Agent (sıfır kurulum) • Claude Code • Codex • Qwen Code • Goose AI • OpenClaw • Augment Code • CodeBuddy • Kimi CLI • OpenCode • Factory Droid • GitHub Copilot • Qoder CLI • Mistral Vibe • Nanobot • Aion CLI (forjinnrs, Forjinn-Desk ile birlikte gelen Rust tabanlı arka uç servisi) • Snow CLI • Kiro • Hermes Agent • Cursor Agent ve daha fazlası
+**Desteklenen Agents:** Yerleşik Agent (sıfır kurulum) • Claude Code • Codex • Qwen Code • Goose AI • OpenClaw • Augment Code • CodeBuddy • Kimi CLI • OpenCode • Factory Droid • GitHub Copilot • Qoder CLI • Mistral Vibe • Nanobot • Forjinn CLI (forjinnrs, Forjinn-Desk ile birlikte gelen Rust tabanlı arka uç servisi) • Snow CLI • Kiro • Hermes Agent • Cursor Agent ve daha fazlası
 
 <p align="center">
   <img src="../../resources/multi-agent支持openclaw.gif" alt="Multi-Agent Cowork" width="800">
@@ -111,7 +111,7 @@ Birden fazla AI Agent'ı organize bir ekip olarak çalıştırın: bir **Leader*
 </p>
 
 - **Paralel çoklu agent çalıştırma** — Leader görevleri alt görevlere bölerek paralel çalışan Teammate Agent'lara devreder; her Teammate ACP (Agent Communication Protocol, Forjinn-Desk'nin çoklu agent koordinasyon katmanı), Gemini veya Forjinnrs aracılığıyla kendi modelini kullanır
-- **Leader orkestrasyonu** — Leader atar, izler ve sonuçları toplar; desteklenen arka uçlar: Claude Code, Codex, Gemini, Snow CLI ve Aion CLI
+- **Leader orkestrasyonu** — Leader atar, izler ve sonuçları toplar; desteklenen arka uçlar: Claude Code, Codex, Gemini, Snow CLI ve Forjinn CLI
 - **Ekip izole çalışma alanı** — tüm Agent'lar aynı klasörü paylaşır; her birinin bekleyen onaylar için kenar çubuğu rozeti ile kendi izin onay iletişim kutusu vardır
 
 <details>
@@ -120,7 +120,7 @@ Birden fazla AI Agent'ı organize bir ekip olarak çalıştırın: bir **Leader*
 <br>
 
 - **Paylaşılan çalışma alanı** — tüm Agent'lar aynı klasörü okur/yazar; dosya paneli süreç boyunca görünür kalır
-- **Desteklenen arka uçlar** — Claude Code, Codex, Gemini, Snow CLI, Aion CLI (forjinnrs); `mcpCapabilities.stdio` ile diğer ACP arka uçları otomatik desteklenir
+- **Desteklenen arka uçlar** — Claude Code, Codex, Gemini, Snow CLI, Forjinn CLI (forjinnrs); `mcpCapabilities.stdio` ile diğer ACP arka uçları otomatik desteklenir
 - **Dinamik ölçeklendirme** — ekip çalışırken Teammate ekleyip kaldırabilirsiniz; sessiz Agent'lar otomatik olarak başarısız durumuna yükseltilir ve tek tıkla kaldırılabilir
 - **Ayrıntılı izinler** — her Agent'ın kendi izin onay iletişim kutusu var; kenar çubuğu rozeti bekleyen onayları gösterir
 - **Dosya paylaşımı** — Leader, Teammate'lere dosya eklerini iletebilir

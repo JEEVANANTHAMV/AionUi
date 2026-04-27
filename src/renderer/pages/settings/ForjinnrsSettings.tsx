@@ -33,7 +33,7 @@ const ForjinnrsSettings: React.FC = () => {
     <SettingsPageWrapper>
       <div className='flex flex-col gap-16px'>
         <Typography.Title heading={5} className='!mb-0'>
-          Aion CLI
+          Forjinn CLI
         </Typography.Title>
 
         {/* Status */}
@@ -64,7 +64,7 @@ const ForjinnrsSettings: React.FC = () => {
         <Typography.Text type='secondary' className='text-12px'>
           {t('settings.forjinnrs.providerNote', {
             defaultValue:
-              'Provider and API key settings are managed in the Models page. Aion CLI supports: Anthropic, OpenAI, AWS Bedrock.',
+              'Provider and API key settings are managed in the Models page. Forjinn CLI supports: Anthropic, OpenAI, AWS Bedrock.',
           })}
         </Typography.Text>
       </div>

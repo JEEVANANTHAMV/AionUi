@@ -100,13 +100,7 @@ const AssistantSelectionArea: React.FC<AssistantSelectionAreaProps> = ({
   const navigate = useNavigate();
   const [agentMessage, agentMessageContext] = Message.useMessage({ maxCount: 10 });
 
-  const avatarImageMap: Record<string, string> = useMemo(
-    () => ({
-      'cowork.svg': coworkSvg,
-      '\u{1F6E0}\u{FE0F}': coworkSvg,
-    }),
-    []
-  );
+  const avatarImageMap = CUSTOM_AVATAR_IMAGE_MAP;
 
   const { assistants, activeAssistantId, setActiveAssistantId, activeAssistant, isExtensionAssistant, loadAssistants } =
     useAssistantList();
@@ -365,27 +359,49 @@ const AssistantSelectionArea: React.FC<AssistantSelectionAreaProps> = ({
                 onClick={() => onSelectAssistant(`custom:${assistant.id}`)}
               >
                 <div className='flex-shrink-0 flex items-center justify-center w-16px h-16px text-[#007AFF] group-hover:scale-110 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]'>
-                  {IconComponent ? (
-                    <IconComponent theme='outline' size={16} fill='currentColor' />
-                  ) : isImageAvatar ? (
-                    <img
-                      src={avatarImage}
-                      alt=''
-                      width={16}
-                      height={16}
-                      style={{ objectFit: 'contain' }}
-                      className='transition-opacity duration-500 ease-in-out'
-                    />
-                  ) : avatarValue ? (
-                    <span
-                      className='transition-opacity duration-500 ease-in-out'
-                      style={{ fontSize: 16, lineHeight: '18px' }}
-                    >
-                      {avatarValue}
-                    </span>
-                  ) : (
-                    <Robot theme='outline' size={16} />
-                  )}
+                  {(() => {
+                    // Try ID-based logo first
+                    const strippedId = assistant.id.replace(/^builtin-/, '');
+                    const idLogo = CUSTOM_AVATAR_IMAGE_MAP[strippedId];
+                    if (idLogo) {
+                      return (
+                        <img
+                          src={idLogo}
+                          alt=''
+                          width={16}
+                          height={16}
+                          style={{ objectFit: 'contain' }}
+                        />
+                      );
+                    }
+
+                    if (IconComponent) {
+                      return <IconComponent theme='multi-color' size={16} fill={['#333', '#2F88FF', '#FFF', '#43CCF8']} />;
+                    }
+                    if (isImageAvatar) {
+                      return (
+                        <img
+                          src={avatarImage}
+                          alt=''
+                          width={16}
+                          height={16}
+                          style={{ objectFit: 'contain' }}
+                          className='transition-opacity duration-500 ease-in-out'
+                        />
+                      );
+                    }
+                    if (avatarValue) {
+                      return (
+                        <span
+                          className='transition-opacity duration-500 ease-in-out'
+                          style={{ fontSize: 16, lineHeight: '18px' }}
+                        >
+                          {avatarValue}
+                        </span>
+                      );
+                    }
+                    return <Robot theme='multi-color' size={16} fill={['#333', '#2F88FF', '#FFF', '#43CCF8']} />;
+                  })()}
                 </div>
                 <span className='text-13px font-medium text-t-primary opacity-0 group-hover:opacity-100 whitespace-nowrap overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] max-w-0 group-hover:max-w-200px'>
                   {assistant.nameI18n?.[localeKey] || assistant.name}

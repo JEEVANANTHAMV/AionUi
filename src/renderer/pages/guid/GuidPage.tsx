@@ -32,11 +32,64 @@ import { ACP_BACKENDS_ALL } from '@/common/types/acpTypes';
 import { getAgentLogo } from '@/renderer/utils/model/agentLogo';
 import type { AcpBackendConfig } from './types';
 import { Button, ConfigProvider, Dropdown, Menu, Message } from '@arco-design/web-react';
-import { Down, Left, Robot, Write } from '@icon-park/react';
+import {
+  Book,
+  BookOpen,
+  ChartGraph,
+  ChartLine,
+  Compass,
+  Cube,
+  DocDetail,
+  Down,
+  Finance,
+  GameHandle,
+  GraphicDesign,
+  Left,
+  Plan,
+  Ppt,
+  Robot,
+  Slide,
+  Speaker,
+  TableReport,
+  Tv,
+  Write,
+} from '@icon-park/react';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './index.module.css';
+
+const ICON_MAP: Record<string, React.ComponentType<any>> = {
+  Book,
+  BookOpen,
+  ChartGraph,
+  ChartLine,
+  Compass,
+  Cube,
+  DocDetail,
+  Finance,
+  GameHandle,
+  GraphicDesign,
+  Plan,
+  Ppt,
+  Slide,
+  Speaker,
+  TableReport,
+  Tv,
+};
+
+const DynamicIcon: React.FC<{ name: string; size?: number; className?: string }> = ({ name, size = 26, className }) => {
+  const IconComponent = ICON_MAP[name] || Robot;
+  // Use a colorful multi-color theme for the icons
+  return (
+    <IconComponent
+      theme='multi-color'
+      size={size}
+      fill={['#333', '#2F88FF', '#FFF', '#43CCF8']}
+      className={className}
+    />
+  );
+};
 
 const GuidPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -316,13 +369,26 @@ const GuidPage: React.FC = () => {
     if (!agentSelection.isPresetAgent) return null;
     const selectedId = agentSelection.selectedAgentInfo?.customAgentId;
     const strippedId = selectedId?.replace(/^builtin-/, '');
+
+    // 1. Try mapping by ID first (for our new colorful logos)
+    if (strippedId && CUSTOM_AVATAR_IMAGE_MAP[strippedId]) {
+      return { kind: 'image' as const, value: CUSTOM_AVATAR_IMAGE_MAP[strippedId] };
+    }
+
     const candidates = new Set(selectedId && strippedId ? [selectedId, `builtin-${strippedId}`, strippedId] : []);
     const selectedAssistant = agentSelection.customAgents.find((item) => candidates.has(item.id));
     const avatarValue = selectedAssistant?.avatar?.trim() || agentSelection.selectedAgentInfo?.avatar?.trim();
     if (!avatarValue) return { kind: 'icon' as const };
+
+    // 2. Try mapping by avatarValue (cowork.svg etc)
     const mappedAvatar = CUSTOM_AVATAR_IMAGE_MAP[avatarValue];
+    if (mappedAvatar) {
+      return { kind: 'image' as const, value: mappedAvatar };
+    }
+
     const resolvedAvatar = resolveExtensionAssetUrl(avatarValue);
-    const avatarImage = mappedAvatar || resolvedAvatar;
+    const avatarImage = resolvedAvatar;
+
     const isImageAvatar = Boolean(
       avatarImage &&
       (/\.(svg|png|jpe?g|webp|gif)$/i.test(avatarImage) ||
@@ -331,6 +397,12 @@ const GuidPage: React.FC = () => {
     if (isImageAvatar && avatarImage) {
       return { kind: 'image' as const, value: avatarImage };
     }
+
+    // 3. If it looks like an IconPark icon name, return as 'icon-park' kind
+    if (avatarValue && ICON_MAP[avatarValue]) {
+      return { kind: 'icon-park' as const, value: avatarValue };
+    }
+
     return { kind: 'emoji' as const, value: avatarValue };
   }, [
     agentSelection.customAgents,
@@ -572,6 +644,8 @@ const GuidPage: React.FC = () => {
                           height={28}
                           style={{ objectFit: 'contain' }}
                         />
+                      ) : selectedAssistantAvatar?.kind === 'icon-park' ? (
+                        <DynamicIcon name={selectedAssistantAvatar.value} size={26} />
                       ) : selectedAssistantAvatar?.kind === 'emoji' ? (
                         <span className={styles.heroTitleEmoji}>{selectedAssistantAvatar.value}</span>
                       ) : (
@@ -595,7 +669,7 @@ const GuidPage: React.FC = () => {
                     position='bl'
                     droplist={
                       <Menu
-                        onClickMenuItem={(key) => {
+                        onClickMenuItem={(key: string | number) => {
                           handlePresetAgentTypeSwitch(String(key)).catch((err) =>
                             console.error('Failed to switch agent type:', err)
                           );
@@ -678,7 +752,7 @@ const GuidPage: React.FC = () => {
                   shape='circle'
                   icon={<Down theme='outline' size={12} fill='currentColor' />}
                   className={`${styles.heroSubtitleToggle} ${isDescriptionExpanded ? styles.heroSubtitleToggleExpanded : ''}`}
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     setIsDescriptionExpanded((v) => !v);
                   }}

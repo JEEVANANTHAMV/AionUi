@@ -209,7 +209,7 @@ const ForjinnrsSendBox: React.FC<{
             conversation_id,
             files,
           });
-          assertBridgeSuccess(result, 'Failed to send message to Aion CLI');
+          assertBridgeSuccess(result, 'Failed to send message to Forjinn CLI');
         }
         emitter.emit('chat.history.refresh');
         if (files.length > 0) {
