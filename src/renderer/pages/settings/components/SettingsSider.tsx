@@ -184,7 +184,10 @@ const SettingsSider: React.FC<{ collapsed?: boolean; tooltipEnabled?: boolean }>
     };
 
     // Start with ordered builtin IDs, hiding desktop-only tabs in browser mode
-    const result: SiderItem[] = BUILTIN_TAB_IDS.filter((id) => isDesktop || id !== 'pet').map((id) => builtinMap[id]);
+    const DESKTOP_ONLY_TABS = ['pet', 'tools', 'attachedAgents', 'mcp'];
+    const result: SiderItem[] = BUILTIN_TAB_IDS.filter((id) => isDesktop || !DESKTOP_ONLY_TABS.includes(id)).map(
+      (id) => builtinMap[id]
+    );
 
     // Extension tabs with position anchoring
     const beforeMap = new Map<string, IExtensionSettingsTab[]>();
@@ -304,12 +307,14 @@ const SettingsSider: React.FC<{ collapsed?: boolean; tooltipEnabled?: boolean }>
                         size?: string | number;
                         className?: string;
                         strokeWidth?: number;
+                        fill?: string | string[];
                       }>,
                       {
-                        theme: 'outline',
+                        theme: 'multi-color',
                         size: '20',
+                        fill: ['#333', '#2F88FF', '#FFF', '#43CCF8'],
                         strokeWidth: 3,
-                        className: 'block leading-none text-t-secondary',
+                        className: 'block leading-none',
                       }
                     )
                   )}

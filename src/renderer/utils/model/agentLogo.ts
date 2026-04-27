@@ -10,7 +10,7 @@
  * All places that need to display agent icons should use this utility instead of maintaining separate lists
  */
 
-import ForjinnLogo from '@/renderer/assets/logos/brand/forjinn-colorful.png';
+import ForjinnLogo from '@/renderer/assets/logos/assistants/forjinn-colorful.png';
 import AuggieLogo from '@/renderer/assets/logos/brand/auggie.svg';
 import ClaudeLogo from '@/renderer/assets/logos/ai-major/claude.svg';
 import CursorLogo from '@/renderer/assets/logos/tools/coding/cursor.png';

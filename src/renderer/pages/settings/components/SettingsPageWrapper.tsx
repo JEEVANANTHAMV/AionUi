@@ -71,7 +71,8 @@ export function getBuiltinSettingsNavItems(isDesktop: boolean, t: TranslateFn): 
     system: { id: 'system', label: t('settings.system'), icon: <System theme='outline' size='16' />, path: 'system' },
   };
 
-  return BUILTIN_TAB_IDS.map((id) => builtinMap[id]);
+  const DESKTOP_ONLY_TABS = ['pet', 'tools', 'attachedAgents', 'mcp'];
+  return BUILTIN_TAB_IDS.filter((id) => isDesktop || !DESKTOP_ONLY_TABS.includes(id)).map((id) => builtinMap[id]);
 }
 
 const SettingsPageWrapper: React.FC<SettingsPageWrapperProps> = ({ children, className, contentClassName }) => {
