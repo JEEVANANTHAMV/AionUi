@@ -5,15 +5,16 @@
  */
 
 import { Type } from '@google/genai';
-import {
-  BaseDeclarativeTool,
-  BaseToolInvocation,
-  Kind,
+import type {
   ToolResult,
   ToolInvocation,
   ToolLocation,
   ToolCallConfirmationDetails,
-  MessageBus,
+  MessageBus} from '@office-ai/aioncli-core';
+import {
+  BaseDeclarativeTool,
+  BaseToolInvocation,
+  Kind,
   ToolErrorType,
   getErrorMessage,
 } from '@office-ai/aioncli-core';

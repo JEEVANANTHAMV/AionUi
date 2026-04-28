@@ -184,8 +184,8 @@ const SettingsSider: React.FC<{ collapsed?: boolean; tooltipEnabled?: boolean }>
     };
 
     // Start with ordered builtin IDs, hiding desktop-only tabs in browser mode
-    const DESKTOP_ONLY_TABS = ['pet', 'tools', 'attachedAgents', 'mcp'];
-    const result: SiderItem[] = BUILTIN_TAB_IDS.filter((id) => isDesktop || !DESKTOP_ONLY_TABS.includes(id)).map(
+    const DESKTOP_ONLY_TABS = new Set(['pet', 'tools', 'attachedAgents', 'mcp']);
+    const result: SiderItem[] = BUILTIN_TAB_IDS.filter((id) => isDesktop || !DESKTOP_ONLY_TABS.has(id)).map(
       (id) => builtinMap[id]
     );
 

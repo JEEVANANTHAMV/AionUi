@@ -10,6 +10,7 @@ import './process/utils/configureChromium';
 import './process/utils/configureConsoleLog';
 import { app, BrowserWindow, nativeImage, net, powerMonitor, protocol, screen } from 'electron';
 import fixPath from 'fix-path';
+import * as Sentry from '@sentry/electron/main';
 import * as fs from 'fs';
 import * as path from 'path';
 import { pathToFileURL } from 'url';
@@ -131,6 +132,15 @@ void logEnvironmentDiagnostics();
 // Handle Squirrel startup events (Windows installer)
 if (electronSquirrelStartup) {
   app.quit();
+}
+
+// ============ Sentry Initialization ============
+// Sentry must be initialized BEFORE app is ready to properly register custom protocols
+// and inject preload scripts for renderer communication.
+try {
+  Sentry.init({ dsn: process.env.SENTRY_DSN });
+} catch (error) {
+  console.error('[Forjinn-Desk] Failed to initialize Sentry early:', error);
 }
 
 // ============ Custom Asset Protocol ============
@@ -446,15 +456,12 @@ const handleAppReady = async (): Promise<void> => {
     return;
   }
 
-  // Initialize Sentry after Electron is ready
+  // Set Sentry user after analytics ID is available
   try {
-    const { init } = await import('@sentry/electron/main');
-    init({ dsn: process.env.SENTRY_DSN });
     const analyticsId = getOrCreateAnalyticsId();
-    const { setUser } = await import('@sentry/electron/main');
-    setUser({ id: analyticsId });
+    Sentry.setUser({ id: analyticsId });
   } catch (error) {
-    console.error('[Forjinn-Desk] Failed to initialize Sentry:', error);
+    console.error('[Forjinn-Desk] Failed to set Sentry user:', error);
   }
 
   try {
