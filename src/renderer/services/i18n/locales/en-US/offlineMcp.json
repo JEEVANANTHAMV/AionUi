@@ -9,7 +9,7 @@
   "configureTitle": "Configure Server",
   "type": "Type",
   "description": "Description",
-  "status": "Status",
+  "statusLabel": "Status",
   "port": "Port",
   "enabled": "Enabled",
   "disabled": "Disabled",
@@ -36,5 +36,14 @@
   "autoStartEnabled": "Auto-start enabled",
   "autoStartDisabled": "Auto-start disabled",
   "saveSuccess": "Configuration saved",
-  "saveFailed": "Failed to save configuration"
+  "saveFailed": "Failed to save configuration",
+  "status": {
+    "not_installed": "Not Installed",
+    "downloading": "Downloading",
+    "installing": "Installing",
+    "ready": "Ready",
+    "running": "Running",
+    "error": "Error",
+    "stopped": "Stopped"
+  }
 }

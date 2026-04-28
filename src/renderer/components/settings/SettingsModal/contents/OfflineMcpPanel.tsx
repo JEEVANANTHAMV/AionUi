@@ -287,7 +287,7 @@ const OfflineMcpPanel: React.FC = () => {
       render: (desc: string) => <span className={styles.description}>{desc}</span>,
     },
     {
-      title: t('offlineMcp.status'),
+      title: t('offlineMcp.statusLabel'),
       render: (_: unknown, record: ServerRow) => (
         <Badge
           status={statusColors[record.state.status]}

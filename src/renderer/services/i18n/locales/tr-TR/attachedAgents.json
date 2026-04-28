@@ -19,5 +19,13 @@
   "stopFailed": "Failed to stop agent",
   "saveSuccess": "Configuration saved",
   "saveFailed": "Failed to save configuration",
-  "fetchFailed": "Failed to fetch agents"
+  "fetchFailed": "Failed to fetch agents",
+  "status": {
+    "idle": "Idle",
+    "starting": "Starting",
+    "running": "Running",
+    "busy": "Busy",
+    "error": "Error",
+    "stopped": "Stopped"
+  }
 }
