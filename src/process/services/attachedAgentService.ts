@@ -162,48 +162,62 @@ class AttachedAgentService extends EventEmitter {
    * Start OpenCode agent
    */
   private async startOpenCodeAgent(agentId: string, config: OpenCodeAgentConfig): Promise<void> {
-    // OpenCode agent connects via HTTP to an existing OpenCode instance
-    // For now, we assume OpenCode is running on the configured endpoint
-    const port = config.port || 8080;
-
-    // Create a proxy process that maintains the connection
-    const proxyProcess = spawn(
-      process.execPath,
-      [path.join(__dirname, 'opencodeProxy.js'), '--port', String(port), '--agent-id', agentId],
-      {
-        detached: false,
-        stdio: ['pipe', 'pipe', 'pipe'],
+    const port = config.port || 4096;
+    const endpoint = config.endpoint || `http://localhost:${port}`;
+    
+    // Check if OpenCode is already running
+    try {
+      const response = await fetch(`${endpoint}/global/health`);
+      if (response.ok) {
+        return;
       }
-    );
+    } catch (e) {
+      // Not reachable, proceed to spawn it
+    }
 
-    this.processes.set(agentId, proxyProcess);
+    const executablePath = (config.options?.executablePath as string) || 'opencode';
+    const args = ['web'];
+    if (config.port) {
+      args.push('--port', String(config.port));
+    }
+
+    const opencodeProcess = spawn(executablePath, args, {
+      detached: false,
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+
+    this.processes.set(agentId, opencodeProcess);
 
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
-        reject(new Error('OpenCode agent start timeout'));
+        reject(new Error('OpenCode server start timeout'));
       }, 30000);
 
-      proxyProcess.stdout?.on('data', (data: Buffer) => {
-        const message = data.toString();
-        if (message.includes('ready')) {
-          clearTimeout(timeout);
-          resolve();
+      const checkHealth = async () => {
+        try {
+          const response = await fetch(`${endpoint}/global/health`);
+          if (response.ok) {
+            clearTimeout(timeout);
+            resolve();
+            return;
+          }
+        } catch (error) {
+          // Ignore connection errors during startup
         }
-      });
+        setTimeout(checkHealth, 1000);
+      };
 
-      proxyProcess.stderr?.on('data', (data: Buffer) => {
-        console.error(`OpenCode agent error: ${data}`);
-      });
+      void checkHealth();
 
-      proxyProcess.on('error', (error) => {
+      opencodeProcess.on('error', (error) => {
         clearTimeout(timeout);
         reject(error);
       });
 
-      proxyProcess.on('exit', (code) => {
-        if (code !== 0) {
+      opencodeProcess.on('exit', (code) => {
+        if (code !== 0 && code !== null) {
           clearTimeout(timeout);
-          reject(new Error(`OpenCode agent exited with code ${code}`));
+          reject(new Error(`OpenCode exited with code ${code}`));
         }
       });
     });
@@ -362,7 +376,6 @@ class AttachedAgentService extends EventEmitter {
     }
 
     if (state.status !== AttachedAgentStatus.RUNNING) {
-      // Auto-start if not running
       const started = await this.startAgent(agentId);
       if (!started) {
         return {
@@ -379,6 +392,81 @@ class AttachedAgentService extends EventEmitter {
       status: AttachedAgentStatus.BUSY,
       lastTask: taskId,
     });
+
+    if (config.type === AttachedAgentType.OPENCODE) {
+      try {
+        const port = config.port || 4096;
+        const endpoint = config.endpoint || `http://localhost:${port}`;
+
+        // 1. Create a session
+        const sessionRes = await fetch(`${endpoint}/session`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: `AionUI Session ${taskId}` }),
+        });
+
+        if (!sessionRes.ok) {
+          throw new Error(`Failed to create OpenCode session: ${sessionRes.statusText}`);
+        }
+
+        const sessionData = await sessionRes.json() as { id: string };
+        const sessionId = sessionData.id;
+
+        // 2. Send instruction
+        const messageRes = await fetch(`${endpoint}/session/${sessionId}/message`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            parts: [{ type: 'text', text: instruction }],
+          }),
+        });
+
+        if (!messageRes.ok) {
+          throw new Error(`Failed to send message to OpenCode: ${messageRes.statusText}`);
+        }
+
+        // 3. Optional: Get current worktree to build URL
+        let worktree = '';
+        try {
+          const worktreeRes = await fetch(`${endpoint}/project/current`);
+          if (worktreeRes.ok) {
+            const worktreeData = await worktreeRes.json() as { worktree: string };
+            worktree = worktreeData.worktree;
+          }
+        } catch (e) {
+          // Non-critical failure
+        }
+
+        let sessionUrl = `${endpoint}/session/${sessionId}`;
+        if (worktree) {
+          const encodedWorktree = Buffer.from(worktree).toString('base64').replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
+          sessionUrl = `${endpoint}/${encodedWorktree}/session/${sessionId}`;
+        }
+
+        this.updateState(agentId, {
+          status: AttachedAgentStatus.RUNNING,
+          lastResult: `Session created and message sent. URL: ${sessionUrl}`,
+          taskCount: state.taskCount + 1,
+        });
+
+        return {
+          taskId,
+          agentId,
+          success: true,
+          result: `OpenCode task dispatched. View session at: ${sessionUrl}`,
+          completedAt: Date.now(),
+        };
+      } catch (error) {
+        this.updateState(agentId, { status: AttachedAgentStatus.RUNNING });
+        return {
+          taskId,
+          agentId,
+          success: false,
+          error: error instanceof Error ? error.message : String(error),
+          completedAt: Date.now(),
+        };
+      }
+    }
 
     return new Promise((resolve) => {
       const timeoutId = setTimeout(() => {
@@ -405,7 +493,6 @@ class AttachedAgentService extends EventEmitter {
         resolve(result);
       });
 
-      // Send task to agent process
       this.sendTaskToAgent(agentId, taskId, instruction, request.context);
     });
   }
