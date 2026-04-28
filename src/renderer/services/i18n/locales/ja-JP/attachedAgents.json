@@ -1,0 +1,23 @@
+{
+  "title": "Attached Agents",
+  "subtitle": "Manage attached agents for task execution",
+  "configureTitle": "Configure Agent",
+  "name": "Name",
+  "endpoint": "Endpoint",
+  "port": "Port",
+  "enabled": "Enabled",
+  "autoStart": "Auto Start",
+  "start": "Start",
+  "stop": "Stop",
+  "configure": "Configure",
+  "startedAt": "Started At",
+  "taskCount": "Task Count",
+  "lastTask": "Last Task",
+  "startSuccess": "Agent started",
+  "startFailed": "Failed to start agent",
+  "stopSuccess": "Agent stopped",
+  "stopFailed": "Failed to stop agent",
+  "saveSuccess": "Configuration saved",
+  "saveFailed": "Failed to save configuration",
+  "fetchFailed": "Failed to fetch agents"
+}

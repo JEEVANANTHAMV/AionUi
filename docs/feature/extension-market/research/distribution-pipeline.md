@@ -494,15 +494,15 @@ ext-claude-code-1.2.0.tgz
 
 #### 客户端下载实现要点
 
-| 要点        | 方案                                                              |
-| ----------- | ----------------------------------------------------------------- |
-| HTTP 客户端 | Electron 内置 `net.request` (支持代理) 或 Node.js `https`         |
-| 超时        | 连接 10s, 下载 60s                                                |
-| 重试        | 3 次, 指数退避 (1s, 2s, 4s), 自动切换备选源                       |
-| 断点续传    | P0 不做 (extension 包通常 <1MB); P1 可用 `Range` header           |
+| 要点        | 方案                                                                    |
+| ----------- | ----------------------------------------------------------------------- |
+| HTTP 客户端 | Electron 内置 `net.request` (支持代理) 或 Node.js `https`               |
+| 超时        | 连接 10s, 下载 60s                                                      |
+| 重试        | 3 次, 指数退避 (1s, 2s, 4s), 自动切换备选源                             |
+| 断点续传    | P0 不做 (extension 包通常 <1MB); P1 可用 `Range` header                 |
 | 缓存        | `~/.forjinn-desk/cache/<name>-<version>.tgz`, 安装成功后保留 (方便回退) |
-| 进度展示    | 下载进度通过 IPC 推送到 renderer, UI 显示进度条                   |
-| 并发        | 单个 extension 串行下载; 多个 extension 可并行 (限 3 并发)        |
+| 进度展示    | 下载进度通过 IPC 推送到 renderer, UI 显示进度条                         |
+| 并发        | 单个 extension 串行下载; 多个 extension 可并行 (限 3 并发)              |
 
 #### 安装流程
 
@@ -634,13 +634,13 @@ flowchart TD
 
 ### 与现有系统的对接点
 
-| 现有模块               | 对接方式                                                    |
-| ---------------------- | ----------------------------------------------------------- |
-| `ExtensionLoader`      | 安装到 `~/.forjinn-desk/extensions/` 后, 现有扫描逻辑自动发现     |
-| `ExtensionRegistry`    | 安装完成后触发 `hotReload()`, 新 extension 自动注入         |
-| `lifecycle.ts`         | 安装后自动运行 `onInstall()` + `onActivate()`               |
-| `extensionsBridge.ts`  | 新增 `extensions.install` / `extensions.uninstall` IPC 通道 |
-| `analyzePermissions()` | 安装前从 index.json 读取权限摘要, 展示给用户                |
+| 现有模块               | 对接方式                                                      |
+| ---------------------- | ------------------------------------------------------------- |
+| `ExtensionLoader`      | 安装到 `~/.forjinn-desk/extensions/` 后, 现有扫描逻辑自动发现 |
+| `ExtensionRegistry`    | 安装完成后触发 `hotReload()`, 新 extension 自动注入           |
+| `lifecycle.ts`         | 安装后自动运行 `onInstall()` + `onActivate()`                 |
+| `extensionsBridge.ts`  | 新增 `extensions.install` / `extensions.uninstall` IPC 通道   |
+| `analyzePermissions()` | 安装前从 index.json 读取权限摘要, 展示给用户                  |
 
 ---
 
@@ -648,16 +648,16 @@ flowchart TD
 
 ### Phase 1 — MVP (Agent Hub)
 
-| 步骤 | 内容                                                                                          | 依赖     |
-| ---- | --------------------------------------------------------------------------------------------- | -------- |
+| 步骤 | 内容                                                                                                | 依赖     |
+| ---- | --------------------------------------------------------------------------------------------------- | -------- |
 | 1.1  | 创建 `forjinn-desk/hub` GitHub 仓库, 迁入官方 extension                                             | —        |
-| 1.2  | 编写 `scripts/build.ts`: 扫描 → 打包 .tgz → 计算 SHA-512 → 生成 index.json                    | —        |
-| 1.3  | 配置 GitHub Actions CI: PR merge → build → commit dist/                                       | 1.2      |
-| 1.4  | APP 内置 `dist/` 快照 (构建时从 hub 仓库拷贝)                                                 | 1.3      |
-| 1.5  | 客户端: IndexManager — 加载内置 index + 拉取远程 index + 合并                                 | —        |
+| 1.2  | 编写 `scripts/build.ts`: 扫描 → 打包 .tgz → 计算 SHA-512 → 生成 index.json                          | —        |
+| 1.3  | 配置 GitHub Actions CI: PR merge → build → commit dist/                                             | 1.2      |
+| 1.4  | APP 内置 `dist/` 快照 (构建时从 hub 仓库拷贝)                                                       | 1.3      |
+| 1.5  | 客户端: IndexManager — 加载内置 index + 拉取远程 index + 合并                                       | —        |
 | 1.6  | 客户端: ExtensionInstaller — 下载 .tgz → 验证 integrity → 解压 → 安装到 ~/.forjinn-desk/extensions/ | —        |
-| 1.7  | IPC: 新增 `extensions.install` / `extensions.uninstall` / `extensions.check-updates` 通道     | 1.6      |
-| 1.8  | UI: 在 Local Agent 页融入 Hub 列表, Install/Update 按钮                                       | 1.5, 1.7 |
+| 1.7  | IPC: 新增 `extensions.install` / `extensions.uninstall` / `extensions.check-updates` 通道           | 1.6      |
+| 1.8  | UI: 在 Local Agent 页融入 Hub 列表, Install/Update 按钮                                             | 1.5, 1.7 |
 
 ### Phase 2 — 签名 + 多 Hub
 

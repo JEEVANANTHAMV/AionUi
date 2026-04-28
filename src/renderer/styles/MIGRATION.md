@@ -36,18 +36,18 @@
 
 ## 📋 常见颜色映射表
 
-| 旧值 (Hex) | UnoCSS 类                     | CSS 变量                | 说明            |
-| ---------- | ----------------------------- | ----------------------- | --------------- |
-| `#FFFFFF`  | `bg-base`                     | `var(--bg-base)`        | 主背景          |
-| `#F7F8FA`  | `bg-1`                        | `var(--bg-1)`           | 次级背景/填充色 |
-| `#F2F3F5`  | `bg-2`                        | `var(--bg-2)`           | 三级背景        |
-| `#E5E6EB`  | `bg-3` 或 `border-b-base`     | `var(--border-base)`    | 边框/分隔线     |
-| `#7583B2`  | `bg-brand` / `text-brand`     | `var(--brand)`          | 品牌色          |
-| `#EFF0F6`  | `bg-forjinn-1` / `bg-brand-light` | `var(--forjinn-1)`          | 品牌浅色背景    |
-| `#E5E7F0`  | `bg-forjinn-2`                    | `var(--forjinn-2)`          | Forjinn 色板 2      |
-| `#1D2129`  | `text-t-primary`              | `var(--text-primary)`   | 主要文字        |
-| `#86909C`  | `text-t-secondary` / `bg-6`   | `var(--text-secondary)` | 次要文字        |
-| `#165DFF`  | `bg-primary` / `text-primary` | `var(--primary)`        | 主色调          |
+| 旧值 (Hex) | UnoCSS 类                         | CSS 变量                | 说明            |
+| ---------- | --------------------------------- | ----------------------- | --------------- |
+| `#FFFFFF`  | `bg-base`                         | `var(--bg-base)`        | 主背景          |
+| `#F7F8FA`  | `bg-1`                            | `var(--bg-1)`           | 次级背景/填充色 |
+| `#F2F3F5`  | `bg-2`                            | `var(--bg-2)`           | 三级背景        |
+| `#E5E6EB`  | `bg-3` 或 `border-b-base`         | `var(--border-base)`    | 边框/分隔线     |
+| `#7583B2`  | `bg-brand` / `text-brand`         | `var(--brand)`          | 品牌色          |
+| `#EFF0F6`  | `bg-forjinn-1` / `bg-brand-light` | `var(--forjinn-1)`      | 品牌浅色背景    |
+| `#E5E7F0`  | `bg-forjinn-2`                    | `var(--forjinn-2)`      | Forjinn 色板 2  |
+| `#1D2129`  | `text-t-primary`                  | `var(--text-primary)`   | 主要文字        |
+| `#86909C`  | `text-t-secondary` / `bg-6`       | `var(--text-secondary)` | 次要文字        |
+| `#165DFF`  | `bg-primary` / `text-primary`     | `var(--primary)`        | 主色调          |
 
 ## 🔄 迁移步骤
 

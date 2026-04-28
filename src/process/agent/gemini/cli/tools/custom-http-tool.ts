@@ -88,7 +88,7 @@ class CustomHttpInvocation extends BaseToolInvocation<any, ToolResult> {
   async execute(signal: AbortSignal, updateOutput?: (output: string) => void): Promise<ToolResult> {
     try {
       updateOutput?.(`Calling ${this.toolConfig.name}...`);
-      
+
       let finalUrl = this.toolConfig.url;
       let body: any = null;
       const headersStr = this.toolConfig.headers || '{}';
@@ -114,7 +114,7 @@ class CustomHttpInvocation extends BaseToolInvocation<any, ToolResult> {
       });
 
       const resultText = await response.text();
-      
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${resultText}`);
       }

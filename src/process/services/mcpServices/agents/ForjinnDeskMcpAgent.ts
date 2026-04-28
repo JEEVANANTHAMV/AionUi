@@ -86,7 +86,9 @@ export class ForjinnDeskMcpAgent extends AbstractMcpAgent {
             updatedAt: Date.now(),
           });
         } else {
-          console.warn(`[ForjinnDeskMcpAgent] Skipping ${server.name}: unsupported transport type ${server.transport.type}`);
+          console.warn(
+            `[ForjinnDeskMcpAgent] Skipping ${server.name}: unsupported transport type ${server.transport.type}`
+          );
         }
       });
 

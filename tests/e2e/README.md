@@ -191,8 +191,8 @@ Failed tests automatically get screenshots attached to the HTML report.
 
 Variables set automatically during test launch:
 
-| Variable                     | Value | Purpose                  |
-| ---------------------------- | ----- | ------------------------ |
+| Variable                           | Value | Purpose                  |
+| ---------------------------------- | ----- | ------------------------ |
 | `FORJINN_DESK_E2E_TEST`            | `1`   | App recognizes test mode |
 | `FORJINN_DESK_DISABLE_AUTO_UPDATE` | `1`   | No update checks         |
 | `FORJINN_DESK_DISABLE_DEVTOOLS`    | `1`   | No DevTools windows      |

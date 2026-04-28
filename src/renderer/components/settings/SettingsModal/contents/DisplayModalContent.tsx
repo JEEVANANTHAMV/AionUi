@@ -43,8 +43,6 @@ const DisplayModalContent: React.FC = () => {
   const viewMode = useSettingsViewMode();
   const isPageMode = viewMode === 'page';
 
-
-
   // 显示设置项配置 / Display items configuration
   const displayItems = [
     { key: 'theme', label: t('settings.theme'), component: <ThemeSwitcher /> },
@@ -66,7 +64,6 @@ const DisplayModalContent: React.FC = () => {
               ))}
             </div>
           </div>
-
         </div>
       </ForjinnScrollArea>
     </div>

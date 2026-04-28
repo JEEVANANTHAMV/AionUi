@@ -235,7 +235,6 @@ export const [功能名] = {
 - `zh-TW.json` - 简体中文 (必须)
 - `en-US.json` - English (必须)
 
-
 ---
 
 ## 4. 验收标准

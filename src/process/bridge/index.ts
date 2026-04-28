@@ -44,6 +44,10 @@ import { initRemoteAgentBridge } from './remoteAgentBridge';
 import { initHubBridge } from './hubBridge';
 import { initTeamBridge } from './teamBridge';
 import type { TeamSessionService } from '@process/team/TeamSessionService';
+import { initAttachedAgentBridge } from './attachedAgentBridge';
+import { initExtendedToolsBridge } from './extendedToolsBridge';
+import { initOfflineMcpBridge } from './offlineMcpBridge';
+import { initSummarizationBridge } from './summarizationBridge';
 
 export interface BridgeDependencies {
   conversationService: IConversationService;
@@ -92,6 +96,11 @@ export function initAllBridges(deps: BridgeDependencies): void {
   initRemoteAgentBridge();
   initHubBridge();
   initTeamBridge(deps.teamSessionService);
+  // New bridges for attached agents, tools, offline MCP, and summarization
+  initAttachedAgentBridge();
+  initExtendedToolsBridge();
+  initOfflineMcpBridge();
+  initSummarizationBridge();
 }
 
 /**
@@ -141,6 +150,10 @@ export {
   initWindowControlsBridge,
   initWeixinLoginBridge,
   initWorkspaceSnapshotBridge,
+  initAttachedAgentBridge,
+  initExtendedToolsBridge,
+  initOfflineMcpBridge,
+  initSummarizationBridge,
 };
 export { disposeAllSnapshots } from './workspaceSnapshotBridge';
 export { disposeAllTeamSessions } from './teamBridge';

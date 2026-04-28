@@ -43,10 +43,19 @@ const {
     mockRefreshTrayMenu: vi.fn(async () => {}),
     mockRemoveFromMessageCache: vi.fn(),
     mockConversationService: {
-      createConversation: vi.fn(async () => ({ id: 'conv-created', name: 'Created Conversation', source: 'forjinn-desk' })),
+      createConversation: vi.fn(async () => ({
+        id: 'conv-created',
+        name: 'Created Conversation',
+        source: 'forjinn-desk',
+      })),
       deleteConversation: vi.fn(async () => {}),
       updateConversation: vi.fn(async () => {}),
-      getConversation: vi.fn(async () => ({ id: 'conv-1', source: 'forjinn-desk', name: 'Original Name', type: 'gemini' })),
+      getConversation: vi.fn(async () => ({
+        id: 'conv-1',
+        source: 'forjinn-desk',
+        name: 'Original Name',
+        type: 'gemini',
+      })),
       createWithMigration: vi.fn(async () => ({ id: 'conv-migrated', source: 'forjinn-desk' })),
     },
     mockWorkerTaskManager: {

@@ -18,7 +18,12 @@ const useOpenClawDraft = getSendBoxDraftHook('openclaw-gateway', {
 });
 const useNanobotDraft = getSendBoxDraftHook('nanobot', { _type: 'nanobot', atPath: [], content: '', uploadFile: [] });
 const useRemoteDraft = getSendBoxDraftHook('remote', { _type: 'remote', atPath: [], content: '', uploadFile: [] });
-const useForjinnrsDraft = getSendBoxDraftHook('forjinnrs', { _type: 'forjinnrs', atPath: [], content: '', uploadFile: [] });
+const useForjinnrsDraft = getSendBoxDraftHook('forjinnrs', {
+  _type: 'forjinnrs',
+  atPath: [],
+  content: '',
+  uploadFile: [],
+});
 
 type Props = {
   conversationId: string;

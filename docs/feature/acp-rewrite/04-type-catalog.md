@@ -1011,57 +1011,57 @@ classDiagram
 
 ## 7. 类型来源总结表
 
-| #   | 类型                        | 来源         | 边界             | 定义文件                                  |
-| --- | --------------------------- | ------------ | ---------------- | ----------------------------------------- |
-| 1   | `AgentConfig`               | 新定义       | 跨层             | types.ts                                  |
-| 2   | `McpServer`                 | SDK 原样     | 跨层             | SDK import                                |
-| 3   | `AcpError`                  | 新定义       | 跨层             | errors/AcpError.ts                        |
-| 4   | `AcpErrorCode`              | 新定义       | 跨层             | errors/AcpError.ts                        |
-| 5   | `AcpMetrics`                | 新定义       | 跨层             | types.ts                                  |
-| 6   | `MetricsSnapshot`           | 新定义       | 跨层             | types.ts                                  |
-| 7   | `Stream`                    | SDK 原样     | Infra 内部       | session/types.ts                          |
-| 8   | `AcpClient`                 | 新定义       | Infra -> Session | (待创建)                                  |
-| 9   | `ClientFactory`             | 新定义       | App 内部         | (待创建)                                  |
-| 10  | `AgentLifecycleSnapshot`    | 新定义       | Infra -> Session | (待创建)                                  |
-| 11  | `DisconnectInfo`            | 新定义       | Infra -> Session | (待创建)                                  |
-| 12  | `ProtocolHandlers`          | 新定义       | Infra 内部       | session/types.ts                          |
-| 13  | `SessionNotification`       | SDK 原样     | Infra -> Session | SDK import                                |
-| 14  | ~~`SessionUpdate`~~         | ~~SDK 原样~~ | -                | (SDK 内部，通过 SessionNotification 访问) |
-| 15  | `RequestPermissionRequest`  | SDK 原样     | Infra -> Session | SDK import                                |
-| 16  | `RequestPermissionResponse` | SDK 原样     | Session -> Infra | SDK import                                |
-| 17  | `PromptResponse`            | SDK 原样     | Infra -> Session | SDK import                                |
-| 18  | `InitializeResponse`        | SDK 原样     | Infra -> Session | SDK import                                |
-| 19  | ~~`RawAuthMethod`~~         | -            | -                | (已移除，SDK `AuthMethod` 直接使用)       |
-| 20  | ~~`LocalProcessConfig`~~    | ~~新定义~~   | ~~Infra 内部~~   | (v1.2 移除，内部化到 ProcessAcpClient)    |
-| 21  | `CreateSessionParams`       | 新定义       | Infra 内部       | types.ts                                  |
-| 22  | `LoadSessionParams`         | 新定义       | Infra 内部       | types.ts                                  |
-| 23  | `PromptContent`             | 新定义       | Session -> Infra | types.ts                                  |
-| 24  | ~~`PromptContentItem`~~     | -            | -                | (已移除，SDK `ContentBlock` 直接使用)     |
-| 25  | `SessionCallbacks`          | 新定义       | Session -> App   | types.ts                                  |
-| 26  | `SessionStatus`             | 新定义       | Session -> App   | types.ts                                  |
-| 27  | `QueueSnapshot`             | 新定义       | Session -> App   | types.ts                                  |
-| 28  | `PermissionUIData`          | 新定义       | Session -> App   | types.ts                                  |
-| 29  | `ToolKind`                  | SDK 原样     | Session -> App   | SDK import                                |
-| 30  | `ConfigSnapshot`            | 新定义       | Session -> App   | types.ts                                  |
-| 31  | `ModelSnapshot`             | 新定义       | Session -> App   | types.ts                                  |
-| 32  | `ModeSnapshot`              | 新定义       | Session -> App   | types.ts                                  |
-| 33  | `ContextUsage`              | 新定义       | Session -> App   | types.ts                                  |
-| 34  | `SessionSignal`             | 新定义       | Session -> App   | types.ts                                  |
-| 35  | `AuthRequiredData`          | 新定义       | Session -> App   | types.ts                                  |
-| 36  | `AuthMethod`                | SDK 原样     | Session -> App   | SDK import                                |
-| 37  | ~~`AuthInputField`~~        | -            | -                | (已移除，SDK `AuthEnvVar` 替代)           |
-| 38  | `ConfigOption`              | SDK 简化     | Session <-> App  | types.ts                                  |
+| #   | 类型                        | 来源               | 边界             | 定义文件                                  |
+| --- | --------------------------- | ------------------ | ---------------- | ----------------------------------------- |
+| 1   | `AgentConfig`               | 新定义             | 跨层             | types.ts                                  |
+| 2   | `McpServer`                 | SDK 原样           | 跨层             | SDK import                                |
+| 3   | `AcpError`                  | 新定义             | 跨层             | errors/AcpError.ts                        |
+| 4   | `AcpErrorCode`              | 新定义             | 跨层             | errors/AcpError.ts                        |
+| 5   | `AcpMetrics`                | 新定义             | 跨层             | types.ts                                  |
+| 6   | `MetricsSnapshot`           | 新定义             | 跨层             | types.ts                                  |
+| 7   | `Stream`                    | SDK 原样           | Infra 内部       | session/types.ts                          |
+| 8   | `AcpClient`                 | 新定义             | Infra -> Session | (待创建)                                  |
+| 9   | `ClientFactory`             | 新定义             | App 内部         | (待创建)                                  |
+| 10  | `AgentLifecycleSnapshot`    | 新定义             | Infra -> Session | (待创建)                                  |
+| 11  | `DisconnectInfo`            | 新定义             | Infra -> Session | (待创建)                                  |
+| 12  | `ProtocolHandlers`          | 新定义             | Infra 内部       | session/types.ts                          |
+| 13  | `SessionNotification`       | SDK 原样           | Infra -> Session | SDK import                                |
+| 14  | ~~`SessionUpdate`~~         | ~~SDK 原样~~       | -                | (SDK 内部，通过 SessionNotification 访问) |
+| 15  | `RequestPermissionRequest`  | SDK 原样           | Infra -> Session | SDK import                                |
+| 16  | `RequestPermissionResponse` | SDK 原样           | Session -> Infra | SDK import                                |
+| 17  | `PromptResponse`            | SDK 原样           | Infra -> Session | SDK import                                |
+| 18  | `InitializeResponse`        | SDK 原样           | Infra -> Session | SDK import                                |
+| 19  | ~~`RawAuthMethod`~~         | -                  | -                | (已移除，SDK `AuthMethod` 直接使用)       |
+| 20  | ~~`LocalProcessConfig`~~    | ~~新定义~~         | ~~Infra 内部~~   | (v1.2 移除，内部化到 ProcessAcpClient)    |
+| 21  | `CreateSessionParams`       | 新定义             | Infra 内部       | types.ts                                  |
+| 22  | `LoadSessionParams`         | 新定义             | Infra 内部       | types.ts                                  |
+| 23  | `PromptContent`             | 新定义             | Session -> Infra | types.ts                                  |
+| 24  | ~~`PromptContentItem`~~     | -                  | -                | (已移除，SDK `ContentBlock` 直接使用)     |
+| 25  | `SessionCallbacks`          | 新定义             | Session -> App   | types.ts                                  |
+| 26  | `SessionStatus`             | 新定义             | Session -> App   | types.ts                                  |
+| 27  | `QueueSnapshot`             | 新定义             | Session -> App   | types.ts                                  |
+| 28  | `PermissionUIData`          | 新定义             | Session -> App   | types.ts                                  |
+| 29  | `ToolKind`                  | SDK 原样           | Session -> App   | SDK import                                |
+| 30  | `ConfigSnapshot`            | 新定义             | Session -> App   | types.ts                                  |
+| 31  | `ModelSnapshot`             | 新定义             | Session -> App   | types.ts                                  |
+| 32  | `ModeSnapshot`              | 新定义             | Session -> App   | types.ts                                  |
+| 33  | `ContextUsage`              | 新定义             | Session -> App   | types.ts                                  |
+| 34  | `SessionSignal`             | 新定义             | Session -> App   | types.ts                                  |
+| 35  | `AuthRequiredData`          | 新定义             | Session -> App   | types.ts                                  |
+| 36  | `AuthMethod`                | SDK 原样           | Session -> App   | SDK import                                |
+| 37  | ~~`AuthInputField`~~        | -                  | -                | (已移除，SDK `AuthEnvVar` 替代)           |
+| 38  | `ConfigOption`              | SDK 简化           | Session <-> App  | types.ts                                  |
 | 39  | `TMessage`                  | 现有(Forjinn-Desk) | Session -> App   | types.ts (占位)                           |
-| 40  | `QueuedPrompt`              | 新定义       | Session 内部     | types.ts                                  |
-| 41  | `PendingPermission`         | 新定义       | Session 内部     | session/types.ts                          |
-| 42  | `SessionOptions`            | 新定义       | Session 内部     | session/types.ts                          |
-| 43  | `SignalEvent`               | 新定义       | App -> IPC       | types.ts                                  |
-| 44  | `SessionEntry`              | 新定义       | App 内部         | (待创建)                                  |
-| 45  | `ClientFactory`             | 新定义       | App 内部         | (待创建)                                  |
-| 46  | `RuntimeOptions`            | 新定义       | App 内部         | types.ts                                  |
-| 47  | `AgentSpawnError`           | 新定义       | 跨层             | errors/AcpError.ts                        |
-| 48  | `AgentStartupError`         | 新定义       | 跨层             | errors/AcpError.ts                        |
-| 49  | `AgentDisconnectedError`    | 新定义       | 跨层             | errors/AcpError.ts                        |
+| 40  | `QueuedPrompt`              | 新定义             | Session 内部     | types.ts                                  |
+| 41  | `PendingPermission`         | 新定义             | Session 内部     | session/types.ts                          |
+| 42  | `SessionOptions`            | 新定义             | Session 内部     | session/types.ts                          |
+| 43  | `SignalEvent`               | 新定义             | App -> IPC       | types.ts                                  |
+| 44  | `SessionEntry`              | 新定义             | App 内部         | (待创建)                                  |
+| 45  | `ClientFactory`             | 新定义             | App 内部         | (待创建)                                  |
+| 46  | `RuntimeOptions`            | 新定义             | App 内部         | types.ts                                  |
+| 47  | `AgentSpawnError`           | 新定义             | 跨层             | errors/AcpError.ts                        |
+| 48  | `AgentStartupError`         | 新定义             | 跨层             | errors/AcpError.ts                        |
+| 49  | `AgentDisconnectedError`    | 新定义             | 跨层             | errors/AcpError.ts                        |
 
 > **SDK 类型穿透范围**: SDK 原始类型（`SessionNotification`、`RequestPermissionRequest` 等）最远到达 AcpSession 内部。`handleSessionUpdate()` 和 `handlePermissionRequest()` 是翻译边界，之后全部是应用类型。
 

@@ -369,8 +369,8 @@ sudo /usr/libexec/ApplicationFirewall/socketfilterfw --unblockapp /Applications/
 
 ### 配置文件位置
 
-| 平台    | 配置文件位置                                             |
-| ------- | -------------------------------------------------------- |
+| 平台    | 配置文件位置                                                   |
+| ------- | -------------------------------------------------------------- |
 | Windows | `%APPDATA%/Forjinn-Desk/webui.config.json`                     |
 | macOS   | `~/Library/Application Support/Forjinn-Desk/webui.config.json` |
 | Linux   | `~/.config/Forjinn-Desk/webui.config.json`                     |

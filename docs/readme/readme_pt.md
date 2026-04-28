@@ -56,7 +56,7 @@
 
 **Forjinn-Desk é mais que um cliente de chat.** É uma plataforma Cowork onde os AI Agents trabalham com você no seu computador — lendo arquivos, escrevendo código, navegando na web e automatizando tarefas. Você pode ver tudo que o Agent faz e sempre está no controle.
 
-|                                              | Clientes de chat AI tradicionais | **Forjinn-Desk (Cowork)**                                                                                                                        |
+|                                              | Clientes de chat AI tradicionais | **Forjinn-Desk (Cowork)**                                                                                                                  |
 | :------------------------------------------- | :------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
 | AI pode operar em seus arquivos              | Limitado ou Não                  | **Sim — Agent integrado com acesso completo a arquivos**                                                                                   |
 | AI pode executar tarefas de múltiplas etapas | Limitado                         | **Sim — autônomo com sua aprovação**                                                                                                       |
@@ -460,7 +460,7 @@ _Abra múltiplas conversas, as tarefas não se misturam, memória independente, 
 
 Forjinn-Desk é um **Desktop Multi-AI Agent gratuito e de código aberto**. Comparado ao Claude Cowork que só roda no macOS e está bloqueado ao Claude, Forjinn-Desk é sua versão aprimorada de modelo completo e multiplataforma.
 
-| Dimensão           | Claude Cowork  | Forjinn-Desk                                              |
+| Dimensão           | Claude Cowork  | Forjinn-Desk                                        |
 | :----------------- | :------------- | :-------------------------------------------------- |
 | SO                 | Apenas macOS   | macOS / Windows / Linux                             |
 | Suporte de modelos | Apenas Claude  | Gemini, Claude, DeepSeek, OpenAI, Ollama, ...       |

@@ -1,0 +1,117 @@
+.container {
+  padding: 16px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--color-text-3);
+}
+
+.header {
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: var(--color-text-1);
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--color-text-3);
+  margin: 0;
+}
+
+/* Built-in tools styles */
+.builtinContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.categoryHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.categoryName {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.toolsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toolCard {
+  transition: all 0.2s ease;
+}
+
+.toolCard:hover {
+  background-color: var(--color-fill-2);
+}
+
+.toolRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.toolInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.toolName {
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--color-text-1);
+}
+
+.toolDescription {
+  font-size: 12px;
+  color: var(--color-text-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Custom tools styles */
+.customContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.customHeader {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 12px;
+  }
+
+  .toolRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}

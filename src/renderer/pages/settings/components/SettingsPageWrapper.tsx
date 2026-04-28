@@ -4,15 +4,7 @@ import { useLayoutContext } from '@/renderer/hooks/context/LayoutContext';
 import { SettingsViewModeProvider } from '@/renderer/components/settings/SettingsModal/settingsViewContext';
 import { isElectronDesktop, resolveExtensionAssetUrl } from '@/renderer/utils/platform';
 import { extensions as extensionsIpc, type IExtensionSettingsTab } from '@/common/adapter/ipcBridge';
-import {
-  Cat,
-  Computer,
-  Lightning,
-  LinkCloud,
-  Puzzle,
-  Robot,
-  System,
-} from '@icon-park/react';
+import { Cat, Computer, Lightning, LinkCloud, Puzzle, Robot, System, Tool, Plug, User } from '@icon-park/react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useExtI18n } from '@/renderer/hooks/system/useExtI18n';
@@ -49,6 +41,24 @@ export function getBuiltinSettingsNavItems(isDesktop: boolean, t: TranslateFn): 
       label: t('settings.capabilities', { defaultValue: 'Capabilities' }),
       icon: <Lightning theme='outline' size='16' />,
       path: 'capabilities',
+    },
+    attachedAgents: {
+      id: 'attachedAgents',
+      label: t('settings.attachedAgents', { defaultValue: 'Attached Agents' }),
+      icon: <User theme='outline' size='16' />,
+      path: 'attached-agents',
+    },
+    tools: {
+      id: 'tools',
+      label: t('settings.tools', { defaultValue: 'Tools' }),
+      icon: <Tool theme='outline' size='16' />,
+      path: 'tools',
+    },
+    mcp: {
+      id: 'mcp',
+      label: t('settings.mcp', { defaultValue: 'MCP Servers' }),
+      icon: <Plug theme='outline' size='16' />,
+      path: 'mcp',
     },
     display: {
       id: 'display',

@@ -105,7 +105,9 @@ const mapSizeToNative = (size?: ForjinnSelectSize): NativeSelectSize | undefined
   return size;
 };
 
-type ForjinnSelectComponent = React.ForwardRefExoticComponent<ForjinnSelectProps & React.RefAttributes<SelectHandle>> & {
+type ForjinnSelectComponent = React.ForwardRefExoticComponent<
+  ForjinnSelectProps & React.RefAttributes<SelectHandle>
+> & {
   Option: typeof Select.Option;
   OptGroup: typeof Select.OptGroup;
 };

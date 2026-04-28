@@ -530,7 +530,9 @@ try {
         killWindowsProcesses(['Forjinn-Desk.exe', 'electron.exe']);
         cleaned = tryRemoveDir(winUnpackedDir);
         if (!cleaned) {
-          console.log('⚠️  Directory still locked. Please close any running Forjinn-Desk/Electron processes and retry.');
+          console.log(
+            '⚠️  Directory still locked. Please close any running Forjinn-Desk/Electron processes and retry.'
+          );
         }
       }
     }

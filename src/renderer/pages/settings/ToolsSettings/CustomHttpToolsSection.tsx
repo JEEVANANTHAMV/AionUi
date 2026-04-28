@@ -22,20 +22,23 @@ const CustomHttpToolsSection: React.FC = () => {
     setIsModalVisible(true);
   }, []);
 
-  const handleSubmit = useCallback(async (data: Omit<ICustomHttpTool, 'id' | 'createdAt' | 'updatedAt'>) => {
-    try {
-      if (editingTool) {
-        await updateTool(editingTool.id, data);
-        Message.success(t('settings.customToolUpdateSuccess') || 'Tool updated successfully');
-      } else {
-        await addTool(data);
-        Message.success(t('settings.customToolAddSuccess') || 'Tool added successfully');
+  const handleSubmit = useCallback(
+    async (data: Omit<ICustomHttpTool, 'id' | 'createdAt' | 'updatedAt'>) => {
+      try {
+        if (editingTool) {
+          await updateTool(editingTool.id, data);
+          Message.success(t('settings.customToolUpdateSuccess') || 'Tool updated successfully');
+        } else {
+          await addTool(data);
+          Message.success(t('settings.customToolAddSuccess') || 'Tool added successfully');
+        }
+        setIsModalVisible(false);
+      } catch (error) {
+        Message.error(t('settings.customToolSaveFailed') || 'Failed to save tool');
       }
-      setIsModalVisible(false);
-    } catch (error) {
-      Message.error(t('settings.customToolSaveFailed') || 'Failed to save tool');
-    }
-  }, [editingTool, addTool, updateTool, t]);
+    },
+    [editingTool, addTool, updateTool, t]
+  );
 
   const columns = [
     {
@@ -43,90 +46,76 @@ const CustomHttpToolsSection: React.FC = () => {
       dataIndex: 'name',
       render: (name: string, record: ICustomHttpTool) => (
         <Space size={4}>
-          <Api size={14} className="text-blue-600" />
-          <span className="font-medium text-sm">{name}</span>
+          <Api size={14} className='text-blue-600' />
+          <span className='font-medium text-sm'>{name}</span>
         </Space>
-      )
+      ),
     },
     {
       title: t('settings.customToolDescription') || 'Description',
       dataIndex: 'description',
       render: (desc: string) => (
         <Tooltip content={desc}>
-          <div className="text-xs text-t-secondary line-clamp-1 max-w-[200px]">{desc}</div>
+          <div className='text-xs text-t-secondary line-clamp-1 max-w-[200px]'>{desc}</div>
         </Tooltip>
-      )
+      ),
     },
     {
       title: t('settings.customToolEndpoint') || 'Endpoint',
       render: (_: any, record: ICustomHttpTool) => (
-        <div className="text-xs font-mono">
-          <span className="bg-fill-3 px-1 rounded mr-1 text-[10px]">{record.method}</span>
-          <span className="text-t-tertiary">{record.url}</span>
+        <div className='text-xs font-mono'>
+          <span className='bg-fill-3 px-1 rounded mr-1 text-[10px]'>{record.method}</span>
+          <span className='text-t-tertiary'>{record.url}</span>
         </div>
-      )
+      ),
     },
     {
       title: t('common.enabled') || 'Enabled',
       dataIndex: 'enabled',
       width: 80,
       render: (enabled: boolean, record: ICustomHttpTool) => (
-        <Switch
-          size="small"
-          checked={enabled}
-          onChange={(checked) => toggleTool(record.id, checked)}
-        />
-      )
+        <Switch size='small' checked={enabled} onChange={(checked) => toggleTool(record.id, checked)} />
+      ),
     },
     {
       title: t('common.operations') || 'Operations',
       width: 100,
       render: (_: any, record: ICustomHttpTool) => (
         <Space>
-          <Button
-            type="text"
-            size="mini"
-            icon={<Edit />}
-            onClick={() => handleEdit(record)}
-          />
+          <Button type='text' size='mini' icon={<Edit />} onClick={() => handleEdit(record)} />
           <Popconfirm
             title={t('settings.customToolDeleteConfirm') || 'Are you sure you want to delete this tool?'}
             onOk={() => deleteTool(record.id)}
           >
-            <Button
-              type="text"
-              size="mini"
-              status="danger"
-              icon={<Delete />}
-            />
+            <Button type='text' size='mini' status='danger' icon={<Delete />} />
           </Popconfirm>
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
   return (
-    <div className="flex flex-col gap-16px">
-      <div className="flex items-center justify-between">
-        <div className="flex flex-col gap-4px">
-          <span className="text-14px text-t-primary">{t('settings.customHttpTools') || 'Custom HTTP Tools'}</span>
-          <span className="text-12px text-t-secondary">
+    <div className='flex flex-col gap-16px'>
+      <div className='flex items-center justify-between'>
+        <div className='flex flex-col gap-4px'>
+          <span className='text-14px text-t-primary'>{t('settings.customHttpTools') || 'Custom HTTP Tools'}</span>
+          <span className='text-12px text-t-secondary'>
             {t('settings.customHttpToolsDesc') || 'Define custom HTTP endpoints that the AI can call as tools.'}
           </span>
         </div>
-        <Button type="outline" icon={<Plus />} shape="round" onClick={handleAdd}>
+        <Button type='outline' icon={<Plus />} shape='round' onClick={handleAdd}>
           {t('settings.addTool') || 'Add Tool'}
         </Button>
       </div>
 
       <Table
-        rowKey="id"
+        rowKey='id'
         columns={columns}
         data={tools}
         pagination={false}
-        className="border border-border-2 rounded-lg overflow-hidden"
+        className='border border-border-2 rounded-lg overflow-hidden'
         noDataElement={
-          <div className="py-24px text-center text-t-tertiary text-13px">
+          <div className='py-24px text-center text-t-tertiary text-13px'>
             {t('settings.noCustomTools') || 'No custom tools defined yet.'}
           </div>
         }

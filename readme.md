@@ -56,7 +56,7 @@
 
 **Forjinn-Desk is more than a chat client.** It's a Cowork platform where AI agents work alongside you on your computer — reading files, writing code, browsing the web, and automating tasks. You see everything the agent does, and you're always in control.
 
-|                                 | Traditional AI Chat Clients | **Forjinn-Desk (Cowork)**                                                                                                           |
+|                                 | Traditional AI Chat Clients | **Forjinn-Desk (Cowork)**                                                                                                     |
 | :------------------------------ | :-------------------------- | :---------------------------------------------------------------------------------------------------------------------------- |
 | AI can operate on your files    | Limited or No               | **Yes — built-in agent with full file access**                                                                                |
 | AI can execute multi-step tasks | Limited                     | **Yes — autonomous with your approval**                                                                                       |
@@ -186,14 +186,14 @@ Run multiple AI agents as an organized team: a **Leader** agent receives your in
 
 Other AI apps give you a chatbox with your API key. **Forjinn-Desk gives you a full Cowork agent.**
 
-| Your API Key                            | What You Get                                |
-| :-------------------------------------- | :------------------------------------------ |
-| Gemini API Key (or Google login — free) | Gemini-powered Cowork Agent                 |
-| OpenAI API Key                          | GPT-powered Cowork Agent                    |
-| Anthropic API Key                       | Claude-powered Cowork Agent                 |
+| Your API Key                            | What You Get                                   |
+| :-------------------------------------- | :--------------------------------------------- |
+| Gemini API Key (or Google login — free) | Gemini-powered Cowork Agent                    |
+| OpenAI API Key                          | GPT-powered Cowork Agent                       |
+| Anthropic API Key                       | Claude-powered Cowork Agent                    |
 | AWS Bedrock credentials                 | Bedrock-powered Agent via Aion CLI (forjinnrs) |
-| Ollama / LM Studio (local)              | Local model Cowork Agent                    |
-| NewAPI Gateway                          | Unified access to 20+ models                |
+| Ollama / LM Studio (local)              | Local model Cowork Agent                       |
+| NewAPI Gateway                          | Unified access to 20+ models                   |
 
 Same agent capabilities — file read/write, web search, image generation, tool use — regardless of which model powers it. Forjinn-Desk supports **20+ AI platforms** including cloud services and local deployments.
 
@@ -516,7 +516,7 @@ _Open multiple conversations, tasks don't get mixed up, independent memory, doub
 
 Forjinn-Desk is a **free and open-source Multi-AI Agent Desktop**. Compared to Claude Cowork which only runs on macOS and is locked to Claude, Forjinn-Desk is its full-model, cross-platform enhanced version.
 
-| Dimension     | Claude Cowork | Forjinn-Desk                                                            |
+| Dimension     | Claude Cowork | Forjinn-Desk                                                      |
 | :------------ | :------------ | :---------------------------------------------------------------- |
 | OS            | macOS Only    | macOS / Windows / Linux                                           |
 | Model Support | Claude Only   | Gemini, Claude, DeepSeek, OpenAI, Ollama, ...                     |

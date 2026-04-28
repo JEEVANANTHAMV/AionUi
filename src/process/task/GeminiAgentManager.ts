@@ -372,9 +372,7 @@ export class GeminiAgentManager extends BaseAgentManager<
       this.mcpFingerprint = GeminiAgentManager.computeMcpFingerprint(mcpServers, customHttpTools);
 
       const mcpConfig: Record<string, UiMcpServerConfig> = {};
-      const enabledServers = allServers.filter(
-        (server: IMcpServer) => server.enabled && server.status === 'connected'
-      );
+      const enabledServers = allServers.filter((server: IMcpServer) => server.enabled && server.status === 'connected');
 
       enabledServers.forEach((server: IMcpServer) => {
         const isStdio = server.transport.type === 'stdio';

@@ -389,7 +389,10 @@ export class WorkspaceSnapshotService {
   }
 
   private async createWorkingTreeSnapshot(workspacePath: string): Promise<string> {
-    const gitdir = path.join(os.tmpdir(), `forjinn-desk-snapshot-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+    const gitdir = path.join(
+      os.tmpdir(),
+      `forjinn-desk-snapshot-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+    );
     const gitArgs = [`--git-dir=${gitdir}`, `--work-tree=${workspacePath}`];
 
     await execFileAsync('git', ['init', '--bare', gitdir]);

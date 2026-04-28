@@ -230,8 +230,8 @@
 }
 /* MacBook aesthetics: Blue theme variables and global overrides */
 :root {
-  --primary-blue: #007AFF;
-  --primary-blue-hover: #0063CC;
+  --primary-blue: #007aff;
+  --primary-blue-hover: #0063cc;
   --primary-blue-alpha: rgba(0, 122, 255, 0.1);
   --primary-blue-glass: rgba(0, 122, 255, 0.05);
   --sidebar-bg: var(--color-bg-2);
@@ -299,7 +299,9 @@
 }
 
 /* Blue focus states */
-.arco-input:focus, .arco-textarea:focus, .arco-select-view:focus-within {
+.arco-input:focus,
+.arco-textarea:focus,
+.arco-select-view:focus-within {
   border-color: var(--primary-blue) !important;
   box-shadow: 0 0 0 3px var(--primary-blue-alpha) !important;
   transition: all 0.2s ease;

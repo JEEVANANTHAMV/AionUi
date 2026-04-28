@@ -24,7 +24,10 @@ function getFontDir() {
   const candidates = [
     process.env.FORJINN_DESK_FONTS_DIR,
     path.join(__dirname, '../../canvas-design/canvas-fonts'),
-    path.join(process.env.HOME || '', 'Library/Application Support/Forjinn-Desk/config/skills/canvas-design/canvas-fonts'),
+    path.join(
+      process.env.HOME || '',
+      'Library/Application Support/Forjinn-Desk/config/skills/canvas-design/canvas-fonts'
+    ),
     path.join(process.env.APPDATA || '', 'Forjinn-Desk/config/skills/canvas-design/canvas-fonts'),
   ].filter(Boolean);
 

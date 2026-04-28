@@ -15,6 +15,12 @@ import {
   Robot,
   Speed,
   System,
+  User,
+  Tool,
+  Plug,
+  Browser,
+  Windows,
+  Code,
 } from '@icon-park/react';
 import classNames from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -29,6 +35,9 @@ export const BUILTIN_TAB_IDS = [
   'model',
   'assistants',
   'capabilities',
+  'attachedAgents',
+  'tools',
+  'mcp',
   'display',
   'pet',
   'system',
@@ -150,6 +159,24 @@ const SettingsSider: React.FC<{ collapsed?: boolean; tooltipEnabled?: boolean }>
         label: t('settings.capabilities', { defaultValue: 'Capabilities' }),
         icon: <Lightning />,
         path: 'capabilities',
+      },
+      attachedAgents: {
+        id: 'attachedAgents',
+        label: t('settings.attachedAgents', { defaultValue: 'Attached Agents' }),
+        icon: <User />,
+        path: 'attached-agents',
+      },
+      tools: {
+        id: 'tools',
+        label: t('settings.tools', { defaultValue: 'Tools' }),
+        icon: <Tool />,
+        path: 'tools',
+      },
+      mcp: {
+        id: 'mcp',
+        label: t('settings.mcp', { defaultValue: 'MCP Servers' }),
+        icon: <Plug />,
+        path: 'mcp',
       },
       display: { id: 'display', label: t('settings.display'), icon: <Computer />, path: 'display' },
       pet: { id: 'pet', label: t('pet.desktopPet'), icon: <Cat />, path: 'pet' },

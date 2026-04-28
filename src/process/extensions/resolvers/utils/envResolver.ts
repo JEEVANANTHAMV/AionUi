@@ -16,7 +16,8 @@ let _globalStrictMode: boolean | undefined;
 
 export function isGlobalStrictMode(): boolean {
   if (_globalStrictMode === undefined) {
-    _globalStrictMode = process.env[FORJINN_DESK_STRICT_ENV_ENV] === '1' || process.env[FORJINN_DESK_STRICT_ENV_ENV] === 'true';
+    _globalStrictMode =
+      process.env[FORJINN_DESK_STRICT_ENV_ENV] === '1' || process.env[FORJINN_DESK_STRICT_ENV_ENV] === 'true';
   }
   return _globalStrictMode;
 }

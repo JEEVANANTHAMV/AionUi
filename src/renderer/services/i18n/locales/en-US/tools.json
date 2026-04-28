@@ -1,9 +1,58 @@
 {
+  "title": "Tools",
+  "subtitle": "Manage built-in and custom tools",
+  "builtinTab": "Built-in",
+  "customTab": "Custom",
+  "name": "Name",
+  "description": "Description",
+  "language": "Language",
+  "code": "Code",
+  "codePlaceholder": "Enter your tool code here...",
+  "statusLabel": "Status",
+  "actionsLabel": "Actions",
+  "enabled": "Enabled",
+  "disabled": "Disabled",
+  "status": {
+    "pending": "Pending",
+    "executing": "Executing",
+    "success": "Success",
+    "error": "Error",
+    "canceled": "Canceled"
+  },
+  "actions": {
+    "create": "create",
+    "modify": "modify",
+    "delete": "delete"
+  },
+  "addCustomTool": "Add Custom Tool",
+  "addTool": "Add Tool",
+  "editTool": "Edit Tool",
+  "deleteConfirmTitle": "Delete Tool",
+  "deleteConfirmContent": "Are you sure you want to delete '{{name}}'?",
+  "deleteSuccess": "Tool deleted successfully",
+  "deleteFailed": "Failed to delete tool",
+  "updateSuccess": "Tool updated successfully",
+  "createSuccess": "Tool created successfully",
+  "saveFailed": "Failed to save tool",
+  "fetchFailed": "Failed to fetch tools",
+  "toggleFailed": "Failed to toggle tool",
   "unknownFile": "Unknown file",
   "newFile": "New File",
   "deletedFile": "Deleted File",
   "modified": "Modified",
   "fileChanges": "File Changes",
+  "category": {
+    "fileOperations": "File Operations",
+    "codeOperations": "Code Operations",
+    "terminal": "Terminal",
+    "browser": "Browser",
+    "git": "Git",
+    "web": "Web",
+    "analysis": "Analysis",
+    "agentManagement": "Agent Management",
+    "custom": "Custom",
+    "mcp": "MCP"
+  },
   "shell": {
     "displayName": "Shell Command",
     "description": "Execute shell commands"
@@ -25,13 +74,6 @@
   "unknown": {
     "displayName": "Unknown Tool",
     "description": "Unknown tool type"
-  },
-  "status": {
-    "pending": "Pending",
-    "executing": "Executing",
-    "success": "Success",
-    "error": "Error",
-    "canceled": "Canceled"
   },
   "titles": {
     "web_search_started": "Web Search Started",
@@ -60,10 +102,5 @@
     "duration": "Duration: {{seconds}}",
     "auto_approved": "Auto-approved",
     "manual_approval": "Manual approval"
-  },
-  "actions": {
-    "create": "create",
-    "modify": "modify",
-    "delete": "delete"
   }
 }

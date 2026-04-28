@@ -539,7 +539,6 @@ const Layout: React.FC<{
         </div>
       </NavigationHistoryProvider>
     </LayoutContext.Provider>
-
   );
 };
 

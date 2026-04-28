@@ -217,7 +217,9 @@ export function initAcpConversationBridge(workerTaskManager: IWorkerTaskManager)
       if (!task) {
         return { success: false, msg: 'Conversation not found' };
       }
-      if (!(task instanceof AcpAgentManager || task instanceof GeminiAgentManager || task instanceof ForjinnrsManager)) {
+      if (
+        !(task instanceof AcpAgentManager || task instanceof GeminiAgentManager || task instanceof ForjinnrsManager)
+      ) {
         return {
           success: false,
           msg: 'Mode switching not supported for this agent type',

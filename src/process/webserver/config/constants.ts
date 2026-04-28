@@ -154,7 +154,10 @@ export const SERVER_CONFIG = {
  * would be spoofable. Use SERVER_BASE_URL or trust proxy + req.secure instead.
  */
 function detectHttps(req?: Request): boolean {
-  if (process.env.FORJINN_DESK_HTTPS === 'true' || (process.env.NODE_ENV === 'production' && process.env.HTTPS === 'true')) {
+  if (
+    process.env.FORJINN_DESK_HTTPS === 'true' ||
+    (process.env.NODE_ENV === 'production' && process.env.HTTPS === 'true')
+  ) {
     return true;
   }
 

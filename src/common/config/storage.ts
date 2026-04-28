@@ -103,6 +103,12 @@ export interface IConfigStorageRefer {
     switch?: boolean;
   };
   'tools.speechToText'?: SpeechToTextConfig;
+  // Custom tools configuration
+  'tools.custom'?: import('@/common/types/extendedTools').CustomToolConfig[];
+  // Offline MCP servers configuration
+  'offlineMcp.servers'?: import('@/common/types/offlineMcp').OfflineMcpServerConfig[];
+  // Summarization service configuration
+  'summarization.config'?: import('@/common/types/summarization').SummarizerAgentConfig;
   // 是否在粘贴文件到工作区时询问确认（true = 不再询问）
   'workspace.pasteConfirm'?: boolean;
   // 上传的文件是否保存到工作区目录（true = 保存到工作区，false = 保存到缓存目录）

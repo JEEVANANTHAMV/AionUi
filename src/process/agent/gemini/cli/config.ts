@@ -218,7 +218,9 @@ export async function loadCliConfig({
       if (allowedNames.size > 0) {
         mcpServersConfig = Object.fromEntries(
           // Team MCP servers (forjinn-desk-team-*) are always kept regardless of allowlist
-          Object.entries(mcpServersConfig).filter(([key]) => key.startsWith('forjinn-desk-team-') || allowedNames.has(key))
+          Object.entries(mcpServersConfig).filter(
+            ([key]) => key.startsWith('forjinn-desk-team-') || allowedNames.has(key)
+          )
         );
       }
     }
@@ -228,7 +230,9 @@ export async function loadCliConfig({
       if (excludedNames.size > 0) {
         mcpServersConfig = Object.fromEntries(
           // Team MCP servers (forjinn-desk-team-*) are never excluded
-          Object.entries(mcpServersConfig).filter(([key]) => key.startsWith('forjinn-desk-team-') || !excludedNames.has(key))
+          Object.entries(mcpServersConfig).filter(
+            ([key]) => key.startsWith('forjinn-desk-team-') || !excludedNames.has(key)
+          )
         );
       }
     }

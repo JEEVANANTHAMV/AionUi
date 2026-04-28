@@ -16,6 +16,9 @@ const SystemSettings = React.lazy(() => import('@renderer/pages/settings/SystemS
 const WebuiSettings = React.lazy(() => import('@renderer/pages/settings/WebuiSettings'));
 const PetSettings = React.lazy(() => import('@renderer/pages/settings/PetSettings'));
 const ExtensionSettingsPage = React.lazy(() => import('@renderer/pages/settings/ExtensionSettingsPage'));
+const AttachedAgentsSettings = React.lazy(() => import('@renderer/pages/settings/AttachedAgentsSettings'));
+const ToolsSettings = React.lazy(() => import('@renderer/pages/settings/ToolsSettings'));
+const McpSettings = React.lazy(() => import('@renderer/pages/settings/McpSettings'));
 const LoginPage = React.lazy(() => import('@renderer/pages/login'));
 const ComponentsShowcase = React.lazy(() => import('@renderer/pages/TestShowcase'));
 const ScheduledTasksPage = React.lazy(() => import('@renderer/pages/cron/ScheduledTasksPage'));
@@ -68,7 +71,9 @@ const PanelRoute: React.FC<{ layout: React.ReactElement }> = ({ layout }) => {
           <Route path='/settings/capabilities' element={withRouteFallback(CapabilitiesSettings)} />
           {/* Legacy routes — redirect to the merged /settings/capabilities page */}
           <Route path='/settings/skills-hub' element={<Navigate to='/settings/capabilities?tab=skills' replace />} />
-          <Route path='/settings/tools' element={<Navigate to='/settings/capabilities?tab=tools' replace />} />
+          <Route path='/settings/attached-agents' element={withRouteFallback(AttachedAgentsSettings)} />
+          <Route path='/settings/tools' element={withRouteFallback(ToolsSettings)} />
+          <Route path='/settings/mcp' element={withRouteFallback(McpSettings)} />
           <Route path='/settings/display' element={withRouteFallback(DisplaySettings)} />
           <Route path='/settings/webui' element={withRouteFallback(WebuiSettings)} />
           <Route path='/settings/pet' element={withRouteFallback(PetSettings)} />

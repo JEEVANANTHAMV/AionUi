@@ -1156,6 +1156,140 @@ export interface IExtensionAgentActivitySnapshot {
   agents: IExtensionAgentActivityItem[];
 }
 
+// Attached Agents API
+export const attachedAgents = {
+  getAllConfigs: bridge.buildProvider<IBridgeResponse<import('../types/attachedAgents').AttachedAgentConfig[]>, void>(
+    'attached-agents.get-all-configs'
+  ),
+  getAllStates: bridge.buildProvider<IBridgeResponse<import('../types/attachedAgents').AttachedAgentState[]>, void>(
+    'attached-agents.get-all-states'
+  ),
+  getConfig: bridge.buildProvider<IBridgeResponse<import('../types/attachedAgents').AttachedAgentConfig>, string>(
+    'attached-agents.get-config'
+  ),
+  getState: bridge.buildProvider<IBridgeResponse<import('../types/attachedAgents').AttachedAgentState>, string>(
+    'attached-agents.get-state'
+  ),
+  updateConfig: bridge.buildProvider<
+    IBridgeResponse<import('../types/attachedAgents').AttachedAgentConfig>,
+    { agentId: string; updates: Partial<import('../types/attachedAgents').AttachedAgentConfig> }
+  >('attached-agents.update-config'),
+  startAgent: bridge.buildProvider<IBridgeResponse, string>('attached-agents.start-agent'),
+  stopAgent: bridge.buildProvider<IBridgeResponse, string>('attached-agents.stop-agent'),
+  executeTask: bridge.buildProvider<
+    IBridgeResponse<import('../types/attachedAgents').AttachedAgentTaskResponse>,
+    import('../types/attachedAgents').AttachedAgentTaskRequest
+  >('attached-agents.execute-task'),
+  getCapabilities: bridge.buildProvider<
+    IBridgeResponse<import('../types/attachedAgents').AttachedAgentCapabilities>,
+    string
+  >('attached-agents.get-capabilities'),
+};
+
+// Extended Tools API
+export const extendedTools = {
+  getAllTools: bridge.buildProvider<IBridgeResponse<import('../types/extendedTools').ExtendedToolDefinition[]>, void>(
+    'extended-tools.get-all-tools'
+  ),
+  getToolsByCategory: bridge.buildProvider<
+    IBridgeResponse<import('../types/extendedTools').ExtendedToolDefinition[]>,
+    import('../types/extendedTools').ExtendedToolCategory
+  >('extended-tools.get-tools-by-category'),
+  getTool: bridge.buildProvider<IBridgeResponse<import('../types/extendedTools').ExtendedToolDefinition>, string>(
+    'extended-tools.get-tool'
+  ),
+  getEnabledTools: bridge.buildProvider<
+    IBridgeResponse<import('../types/extendedTools').ExtendedToolDefinition[]>,
+    void
+  >('extended-tools.get-enabled-tools'),
+  createCustomTool: bridge.buildProvider<
+    IBridgeResponse<import('../types/extendedTools').CustomToolConfig>,
+    Omit<import('../types/extendedTools').CustomToolConfig, 'id' | 'createdAt' | 'updatedAt'>
+  >('extended-tools.create-custom-tool'),
+  updateCustomTool: bridge.buildProvider<
+    IBridgeResponse<import('../types/extendedTools').CustomToolConfig>,
+    { id: string; updates: Partial<import('../types/extendedTools').CustomToolConfig> }
+  >('extended-tools.update-custom-tool'),
+  deleteCustomTool: bridge.buildProvider<IBridgeResponse, string>('extended-tools.delete-custom-tool'),
+  toggleTool: bridge.buildProvider<IBridgeResponse, { toolId: string; enabled: boolean }>('extended-tools.toggle-tool'),
+  executeTool: bridge.buildProvider<
+    IBridgeResponse<import('../types/extendedTools').ToolExecutionResult>,
+    { toolId: string; params: Record<string, unknown> }
+  >('extended-tools.execute-tool'),
+  getRegistryState: bridge.buildProvider<IBridgeResponse<import('../types/extendedTools').ToolRegistryState>, void>(
+    'extended-tools.get-registry-state'
+  ),
+  getExecutionHistory: bridge.buildProvider<
+    IBridgeResponse<import('../types/extendedTools').ToolExecutionResult[]>,
+    void
+  >('extended-tools.get-execution-history'),
+};
+
+// Offline MCP API
+export const offlineMcp = {
+  getAllConfigs: bridge.buildProvider<IBridgeResponse<import('../types/offlineMcp').OfflineMcpServerConfig[]>, void>(
+    'offline-mcp.get-all-configs'
+  ),
+  getAllStates: bridge.buildProvider<IBridgeResponse<import('../types/offlineMcp').McpServerRuntimeState[]>, void>(
+    'offline-mcp.get-all-states'
+  ),
+  getConfig: bridge.buildProvider<IBridgeResponse<import('../types/offlineMcp').OfflineMcpServerConfig>, string>(
+    'offline-mcp.get-config'
+  ),
+  getState: bridge.buildProvider<IBridgeResponse<import('../types/offlineMcp').McpServerRuntimeState>, string>(
+    'offline-mcp.get-state'
+  ),
+  updateConfig: bridge.buildProvider<
+    IBridgeResponse<import('../types/offlineMcp').OfflineMcpServerConfig>,
+    { serverId: string; updates: Partial<import('../types/offlineMcp').OfflineMcpServerConfig> }
+  >('offline-mcp.update-config'),
+  ensureBundle: bridge.buildProvider<IBridgeResponse, string>('offline-mcp.ensure-bundle'),
+  startServer: bridge.buildProvider<IBridgeResponse, string>('offline-mcp.start-server'),
+  stopServer: bridge.buildProvider<IBridgeResponse, string>('offline-mcp.stop-server'),
+  restartServer: bridge.buildProvider<IBridgeResponse, string>('offline-mcp.restart-server'),
+  discoverTools: bridge.buildProvider<IBridgeResponse<import('../types/offlineMcp').OfflineMcpTool[]>, string>(
+    'offline-mcp.discover-tools'
+  ),
+  startAutoStartServers: bridge.buildProvider<IBridgeResponse, void>('offline-mcp.start-auto-start-servers'),
+};
+
+// Summarization API
+export const summarization = {
+  getConfig: bridge.buildProvider<IBridgeResponse<import('../types/summarization').SummarizerAgentConfig>, void>(
+    'summarization.get-config'
+  ),
+  updateConfig: bridge.buildProvider<
+    IBridgeResponse<import('../types/summarization').SummarizerAgentConfig>,
+    Partial<import('../types/summarization').SummarizerAgentConfig>
+  >('summarization.update-config'),
+  estimateTokens: bridge.buildProvider<IBridgeResponse<number>, string>('summarization.estimate-tokens'),
+  determineStrategy: bridge.buildProvider<IBridgeResponse<import('../types/summarization').TokenEstimate>, number>(
+    'summarization.determine-strategy'
+  ),
+  createJob: bridge.buildProvider<
+    IBridgeResponse<import('../types/summarization').SummarizationJob>,
+    { filePath: string; content: string }
+  >('summarization.create-job'),
+  getJob: bridge.buildProvider<IBridgeResponse<import('../types/summarization').SummarizationJob>, string>(
+    'summarization.get-job'
+  ),
+  getAllJobs: bridge.buildProvider<IBridgeResponse<import('../types/summarization').SummarizationJob[]>, void>(
+    'summarization.get-all-jobs'
+  ),
+  executeJob: bridge.buildProvider<IBridgeResponse<import('../types/summarization').SummarizationResult>, string>(
+    'summarization.execute-job'
+  ),
+  cancelJob: bridge.buildProvider<IBridgeResponse, string>('summarization.cancel-job'),
+  deleteJob: bridge.buildProvider<IBridgeResponse, string>('summarization.delete-job'),
+  summarizeText: bridge.buildProvider<IBridgeResponse<import('../types/summarization').SummarizationResult>, string>(
+    'summarization.summarize-text'
+  ),
+  summarizeFile: bridge.buildProvider<
+    IBridgeResponse<import('../types/summarization').SummarizationResult>,
+    { filePath: string; content: string }
+  >('summarization.summarize-file'),
+};
+
 export const extensions = {
   /** Get all extension-contributed CSS themes */
   getThemes: bridge.buildProvider<ICssTheme[], void>('extensions.get-themes'),

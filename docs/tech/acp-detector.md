@@ -171,12 +171,12 @@ which <command>
 
 **不参与 CLI 检测的 backend：**
 
-| Backend ID | 原因                                |
-| ---------- | ----------------------------------- |
-| `gemini`   | 内置 agent，始终可用，无需 CLI 检测 |
-| `custom`   | 用户自定义，无 `cliCommand`         |
-| `forjinnrs`   | 非 ACP 协议（JSON Lines），显式排除 |
-| `remote`   | 无本地 CLI，通过 WebSocket URL 连接 |
+| Backend ID  | 原因                                |
+| ----------- | ----------------------------------- |
+| `gemini`    | 内置 agent，始终可用，无需 CLI 检测 |
+| `custom`    | 用户自定义，无 `cliCommand`         |
+| `forjinnrs` | 非 ACP 协议（JSON Lines），显式排除 |
+| `remote`    | 无本地 CLI，通过 WebSocket URL 连接 |
 
 ## 合并与去重
 
@@ -535,20 +535,20 @@ AcpConnection.disconnect()
 
 ## 涉及的模块总览
 
-| 模块                    | 文件                       | 职责                                              |
-| ----------------------- | -------------------------- | ------------------------------------------------- |
-| `AcpDetector`           | `AcpDetector.ts`           | 检测系统已安装的 CLI agents                       |
-| `acpConversationBridge` | `acpConversationBridge.ts` | renderer ↔ main 进程的 IPC 桥接                   |
-| `AcpAgentManager`       | `AcpAgentManager.ts`       | 任务生命周期管理：创建 Agent、持久化、IPC 事件    |
-| `AcpAgent`              | `index.ts`                 | 编排连接/认证/会话/消息流程；权限、模型切换       |
-| `AcpConnection`         | `AcpConnection.ts`         | 核心协议：子进程管理、JSON-RPC 收发、session 状态 |
-| `acpConnectors`         | `acpConnectors.ts`         | 各 backend 的 spawn 逻辑、环境准备、npx Phase 1/2 |
-| `AcpAdapter`            | `AcpAdapter.ts`            | ACP session update → Forjinn-Desk TMessage 格式转换     |
-| `ApprovalStore`         | `ApprovalStore.ts`         | 会话级 "always allow" 权限缓存                    |
-| `utils`                 | `utils.ts`                 | JSON-RPC stdin 写入、进程终止、文件 I/O           |
-| `mcpSessionConfig`      | `mcpSessionConfig.ts`      | 构建 session/new 的 MCP server 列表               |
-| `modelInfo`             | `modelInfo.ts`             | 从 configOptions/models 提取模型信息              |
-| `constants`             | `constants.ts`             | 各 backend 的 YOLO mode 字符串                    |
+| 模块                    | 文件                       | 职责                                                |
+| ----------------------- | -------------------------- | --------------------------------------------------- |
+| `AcpDetector`           | `AcpDetector.ts`           | 检测系统已安装的 CLI agents                         |
+| `acpConversationBridge` | `acpConversationBridge.ts` | renderer ↔ main 进程的 IPC 桥接                     |
+| `AcpAgentManager`       | `AcpAgentManager.ts`       | 任务生命周期管理：创建 Agent、持久化、IPC 事件      |
+| `AcpAgent`              | `index.ts`                 | 编排连接/认证/会话/消息流程；权限、模型切换         |
+| `AcpConnection`         | `AcpConnection.ts`         | 核心协议：子进程管理、JSON-RPC 收发、session 状态   |
+| `acpConnectors`         | `acpConnectors.ts`         | 各 backend 的 spawn 逻辑、环境准备、npx Phase 1/2   |
+| `AcpAdapter`            | `AcpAdapter.ts`            | ACP session update → Forjinn-Desk TMessage 格式转换 |
+| `ApprovalStore`         | `ApprovalStore.ts`         | 会话级 "always allow" 权限缓存                      |
+| `utils`                 | `utils.ts`                 | JSON-RPC stdin 写入、进程终止、文件 I/O             |
+| `mcpSessionConfig`      | `mcpSessionConfig.ts`      | 构建 session/new 的 MCP server 列表                 |
+| `modelInfo`             | `modelInfo.ts`             | 从 configOptions/models 提取模型信息                |
+| `constants`             | `constants.ts`             | 各 backend 的 YOLO mode 字符串                      |
 
 ---
 

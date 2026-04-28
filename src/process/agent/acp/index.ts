@@ -1520,7 +1520,9 @@ export class AcpAgent {
     // Derive teamId from injected team MCP server name (format: forjinn-desk-team-<teamId>)
     // Only emit MCP status events when running inside a team session.
     const teamMcpName = this.extra.teamMcpStdioConfig?.name;
-    const teamId = teamMcpName?.startsWith('forjinn-desk-team-') ? teamMcpName.slice('forjinn-desk-team-'.length) : undefined;
+    const teamId = teamMcpName?.startsWith('forjinn-desk-team-')
+      ? teamMcpName.slice('forjinn-desk-team-'.length)
+      : undefined;
     const slotId = this.id;
 
     const emitMcpStatus = teamId

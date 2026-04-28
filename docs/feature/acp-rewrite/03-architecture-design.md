@@ -1346,12 +1346,12 @@ interface IAcpSessionRepository {
 
 Forjinn-Desk 支持 4 类 Agent 来源，全部通过 2 种 AcpClient 实现覆盖：
 
-| Agent 来源         | 启动方式                                     | AcpClient 实现     | 示例                  |
-| ------------------ | -------------------------------------------- | ------------------ | --------------------- |
-| 内置 agent         | 资源目录下的二进制，路径已知                 | ProcessAcpClient   | goose, gemini, forjinnrs |
-| Hub 安装的 agent   | AionHub 安装到固定目录 (`~/.forjinn-desk-agents/`) | ProcessAcpClient   | 社区 agent            |
-| npm 包分发的 agent | 内置 bun/bunx 启动                           | ProcessAcpClient   | Claude, Codex         |
-| 远程 agent         | WebSocket                                    | WebSocketAcpClient | 云端 agent            |
+| Agent 来源         | 启动方式                                           | AcpClient 实现     | 示例                     |
+| ------------------ | -------------------------------------------------- | ------------------ | ------------------------ |
+| 内置 agent         | 资源目录下的二进制，路径已知                       | ProcessAcpClient   | goose, gemini, forjinnrs |
+| Hub 安装的 agent   | AionHub 安装到固定目录 (`~/.forjinn-desk-agents/`) | ProcessAcpClient   | 社区 agent               |
+| npm 包分发的 agent | 内置 bun/bunx 启动                                 | ProcessAcpClient   | Claude, Codex            |
+| 远程 agent         | WebSocket                                          | WebSocketAcpClient | 云端 agent               |
 
 **关键约束**:
 
