@@ -31,8 +31,17 @@ if (!app.isPackaged) {
 const isWebUI = process.argv.some((arg) => arg === '--webui');
 const isResetPassword = process.argv.includes('--resetpass');
 
-// Only configure flags for WebUI and --resetpass modes
-// 仅为 WebUI 和重置密码模式配置参数
+// Configure Chromium command-line flags for all modes
+// 为所有模式配置 Chromium 命令行参数
+
+// For root user, disable sandbox to prevent crash (applies to all modes)
+// 对于 root 用户，禁用沙箱以防止崩溃（适用于所有模式）
+if (typeof process.getuid === 'function' && process.getuid() === 0) {
+  app.commandLine.appendSwitch('no-sandbox');
+}
+
+// Only configure additional flags for WebUI and --resetpass modes
+// 仅为 WebUI 和重置密码模式配置额外参数
 if (isWebUI || isResetPassword) {
   // In WebUI/reset-password mode on Linux, force headless Ozone backend.
   // This mode should never depend on X11/Wayland availability.
@@ -45,12 +54,6 @@ if (isWebUI || isResetPassword) {
     app.commandLine.appendSwitch('ozone-platform', 'headless');
     app.commandLine.appendSwitch('disable-gpu');
     app.commandLine.appendSwitch('disable-software-rasterizer');
-  }
-
-  // For root user, disable sandbox to prevent crash
-  // 对于 root 用户，禁用沙箱以防止崩溃
-  if (typeof process.getuid === 'function' && process.getuid() === 0) {
-    app.commandLine.appendSwitch('no-sandbox');
   }
 }
 

@@ -68,7 +68,7 @@ export default defineConfig({
     cssCodeSplit: true,
     rollupOptions: {
       input: { index: resolve('src/renderer/index.html') },
-      external: ['node:crypto', 'crypto'],
+      external: ['node:crypto', 'crypto', '@sentry/electron'],
       output: {
         manualChunks(id: string) {
           if (!id.includes('node_modules')) return undefined;
