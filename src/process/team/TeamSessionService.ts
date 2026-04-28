@@ -34,7 +34,7 @@ export class TeamSessionService {
     private readonly repo: ITeamRepository,
     private readonly workerTaskManager: IWorkerTaskManager,
     private readonly conversationService: IConversationService
-  ) { }
+  ) {}
 
   /**
    * Returns the workspace path as-is, or empty string when not specified.

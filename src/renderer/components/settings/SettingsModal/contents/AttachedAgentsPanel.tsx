@@ -35,7 +35,6 @@ const statusColors: Record<AttachedAgentStatus, 'default' | 'error' | 'warning' 
 const AgentCard: React.FC<AgentCardProps> = ({ config, state, onStart, onStop, onConfigure }) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
-  const metadata = ATTACHED_AGENT_METADATA[config.type];
 
   const handleStart = async () => {
     setLoading(true);
@@ -64,79 +63,90 @@ const AgentCard: React.FC<AgentCardProps> = ({ config, state, onStart, onStop, o
   const getIcon = () => {
     switch (config.type) {
       case AttachedAgentType.OPENCODE:
-        return <Code theme='outline' size='32' />;
+        return <Code theme='outline' size='24' />;
       case AttachedAgentType.WINDOWS_MCP:
-        return <Windows theme='outline' size='32' />;
+        return <Windows theme='outline' size='24' />;
       case AttachedAgentType.BROWSER_CONTROL:
-        return <Browser theme='outline' size='32' />;
+        return <Browser theme='outline' size='24' />;
       default:
-        return <Code theme='outline' size='32' />;
+        return <Code theme='outline' size='24' />;
     }
   };
 
   const isRunning = state.status === AttachedAgentStatus.RUNNING || state.status === AttachedAgentStatus.BUSY;
 
   return (
-    <Card
-      className={styles.agentCard}
-      title={
-        <div className={styles.cardHeader}>
-          <div className={styles.cardTitle}>
-            {getIcon()}
+    <Card className={styles.agentCard} bordered={false}>
+      <div className={styles.cardHeader}>
+        <div className={`${styles.cardIconWrapper} ${styles[config.type]}`}>{getIcon()}</div>
+        <div className={styles.cardTitleSection}>
+          <div className={styles.agentNameRow}>
             <span className={styles.agentName}>{config.name}</span>
+            <Badge
+              status={statusColors[state.status]}
+              text={t(`attachedAgents.status.${state.status}`)}
+              className={isRunning ? styles.pulseBadge : ''}
+            />
           </div>
-          <Badge status={statusColors[state.status]} text={t(`attachedAgents.status.${state.status}`)} />
+          <p className={styles.description}>{config.description}</p>
         </div>
-      }
-      extra={<Button type='text' icon={<Setting theme='outline' size='16' />} onClick={() => onConfigure(config.id)} />}
-    >
-      <div className={styles.cardContent}>
-        <p className={styles.description}>{config.description}</p>
+      </div>
 
-        {state.error && <div className={styles.errorMessage}>{state.error}</div>}
+      {state.error && <div className={styles.errorMessage}>{state.error}</div>}
 
-        {state.status === AttachedAgentStatus.RUNNING && (
-          <div className={styles.statusInfo}>
-            <span>
-              {t('attachedAgents.startedAt')}: {state.startedAt ? new Date(state.startedAt).toLocaleString() : '-'}
+      {state.status === AttachedAgentStatus.RUNNING && (
+        <div className={styles.statusInfo}>
+          <div className={styles.statusInfoItem}>
+            <span className={styles.infoLabel}>{t('attachedAgents.startedAt')}:</span>
+            <span className={styles.infoValue}>
+              {state.startedAt ? new Date(state.startedAt).toLocaleString() : '-'}
             </span>
-            <span>
-              {t('attachedAgents.taskCount')}: {state.taskCount}
-            </span>
-            {state.lastTask && (
-              <span>
-                {t('attachedAgents.lastTask')}: {state.lastTask}
-              </span>
-            )}
           </div>
-        )}
-
-        <div className={styles.cardActions}>
-          {isRunning ? (
-            <Button
-              type='primary'
-              status='danger'
-              icon={<Pause theme='outline' size='16' />}
-              onClick={handleStop}
-              loading={loading}
-            >
-              {t('attachedAgents.stop')}
-            </Button>
-          ) : (
-            <Button
-              type='primary'
-              icon={<Play theme='outline' size='16' />}
-              onClick={handleStart}
-              loading={loading}
-              disabled={state.status === AttachedAgentStatus.STARTING}
-            >
-              {t('attachedAgents.start')}
-            </Button>
+          <div className={styles.statusInfoItem}>
+            <span className={styles.infoLabel}>{t('attachedAgents.taskCount')}:</span>
+            <span className={styles.infoValue}>{state.taskCount}</span>
+          </div>
+          {state.lastTask && (
+            <div className={styles.statusInfoItem}>
+              <span className={styles.infoLabel}>{t('attachedAgents.lastTask')}:</span>
+              <span className={styles.infoValue}>{state.lastTask}</span>
+            </div>
           )}
-          <Button type='secondary' icon={<Reload theme='outline' size='16' />} onClick={() => onConfigure(config.id)}>
-            {t('attachedAgents.configure')}
-          </Button>
         </div>
+      )}
+
+      <div className={styles.cardFooter}>
+        <Button
+          type='secondary'
+          icon={<Setting theme='outline' size='16' />}
+          onClick={() => onConfigure(config.id)}
+          className={styles.configBtn}
+        >
+          {t('attachedAgents.configure')}
+        </Button>
+        {isRunning ? (
+          <Button
+            type='primary'
+            status='danger'
+            icon={<Pause theme='outline' size='16' />}
+            onClick={handleStop}
+            loading={loading}
+            className={styles.actionBtn}
+          >
+            {t('attachedAgents.stop')}
+          </Button>
+        ) : (
+          <Button
+            type='primary'
+            icon={<Play theme='outline' size='16' />}
+            onClick={handleStart}
+            loading={loading}
+            disabled={state.status === AttachedAgentStatus.STARTING}
+            className={styles.actionBtn}
+          >
+            {t('attachedAgents.start')}
+          </Button>
+        )}
       </div>
     </Card>
   );

@@ -364,19 +364,13 @@ const AssistantSelectionArea: React.FC<AssistantSelectionAreaProps> = ({
                     const strippedId = assistant.id.replace(/^builtin-/, '');
                     const idLogo = CUSTOM_AVATAR_IMAGE_MAP[strippedId];
                     if (idLogo) {
-                      return (
-                        <img
-                          src={idLogo}
-                          alt=''
-                          width={16}
-                          height={16}
-                          style={{ objectFit: 'contain' }}
-                        />
-                      );
+                      return <img src={idLogo} alt='' width={16} height={16} style={{ objectFit: 'contain' }} />;
                     }
 
                     if (IconComponent) {
-                      return <IconComponent theme='multi-color' size={16} fill={['#333', '#2F88FF', '#FFF', '#43CCF8']} />;
+                      return (
+                        <IconComponent theme='multi-color' size={16} fill={['#333', '#2F88FF', '#FFF', '#43CCF8']} />
+                      );
                     }
                     if (isImageAvatar) {
                       return (

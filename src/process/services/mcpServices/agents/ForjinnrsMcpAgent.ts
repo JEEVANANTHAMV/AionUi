@@ -84,16 +84,16 @@ function toMcpServer(name: string, config: ForjinnrsServerConfig): IMcpServer {
   const transport: IMcpServerTransport =
     transportType === 'stdio'
       ? {
-        type: 'stdio',
-        command: config.command || '',
-        args: config.args || [],
-        env: config.env || {},
-      }
+          type: 'stdio',
+          command: config.command || '',
+          args: config.args || [],
+          env: config.env || {},
+        }
       : {
-        type: transportType,
-        url: config.url || '',
-        headers: config.headers || {},
-      };
+          type: transportType,
+          url: config.url || '',
+          headers: config.headers || {},
+        };
 
   return {
     id: `forjinnrs_${name}`,

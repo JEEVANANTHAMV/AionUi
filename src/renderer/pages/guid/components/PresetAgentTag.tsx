@@ -91,12 +91,21 @@ const PresetAgentTag: React.FC<PresetAgentTagProps> = ({
         }
 
         if (isImageAvatar) {
-          return <img src={avatarImage} alt='' width={15} height={15} style={{ objectFit: 'contain', flexShrink: 0 }} />;
+          return (
+            <img src={avatarImage} alt='' width={15} height={15} style={{ objectFit: 'contain', flexShrink: 0 }} />
+          );
         }
         if (avatarValue) {
           return <span style={{ fontSize: 14, lineHeight: '15px', flexShrink: 0 }}>{avatarValue}</span>;
         }
-        return <Robot theme='multi-color' size={15} fill={['#333', '#2F88FF', '#FFF', '#43CCF8']} style={{ flexShrink: 0 }} />;
+        return (
+          <Robot
+            theme='multi-color'
+            size={15}
+            fill={['#333', '#2F88FF', '#FFF', '#43CCF8']}
+            style={{ flexShrink: 0 }}
+          />
+        );
       })()}
       <span className={styles.presetAgentTagName}>{name}</span>
     </div>

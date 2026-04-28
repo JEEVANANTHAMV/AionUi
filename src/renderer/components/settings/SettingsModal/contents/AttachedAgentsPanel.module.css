@@ -1,102 +1,218 @@
 .container {
-  padding: 16px;
+  padding: 24px;
   height: 100%;
   overflow-y: auto;
-}
-
-.loadingContainer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  min-height: 400px;
+  background: var(--color-bg-1);
 }
 
 .header {
-  margin-bottom: 24px;
+  margin-bottom: 32px;
 }
 
 .title {
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 700;
   margin: 0 0 8px;
   color: var(--color-text-1);
+  letter-spacing: -0.5px;
 }
 
 .subtitle {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--color-text-3);
   margin: 0;
 }
 
 .agentsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 24px;
 }
 
 .agentCard {
-  transition: all 0.2s ease;
+  background: var(--color-bg-2);
+  border: 1px solid var(--color-border-2);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 220px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+  position: relative;
+  overflow: hidden;
+}
+
+.agentCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--color-primary-light-1), var(--color-primary));
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .agentCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+  border-color: var(--color-primary-light-3);
+}
+
+.agentCard:hover::before {
+  opacity: 1;
 }
 
 .cardHeader {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
-.cardTitle {
+.cardIconWrapper {
   display: flex;
   align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--color-fill-2);
+  color: var(--color-primary);
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.agentCard:hover .cardIconWrapper {
+  transform: scale(1.05);
+}
+
+.cardIconWrapper.opencode {
+  background: var(--color-primary-light-1);
+  color: var(--color-primary);
+}
+
+.cardIconWrapper.windows_mcp {
+  background: var(--color-success-light-1);
+  color: var(--color-success);
+}
+
+.cardIconWrapper.browser_control {
+  background: var(--color-warning-light-1);
+  color: var(--color-warning);
+}
+
+.cardTitleSection {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.agentNameRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 12px;
+  margin-bottom: 6px;
 }
 
 .agentName {
-  font-weight: 500;
-  font-size: 16px;
-}
-
-.cardContent {
-  padding: 8px 0;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--color-text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .description {
   font-size: 14px;
   color: var(--color-text-2);
-  margin: 0 0 16px;
+  margin: 0;
   line-height: 1.5;
 }
 
 .errorMessage {
-  background-color: var(--color-danger-light);
+  background-color: var(--color-danger-light-1);
   color: var(--color-danger);
-  padding: 12px;
-  border-radius: 4px;
+  padding: 10px 14px;
+  border-radius: 8px;
   font-size: 13px;
   margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .statusInfo {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  font-size: 12px;
+  gap: 6px;
+  font-size: 13px;
   color: var(--color-text-3);
-  margin-bottom: 16px;
-  padding: 12px;
-  background-color: var(--color-fill-2);
-  border-radius: 4px;
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background-color: var(--color-fill-1);
+  border-radius: 10px;
+  border: 1px solid var(--color-border-1);
 }
 
-.cardActions {
+.statusInfoItem {
   display: flex;
-  gap: 8px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.infoLabel {
+  color: var(--color-text-3);
+}
+
+.infoValue {
+  color: var(--color-text-2);
+  font-weight: 500;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
   justify-content: flex-end;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border-1);
+}
+
+.configBtn {
+  color: var(--color-text-3) !important;
+}
+
+.configBtn:hover {
+  color: var(--color-primary) !important;
+  background-color: var(--color-fill-2) !important;
+}
+
+.actionBtn {
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  padding: 0 16px !important;
+}
+
+.pulseBadge {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
 }
 
 @media (max-width: 768px) {

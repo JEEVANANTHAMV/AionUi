@@ -186,14 +186,14 @@ Run multiple AI agents as an organized team: a **Leader** agent receives your in
 
 Other AI apps give you a chatbox with your API key. **Forjinn-Desk gives you a full Cowork agent.**
 
-| Your API Key                            | What You Get                                   |
-| :-------------------------------------- | :--------------------------------------------- |
-| Gemini API Key (or Google login — free) | Gemini-powered Cowork Agent                    |
-| OpenAI API Key                          | GPT-powered Cowork Agent                       |
-| Anthropic API Key                       | Claude-powered Cowork Agent                    |
+| Your API Key                            | What You Get                                      |
+| :-------------------------------------- | :------------------------------------------------ |
+| Gemini API Key (or Google login — free) | Gemini-powered Cowork Agent                       |
+| OpenAI API Key                          | GPT-powered Cowork Agent                          |
+| Anthropic API Key                       | Claude-powered Cowork Agent                       |
 | AWS Bedrock credentials                 | Bedrock-powered Agent via Forjinn CLI (forjinnrs) |
-| Ollama / LM Studio (local)              | Local model Cowork Agent                       |
-| NewAPI Gateway                          | Unified access to 20+ models                   |
+| Ollama / LM Studio (local)              | Local model Cowork Agent                          |
+| NewAPI Gateway                          | Unified access to 20+ models                      |
 
 Same agent capabilities — file read/write, web search, image generation, tool use — regardless of which model powers it. Forjinn-Desk supports **20+ AI platforms** including cloud services and local deployments.
 

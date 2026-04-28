@@ -162,10 +162,10 @@ export const useGuidSend = (deps: GuidSendDeps): GuidSendResult => {
           presetAgentType: finalEffectiveAgentType,
           presetResources: isPreset
             ? {
-              rules: presetRules,
-              enabledSkills,
-              excludeBuiltinSkills,
-            }
+                rules: presetRules,
+                enabledSkills,
+                excludeBuiltinSkills,
+              }
             : undefined,
           sessionMode: selectedMode,
           extra: {
@@ -173,7 +173,7 @@ export const useGuidSend = (deps: GuidSendDeps): GuidSendResult => {
             excludeBuiltinSkills,
             webSearchEngine:
               placeholderModel.platform === 'gemini-with-google-auth' ||
-                placeholderModel.platform === 'gemini-vertex-ai'
+              placeholderModel.platform === 'gemini-vertex-ai'
                 ? 'google'
                 : 'default',
           },
@@ -404,10 +404,10 @@ export const useGuidSend = (deps: GuidSendDeps): GuidSendResult => {
         presetAgentType: finalEffectiveAgentType,
         presetResources: isPreset
           ? {
-            rules: presetRules,
-            enabledSkills,
-            excludeBuiltinSkills,
-          }
+              rules: presetRules,
+              enabledSkills,
+              excludeBuiltinSkills,
+            }
           : undefined,
         sessionMode: selectedMode,
         currentModelId: selectedAcpModel || undefined,
@@ -423,9 +423,9 @@ export const useGuidSend = (deps: GuidSendDeps): GuidSendResult => {
           cachedConfigOptions.length > 0
             ? Object.keys(pendingConfigOptions).length > 0
               ? cachedConfigOptions.map((opt) => {
-                const pending = opt.id ? pendingConfigOptions[opt.id] : undefined;
-                return pending ? { ...opt, currentValue: pending, selectedValue: pending } : opt;
-              })
+                  const pending = opt.id ? pendingConfigOptions[opt.id] : undefined;
+                  return pending ? { ...opt, currentValue: pending, selectedValue: pending } : opt;
+                })
               : cachedConfigOptions
             : undefined;
 

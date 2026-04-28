@@ -38,7 +38,7 @@ export class McpService {
   private withServiceLock<T>(operation: () => Promise<T>): Promise<T> {
     const queued = this.operationQueue.then(operation, () => operation());
     // Keep the queue moving even if the operation rejects
-    this.operationQueue = queued.catch(() => { });
+    this.operationQueue = queued.catch(() => {});
     return queued;
   }
 
