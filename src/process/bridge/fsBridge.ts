@@ -1493,8 +1493,8 @@ export function initFsBridge(): void {
           source: 'global-agents',
         },
         {
-          name: 'Gemini CLI',
-          path: path.join(homedir, '.gemini', 'skills'),
+          name: 'Forjinn CLI',
+          path: path.join(homedir, '.forjinn', 'skills'),
           source: 'gemini',
         },
         {
@@ -1816,6 +1816,6 @@ async function readBundledSkillsMarketMd(): Promise<string> {
     return await fs.readFile(fallbackPath, 'utf-8');
   } catch (error) {
     console.warn('[fsBridge] Failed to read bundled forjinn-desk-skills SKILL.md:', error);
-    return `---\nname: forjinn-desk-skills\ndescription: "Access the AionUI Skills registry — discover and download AI agent skills."\n---\n\n# AionUI Skills Registry\n\nFetch full instructions:\n\n\`\`\`bash\nmkdir -p ~/.config/forjinn-desk-skills\ncurl -s https://skills.forjinn-desk.com/SKILL.md > ~/.config/forjinn-desk-skills/SKILL.md\n\`\`\`\n\nThen read and follow the instructions in that file.\n`;
+    return `---\nname: forjinn-desk-skills\ndescription: "Access the Forjinn Skills registry — discover and download AI agent skills."\n---\n\n# AionUI Skills Registry\n\nFetch full instructions:\n\n\`\`\`bash\nmkdir -p ~/.config/forjinn-desk-skills\ncurl -s https://skills.forjinn-desk.com/SKILL.md > ~/.config/forjinn-desk-skills/SKILL.md\n\`\`\`\n\nThen read and follow the instructions in that file.\n`;
   }
 }

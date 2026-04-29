@@ -5,20 +5,23 @@ const { configCtorMock } = vi.hoisted(() => ({
   configCtorMock: vi.fn(),
 }));
 
-vi.mock('@office-ai/aioncli-core', () => ({
-  AuthType: {
-    LOGIN_WITH_GOOGLE: 'LOGIN_WITH_GOOGLE',
-    USE_VERTEX_AI: 'USE_VERTEX_AI',
-  },
-  Config: class MockConfig {
-    options: Record<string, unknown>;
-
-    constructor(options: Record<string, unknown>) {
-      this.options = options;
-      configCtorMock(options);
-    }
-  },
-}));
+vi.mock('@office-ai/aioncli-core', async (importOriginal) => {
+  const actual = await importOriginal() as any;
+  return {
+    ...actual,
+    AuthType: {
+      LOGIN_WITH_GOOGLE: 'LOGIN_WITH_GOOGLE',
+      USE_VERTEX_AI: 'USE_VERTEX_AI',
+    },
+    Config: class MockConfig {
+      options: Record<string, unknown>;
+      constructor(options: Record<string, unknown>) {
+        this.options = options;
+        configCtorMock(options);
+      }
+    },
+  };
+});
 
 vi.mock('../../../src/common/platform', () => ({
   getPlatformServices: () => ({
@@ -34,6 +37,11 @@ vi.mock('../../../src/process/agent/gemini/cli/tools/web-fetch', () => ({
 
 vi.mock('../../../src/process/agent/gemini/cli/tools/web-search', () => ({
   WebSearchTool: class {},
+}));
+
+vi.mock('../../../src/process/agent/gemini/cli/tools/external-tools', () => ({
+  ListExternalToolsTool: class {},
+  ExecuteExternalToolTool: class {},
 }));
 
 import { ConversationToolConfig } from '../../../src/process/agent/gemini/cli/tools/conversation-tool-config';

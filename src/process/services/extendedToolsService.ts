@@ -408,9 +408,29 @@ class ExtendedToolsService extends EventEmitter {
    * Execute built-in tool
    */
   private async executeBuiltinTool(toolId: string, params: Record<string, unknown>): Promise<string> {
-    // Built-in tools are executed through the main process bridge
-    // This is a placeholder - actual implementation would call the appropriate bridge
-    return `Executed built-in tool: ${toolId}`;
+    const { execSync } = require('child_process');
+
+    // Git tools have been removed. Use shell instead.
+
+    if (toolId === 'http_get' || toolId === 'http_post') {
+      const url = params.url as string;
+      if (!url) throw new Error('URL is required');
+      
+      try {
+        const response = await fetch(url, {
+          method: toolId === 'http_get' ? 'GET' : 'POST',
+          headers: (params.headers as any) || {},
+          body: toolId === 'http_post' ? JSON.stringify(params.body || {}) : undefined,
+        });
+        const text = await response.text();
+        return `HTTP ${response.status}\n\n${text}`;
+      } catch (e: any) {
+        return `Error making HTTP request: ${e.message}`;
+      }
+    }
+
+    // Fallback for others
+    return `Executed built-in tool: ${toolId} (Underlying implementation pending)`;
   }
 
   /**

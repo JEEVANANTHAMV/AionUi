@@ -83,10 +83,10 @@ function createAionTool(
 
 const server = new McpServer({ name: 'forjinn-desk-team-guide', version: '1.0.0' }, { capabilities: { tools: {} } });
 
-// ---- aion_create_team ----
+// ---- forjinn_create_team ----
 createAionTool(
   server,
-  'aion_create_team',
+  'forjinn_create_team',
   getCreateTeamToolDescription(),
   {
     summary: z.string().min(1).describe('Task summary or initial instruction to send to the team leader agent.'),
@@ -102,10 +102,10 @@ createAionTool(
   FORJINN_MCP_TOKEN
 );
 
-// ---- aion_list_models ----
+// ---- forjinn_list_models ----
 createAionTool(
   server,
-  'aion_list_models',
+  'forjinn_list_models',
   `Query available models for team agent types. Returns the real-time model list that matches the frontend model selector.
 
 Use this BEFORE proposing a team configuration to check what models are available for each agent type.

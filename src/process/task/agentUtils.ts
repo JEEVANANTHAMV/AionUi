@@ -20,7 +20,7 @@ export interface FirstMessageConfig {
   enabledSkills?: string[];
   /** 排除的内置自动注入 skills / Builtin auto-injected skills to exclude */
   excludeBuiltinSkills?: string[];
-  /** Inject Team mode guidance prompt when agent has aion_create_team capability */
+  /** Inject Team mode guidance prompt when agent has forjinn_create_team capability */
   enableTeamGuide?: boolean;
   /** Agent backend type (e.g. 'claude', 'codex') — used to populate team guide prompt */
   backend?: string;

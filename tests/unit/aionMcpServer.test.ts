@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  *
  * Tests for TeamGuideMcpServer tool handler logic (TCP architecture):
- *   - aion_create_team: input validation, TeamSessionService wiring, return shape
+ *   - forjinn_create_team: input validation, TeamSessionService wiring, return shape
  *   - shouldInjectTeamGuideMcp: dynamic capability check (uses cached ACP init results)
  */
 
@@ -198,7 +198,7 @@ describe('TeamGuideMcpServer auth token', () => {
 
   it('rejects requests with wrong auth token', async () => {
     const response = (await tcpRequest(getPort(service), {
-      tool: 'aion_create_team',
+      tool: 'forjinn_create_team',
       args: { summary: 'test' },
       auth_token: 'wrong-token',
     })) as Record<string, unknown>;
@@ -244,7 +244,7 @@ describe('TeamGuideMcpServer auth token', () => {
     });
 
     const response = (await tcpRequest(getPort(service), {
-      tool: 'aion_create_team',
+      tool: 'forjinn_create_team',
       args: { summary: 'oversize recovery check' },
       auth_token: getAuthToken(service),
     })) as Record<string, unknown>;
@@ -255,10 +255,10 @@ describe('TeamGuideMcpServer auth token', () => {
 });
 
 // ------------------------------------------------------------------
-// aion_create_team handler
+// forjinn_create_team handler
 // ------------------------------------------------------------------
 
-describe('aion_create_team handler', () => {
+describe('forjinn_create_team handler', () => {
   let service: TeamGuideMcpServer;
 
   beforeEach(async () => {
@@ -285,7 +285,7 @@ describe('aion_create_team handler', () => {
 
   it('returns teamId, name, route, and status on valid input', async () => {
     const response = (await tcpRequest(getPort(service), {
-      tool: 'aion_create_team',
+      tool: 'forjinn_create_team',
       args: { summary: '构建完整电商网站', name: '电商网站全栈开发' },
       auth_token: getAuthToken(service),
     })) as Record<string, unknown>;
@@ -301,7 +301,7 @@ describe('aion_create_team handler', () => {
 
   it('auto-generates name from summary when name is omitted', async () => {
     const response = (await tcpRequest(getPort(service), {
-      tool: 'aion_create_team',
+      tool: 'forjinn_create_team',
       args: { summary: '构建电商网站 React 前端' },
       auth_token: getAuthToken(service),
     })) as Record<string, unknown>;
@@ -313,7 +313,7 @@ describe('aion_create_team handler', () => {
 
   it('calls TeamSessionService.createTeam with the provided name', async () => {
     await tcpRequest(getPort(service), {
-      tool: 'aion_create_team',
+      tool: 'forjinn_create_team',
       args: { summary: '测试摘要', name: '测试团队' },
       auth_token: getAuthToken(service),
     });
@@ -323,7 +323,7 @@ describe('aion_create_team handler', () => {
 
   it('sends summary as first message to leader agent (async)', async () => {
     await tcpRequest(getPort(service), {
-      tool: 'aion_create_team',
+      tool: 'forjinn_create_team',
       args: { summary: '构建电商网站', name: '电商' },
       auth_token: getAuthToken(service),
     });
@@ -336,7 +336,7 @@ describe('aion_create_team handler', () => {
 
   it('returns error when summary is empty', async () => {
     const response = (await tcpRequest(getPort(service), {
-      tool: 'aion_create_team',
+      tool: 'forjinn_create_team',
       args: { summary: '' },
       auth_token: getAuthToken(service),
     })) as Record<string, unknown>;
@@ -349,7 +349,7 @@ describe('aion_create_team handler', () => {
     mockCreateTeam.mockRejectedValue(new Error('DB write failed'));
 
     const response = (await tcpRequest(getPort(service), {
-      tool: 'aion_create_team',
+      tool: 'forjinn_create_team',
       args: { summary: '构建网站' },
       auth_token: getAuthToken(service),
     })) as Record<string, unknown>;
@@ -359,7 +359,7 @@ describe('aion_create_team handler', () => {
 
   it('uses system-injected backend (from FORJINN_MCP_BACKEND) as agent type', async () => {
     await tcpRequest(getPort(service), {
-      tool: 'aion_create_team',
+      tool: 'forjinn_create_team',
       args: { summary: '分析代码' },
       auth_token: getAuthToken(service),
       backend: 'codex',
@@ -374,7 +374,7 @@ describe('aion_create_team handler', () => {
 
   it('falls back to claude when backend is not in whitelist', async () => {
     await tcpRequest(getPort(service), {
-      tool: 'aion_create_team',
+      tool: 'forjinn_create_team',
       args: { summary: '分析代码' },
       auth_token: getAuthToken(service),
       backend: 'qwen',
@@ -389,7 +389,7 @@ describe('aion_create_team handler', () => {
 
   it('falls back to claude when backend is not provided', async () => {
     await tcpRequest(getPort(service), {
-      tool: 'aion_create_team',
+      tool: 'forjinn_create_team',
       args: { summary: '构建网站' },
       auth_token: getAuthToken(service),
     });

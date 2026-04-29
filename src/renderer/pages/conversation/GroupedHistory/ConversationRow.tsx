@@ -20,6 +20,7 @@ import { useTranslation } from 'react-i18next';
 import type { ConversationRowProps } from './types';
 import { getBackendKeyFromConversation } from './utils/exportHelpers';
 import { isConversationPinned } from './utils/groupingHelpers';
+import { ASSISTANT_ICON_MAP } from '@/renderer/components/agent/AssistantIconMap';
 
 const ConversationRow: React.FC<ConversationRowProps> = (props) => {
   const {
@@ -60,6 +61,10 @@ const ConversationRow: React.FC<ConversationRowProps> = (props) => {
 
     if (assistantInfo) {
       if (assistantInfo.isEmoji) {
+        const IconComponent = ASSISTANT_ICON_MAP[assistantInfo.logo];
+        if (IconComponent) {
+          return <IconComponent theme='outline' size='18' className='line-height-0 flex-shrink-0' />;
+        }
         // Emoji glyphs render with built-in padding, so 16px text ≈ 18px line icon visual weight
         return <span className='text-16px leading-none flex-shrink-0'>{assistantInfo.logo}</span>;
       }
@@ -289,6 +294,5 @@ const ConversationRow: React.FC<ConversationRowProps> = (props) => {
     </Tooltip>
   );
 };
-
 
 export default ConversationRow;

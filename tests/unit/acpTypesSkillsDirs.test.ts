@@ -96,7 +96,7 @@ describe('acpTypes — skillsDirs integration', () => {
     it('should return correct skillsDirs for supported backends', () => {
       expect(getSkillsDirsForBackend('claude')).toEqual(['.claude/skills']);
       expect(getSkillsDirsForBackend('droid')).toEqual(['.factory/skills']);
-      expect(getSkillsDirsForBackend('gemini')).toEqual(['.gemini/skills']); // non-ACP but has skill dirs
+      expect(getSkillsDirsForBackend('gemini')).toEqual(['.forjinn/skills']); // non-ACP but has skill dirs
       expect(getSkillsDirsForBackend('forjinnrs')).toEqual(['.forjinnrs/skills']); // non-ACP but has skill dirs
     });
 

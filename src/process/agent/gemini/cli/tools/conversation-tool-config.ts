@@ -14,6 +14,7 @@ import path from 'path';
 import { WebFetchTool } from './web-fetch';
 import { WebSearchTool } from './web-search';
 import { CustomHttpTool } from './custom-http-tool';
+import { ListExternalToolsTool, ExecuteExternalToolTool } from './external-tools';
 import type { ICustomHttpTool } from '@/common/config/storage';
 
 interface ConversationToolConfigOptions {
@@ -150,6 +151,13 @@ export class ConversationToolConfig {
       const customWebFetchTool = new WebFetchTool(geminiClient, config.getMessageBus());
       toolRegistry.registerTool(customWebFetchTool);
     }
+
+    // 注册外部工具发现与代理执行工具 / Register external tools discovery and proxy execution tools
+    const listExternalToolsTool = new ListExternalToolsTool(config, config.getMessageBus());
+    toolRegistry.registerTool(listExternalToolsTool);
+
+    const executeExternalToolTool = new ExecuteExternalToolTool(config, config.getMessageBus());
+    toolRegistry.registerTool(executeExternalToolTool);
 
     // 注册 gemini_web_search 工具（仅OpenAI模型）
     if (this.useGeminiWebSearch) {

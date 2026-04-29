@@ -116,7 +116,7 @@ export class ForjinnrsManager extends BaseAgentManager<ForjinnrsManagerData, str
     this.init();
 
     // Start the agent bootstrap — store promise so sendMessage can await it
-    this.agentReady = this.start().catch(() => {});
+    this.agentReady = this.start().catch(() => { });
   }
 
   /**
@@ -140,7 +140,7 @@ export class ForjinnrsManager extends BaseAgentManager<ForjinnrsManagerData, str
 
     // Collect stdio MCP servers to inject. In-team sessions get the team_*
     // coordination MCP (with slot handshake). Solo sessions get the team-guide
-    // MCP so aion_create_team / aion_list_models are available. Mirrors
+    // MCP so forjinn_create_team / forjinn_list_models are available. Mirrors
     // GeminiAgentManager's solo branch.
     const stdioMcpServers: StdioMcpOption[] = [];
     if (mergedData.teamMcpStdioConfig) {

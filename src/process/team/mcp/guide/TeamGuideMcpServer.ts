@@ -153,9 +153,9 @@ export class TeamGuideMcpServer {
     callerConversationId?: string
   ): Promise<string> {
     switch (toolName) {
-      case 'aion_create_team':
+      case 'forjinn_create_team':
         return this.handleCreateTeam(args, backend, callerConversationId);
-      case 'aion_list_models':
+      case 'forjinn_list_models':
         return handleListModels(args);
       default:
         throw new Error(`Unknown tool: ${toolName}`);

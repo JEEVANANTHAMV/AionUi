@@ -238,7 +238,7 @@ export class GeminiAgentManager extends BaseAgentManager<
 
         // presetRules are now written to GEMINI.md by setupAssistantWorkspace()
         // and loaded natively by Gemini CLI via loadServerHierarchicalMemory()
-        // Skills are symlinked into .gemini/skills/ and discovered natively by SkillManager
+        // Skills are symlinked into .forjinn/skills/ and discovered natively by SkillManager
         // No prompt injection needed -> native mechanisms handle everything
 
         // Merge builtin skill names into enabledSkills for the worker's skill discovery

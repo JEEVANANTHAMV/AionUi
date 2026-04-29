@@ -151,7 +151,7 @@ export class AcpAgentV2 {
     }
 
     // Inject team-guide MCP server for solo agents (not in team mode) so the
-    // agent has the aion_create_team tool available — mirrors AcpAgent.loadBuiltinSessionMcpServers().
+    // agent has the forjinn_create_team tool available — mirrors AcpAgent.loadBuiltinSessionMcpServers().
     if (!this.agentConfig.teamMcpConfig) {
       if (await shouldInjectTeamGuideMcp(this.agentConfig.agentBackend)) {
         const aionStdioConfig = getTeamGuideStdioConfig();
@@ -911,6 +911,6 @@ export class AcpAgentV2 {
         });
       }
     });
-    AcpAgentV2.cacheQueue = job.catch(() => {});
+    AcpAgentV2.cacheQueue = job.catch(() => { });
   }
 }

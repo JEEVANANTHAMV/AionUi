@@ -42,8 +42,8 @@ export class AcpRuntime {
   private readonly sessions = new Map<string, SessionEntry>();
   private readonly idleReclaimer: IdleReclaimer;
 
-  onStreamEvent: StreamEventHandler = () => {};
-  onSignalEvent: SignalEventHandler = () => {};
+  onStreamEvent: StreamEventHandler = () => { };
+  onSignalEvent: SignalEventHandler = () => { };
 
   constructor(
     // TODO(ACP Discovery): Re-enable acp_session persistence.
@@ -67,7 +67,7 @@ export class AcpRuntime {
     const config = { ...agentConfig };
 
     // Inject team-guide MCP server for solo agents (not in team mode) so the
-    // agent has the aion_create_team tool available.
+    // agent has the forjinn_create_team tool available.
     if (!config.teamMcpConfig) {
       if (await shouldInjectTeamGuideMcp(config.agentBackend)) {
         const aionStdioConfig = getTeamGuideStdioConfig();

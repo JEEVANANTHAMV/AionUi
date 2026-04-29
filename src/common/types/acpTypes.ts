@@ -495,7 +495,7 @@ export type AcpBackend = keyof typeof ACP_BACKENDS_ALL;
  * These agents have their own execution engines but still support native skill discovery.
  */
 const NON_ACP_SKILLS_DIRS: Record<string, string[]> = {
-  gemini: ['.gemini/skills'],
+  gemini: ['.forjinn/skills'],
   forjinnrs: ['.forjinnrs/skills'],
 };
 

@@ -99,11 +99,24 @@ interface ConversationSearchPopoverProps {
   renderTrigger?: (props: { onClick: () => void; isActive: boolean }) => React.ReactNode;
 }
 
+import { ASSISTANT_ICON_MAP } from '@/renderer/components/agent/AssistantIconMap';
+
 const ConversationAgentMark: React.FC<{ conversation: IMessageSearchItem['conversation'] }> = ({ conversation }) => {
   const { info: assistantInfo } = usePresetAssistantInfo(conversation);
 
   if (assistantInfo) {
     if (assistantInfo.isEmoji) {
+      const IconComponent = ASSISTANT_ICON_MAP[assistantInfo.logo];
+      if (IconComponent) {
+        return (
+          <IconComponent
+            theme='outline'
+            size='18'
+            className='line-height-0 flex-shrink-0 text-t-secondary'
+            title={assistantInfo.name}
+          />
+        );
+      }
       return (
         <span className='text-18px leading-none flex-shrink-0' title={assistantInfo.name}>
           {assistantInfo.logo}

@@ -149,7 +149,6 @@ class AgentRegistry {
     ]);
   }
 
-
   private async runExclusiveMutation<T>(task: () => Promise<T>): Promise<T> {
     const previousMutation = this.mutationQueue;
     let releaseCurrentMutation: (() => void) | undefined;

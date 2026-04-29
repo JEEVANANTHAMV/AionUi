@@ -352,7 +352,7 @@ describe('fsBridge skills functionality', () => {
 
   describe('detectAndCountExternalSkills', () => {
     it('should detect direct skills and nested skill packs from common and custom paths', async () => {
-      const geminiPath = path.resolve('/mock/home/.gemini/skills');
+      const geminiPath = path.resolve('/mock/home/.forjinn/skills');
       const customSrcPath = path.resolve('/mock/my/custom/path');
 
       // Configure mock custom paths

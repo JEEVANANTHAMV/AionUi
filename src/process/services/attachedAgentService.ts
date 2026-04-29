@@ -164,7 +164,7 @@ class AttachedAgentService extends EventEmitter {
   private async startOpenCodeAgent(agentId: string, config: OpenCodeAgentConfig): Promise<void> {
     const port = config.port || 4096;
     const endpoint = config.endpoint || `http://localhost:${port}`;
-    
+
     // Check if OpenCode is already running
     try {
       const response = await fetch(`${endpoint}/global/health`);

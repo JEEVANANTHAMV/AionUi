@@ -147,11 +147,11 @@ const GuidPage: React.FC = () => {
 
   // Sync providerAgentKey when selected agent changes
   useEffect(() => {
-    const agent = agentSelection.selectedAgent;
+    const agent = agentSelection.currentEffectiveAgentInfo?.agentType;
     if (agent === 'gemini' || agent === 'forjinnrs') {
       setProviderAgentKey(agent);
     }
-  }, [agentSelection.selectedAgent]);
+  }, [agentSelection.currentEffectiveAgentInfo?.agentType]);
 
   const guidInput = useGuidInput({
     locationState: location.state as { workspace?: string } | null,

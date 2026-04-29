@@ -322,7 +322,7 @@ export async function loadCliConfig({
     summarizeToolOutput: settings.summarizeToolOutput,
     ideMode,
     // Enable native SkillManager for workspace-based skill discovery
-    // Skills are symlinked into workspace .gemini/skills/ by setupAssistantWorkspace()
+    // Skills are symlinked into workspace .forjinn/skills/ by setupAssistantWorkspace()
     // Native activate_skill tool handles: body injection + folder structure + directory permission
     skillsSupport: true,
     // 启用 fetch 错误重试，处理 "exception TypeError: fetch failed sending request" 错误

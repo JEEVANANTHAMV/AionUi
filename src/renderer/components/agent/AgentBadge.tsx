@@ -10,6 +10,8 @@ import { Robot } from '@icon-park/react';
 import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { ASSISTANT_ICON_MAP } from './AssistantIconMap';
+
 export type AgentBadgeProps = {
   /** Agent backend type */
   backend?: string;
@@ -30,6 +32,10 @@ export const AgentLogoIcon: React.FC<
   const logoContent = (() => {
     if (agentLogo) {
       if (agentLogoIsEmoji) {
+        const IconComponent = ASSISTANT_ICON_MAP[agentLogo];
+        if (IconComponent) {
+          return <IconComponent theme='outline' size={16} fill={iconColors.primary} />;
+        }
         return <span className='text-14px leading-none'>{agentLogo}</span>;
       }
       return (

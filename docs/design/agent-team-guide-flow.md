@@ -23,7 +23,7 @@
 │  │   - 子任务间存在并行空间                                           │     │
 │  │   - 单 Agent 完成耗时远大于多 Agent 协作                           │     │
 │  │   建议时需说明：为什么推荐、团队能怎么分工。                        │     │
-│  │   用户同意后，调用 aion_create_team 工具。"                        │     │
+│  │   用户同意后，调用 forjinn_create_team 工具。"                        │     │
 │  └────────────────────────────────────────────────────────────────────┘     │
 │                                                                             │
 │  ② Agent 分析需求 → 判断：涉及前端+后端+数据库+DevOps，适合 Team       │
@@ -48,7 +48,7 @@
                   │ ④ 用户回复："好的，开启团队模式"
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                    AGENT 调用 MCP Tool: aion_create_team                     │
+│                    AGENT 调用 MCP Tool: forjinn_create_team                     │
 │                                                                             │
 │  Tool Input:                                                                │
 │  {                                                                          │
@@ -65,7 +65,7 @@
 ┌═════════════════════════════════════════════════════════════════════════════┐
 ║                     MCP SERVER  (主进程内运行)                               ║
 ║                                                                             ║
-║  ┌─── aion_create_team handler ───────────────────────────────────────┐     ║
+║  ┌─── forjinn_create_team handler ───────────────────────────────────────┐     ║
 ║  │                                                                    │     ║
 ║  │  1. 接收 summary + name                                           │     ║
 ║  │                                                                    │     ║
@@ -245,7 +245,7 @@
 | #   | 模块                  | 位置                                               | 职责                                                    |
 | --- | --------------------- | -------------------------------------------------- | ------------------------------------------------------- |
 | 1   | **Team Guide Prompt** | `src/process/resources/prompts/teamGuidePrompt.ts` | 注入 solo agent 的团队引导规则                          |
-| 2   | **Aion MCP Server**   | `src/process/services/aionMcpServer.ts`            | 主进程内 MCP，提供 `aion_create_team` + `aion_navigate` |
+| 2   | **Aion MCP Server**   | `src/process/services/aionMcpServer.ts`            | 主进程内 MCP，提供 `forjinn_create_team` + `aion_navigate` |
 | 3   | **MCP 注册**          | `src/process/agent/acp/mcpSessionConfig.ts`        | 将 Aion MCP 注册到 solo agent session                   |
 | 4   | **DeepLink 扩展**     | `src/renderer/hooks/system/useDeepLink.ts`         | 处理 `navigate` action，支持任意路由跳转                |
 

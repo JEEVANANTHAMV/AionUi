@@ -6,7 +6,7 @@
 
 /**
  * Shared handler for listing available models.
- * Used by both TeamMcpServer (team_list_models) and TeamGuideMcpServer (aion_list_models).
+ * Used by both TeamMcpServer (team_list_models) and TeamGuideMcpServer (forjinn_list_models).
  */
 
 import { isTeamCapableBackend } from '@/common/types/teamTypes';
