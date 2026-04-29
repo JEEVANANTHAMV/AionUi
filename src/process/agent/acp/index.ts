@@ -370,8 +370,8 @@ export class AcpAgent {
             if (errMsg.includes('model_not_found') || errMsg.includes('无可用渠道')) {
               this.emitErrorMessage(
                 `Claude slot "${configuredModel}" could not be activated on your API relay service. ` +
-                `Please check the model mapping in cc-switch or ~/.claude/settings.json. ` +
-                `Falling back to the relay's default Claude slot.`
+                  `Please check the model mapping in cc-switch or ~/.claude/settings.json. ` +
+                  `Falling back to the relay's default Claude slot.`
               );
             }
           }
@@ -1258,14 +1258,14 @@ export class AcpAgent {
     const contentPreview =
       operation.method === 'fs/write_text_file' && operation.content
         ? [
-          {
-            type: 'content' as const,
-            content: {
-              type: 'text' as const,
-              text: this.formatFileOperationPreview(operation.content),
+            {
+              type: 'content' as const,
+              content: {
+                type: 'text' as const,
+                text: this.formatFileOperationPreview(operation.content),
+              },
             },
-          },
-        ]
+          ]
         : undefined;
 
     return {
@@ -1527,8 +1527,8 @@ export class AcpAgent {
 
     const emitMcpStatus = teamId
       ? (phase: import('@/common/types/teamTypes').TeamMcpPhase, extra?: { serverCount?: number; error?: string }) => {
-        ipcBridge.team.mcpStatus.emit({ teamId: teamId!, slotId, phase, ...extra });
-      }
+          ipcBridge.team.mcpStatus.emit({ teamId: teamId!, slotId, phase, ...extra });
+        }
       : null;
 
     const doSession = async (): Promise<void> => {
@@ -1536,7 +1536,7 @@ export class AcpAgent {
       if (resumeSessionId && resumeConversationId && resumeConversationId !== this.id) {
         console.warn(
           `[AcpAgent] Session ${resumeSessionId} belongs to conversation ${resumeConversationId}, ` +
-          `but current conversation is ${this.id}. Discarding stale session and starting fresh.`
+            `but current conversation is ${this.id}. Discarding stale session and starting fresh.`
         );
         // Skip resume, fall through to create new session
       } else if (resumeSessionId) {
@@ -1824,7 +1824,7 @@ export class AcpAgent {
     modes: AcpSessionModes | null;
   }): Promise<void> {
     const job = AcpAgent.cacheQueue.then(() => this.doCacheSessionCapabilities(snapshot));
-    AcpAgent.cacheQueue = job.catch(() => { });
+    AcpAgent.cacheQueue = job.catch(() => {});
     return job;
   }
 

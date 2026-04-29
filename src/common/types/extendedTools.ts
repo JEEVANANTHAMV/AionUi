@@ -114,16 +114,6 @@ export interface ToolRegistryState {
  * Default built-in tools configuration
  */
 export const DEFAULT_BUILTIN_TOOLS: BuiltinToolConfig[] = [
-  // File Operations
-  {
-    id: 'process_file',
-    name: 'Process File',
-    category: ExtendedToolCategory.FILE_OPERATIONS,
-    description: 'Convert files to markdown with OCR support',
-    enabled: true,
-    icon: 'FileConversion',
-  },
-
   // Web Operations
   {
     id: 'http_get',
@@ -140,56 +130,6 @@ export const DEFAULT_BUILTIN_TOOLS: BuiltinToolConfig[] = [
     description: 'Perform HTTP POST request',
     enabled: true,
     icon: 'Link',
-  },
-
-  // Browser Operations
-  {
-    id: 'browser_navigate',
-    name: 'Browser Navigate',
-    category: ExtendedToolCategory.BROWSER,
-    description: 'Navigate browser to URL',
-    enabled: true,
-    icon: 'Browser',
-  },
-  {
-    id: 'browser_click',
-    name: 'Browser Click',
-    category: ExtendedToolCategory.BROWSER,
-    description: 'Click element in browser',
-    enabled: true,
-    icon: 'Browser',
-  },
-  {
-    id: 'browser_type',
-    name: 'Browser Type',
-    category: ExtendedToolCategory.BROWSER,
-    description: 'Type text into form field',
-    enabled: true,
-    icon: 'Browser',
-  },
-  {
-    id: 'browser_extract',
-    name: 'Browser Extract',
-    category: ExtendedToolCategory.BROWSER,
-    description: 'Extract text from element',
-    enabled: true,
-    icon: 'Browser',
-  },
-  {
-    id: 'browser_screenshot',
-    name: 'Browser Screenshot',
-    category: ExtendedToolCategory.BROWSER,
-    description: 'Take browser screenshot',
-    enabled: true,
-    icon: 'Browser',
-  },
-  {
-    id: 'browser_execute_js',
-    name: 'Browser Execute JS',
-    category: ExtendedToolCategory.BROWSER,
-    description: 'Execute JavaScript in browser',
-    enabled: true,
-    icon: 'Browser',
   },
 
   // Analysis Operations

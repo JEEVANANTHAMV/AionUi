@@ -521,23 +521,16 @@ export function initConversationBridge(
       return { success: false, msg: 'conversation not found' };
     }
 
-    // Handle file paths based on agent type
-    // Gemini requires files in workspace; other agents can use cache directory directly
     let workspaceFiles: string[];
-    const isGeminiAgent = task.type === 'gemini';
-
-    if (isGeminiAgent) {
-      // Gemini: Copy files to workspace (required for gemini CLI)
-      // Wrap in try-catch to prevent unhandled rejection when workspace directory is missing
-      try {
+    // Copy uploaded files to the workspace so they appear in the file tree and are accessible by all agents
+    try {
+      if (task.workspace) {
         workspaceFiles = await copyFilesToDirectory(task.workspace, files, false, getSystemDir().cacheDir);
-      } catch (error) {
-        console.error('[conversationBridge] sendMessage: failed to copy files to workspace:', error);
-        workspaceFiles = [];
+      } else {
+        workspaceFiles = (files ?? []).filter((f) => path.isAbsolute(f));
       }
-    } else {
-      // Non-Gemini agents (ACP, Codex, NanoBot, OpenClaw, Remote): Use cache directory paths directly
-      // Filter to only include absolute paths that exist
+    } catch (error) {
+      console.error('[conversationBridge] sendMessage: failed to copy files to workspace:', error);
       workspaceFiles = (files ?? []).filter((f) => path.isAbsolute(f));
     }
 
@@ -574,7 +567,7 @@ export function initConversationBridge(
       // sendMessage() resolves when the worker acknowledges receipt, but the worker
       // continues reading files asynchronously during streaming. Deleting immediately
       // after sendMessage() causes a race condition where Gemini CLI reads deleted files.
-      if (isGeminiAgent && workspaceFiles.length > 0) {
+      if (task.type === 'gemini' && workspaceFiles.length > 0) {
         const saveToWorkspace = await ProcessConfig.get('upload.saveToWorkspace').catch(() => false);
         if (!saveToWorkspace) {
           const geminiTask = task as unknown as GeminiAgentManager;

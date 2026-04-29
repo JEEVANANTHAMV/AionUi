@@ -131,6 +131,8 @@ export class GeminiAgent {
   private historyUsedOnce = false;
   private skillsIndexPrependedOnce = false; // Track if we've prepended skills index to first message
   private contextFileName: string | undefined;
+  private lastQuery: unknown = null;
+  private lastOptions: any = null;
   /** 内置 skills 目录路径 / Builtin skills directory path */
   private skillsDir?: string;
   /** 启用的 skills 列表 / Enabled skills list */
@@ -452,6 +454,12 @@ export class GeminiAgent {
     );
 
     this.geminiClient = this.config.getGeminiClient();
+    try {
+      const { summarizationService } = require('@/process/services/summarizationService');
+      summarizationService.setGeminiClient(this.geminiClient);
+    } catch (e) {
+      console.warn('[GeminiAgent] Failed to set GeminiClient in SummarizationService:', e);
+    }
 
     // 在初始化时注入 presetRules 到 userMemory
     // Inject presetRules into userMemory at initialization
@@ -596,9 +604,13 @@ export class GeminiAgent {
         if (data.type === 'tool_call_request') {
           const toolRequest = data.data as ToolCallRequestInfo;
           toolCallRequests.push(toolRequest);
-          // 立即保护工具调用，防止被取消
-          // Immediately protect tool call to prevent cancellation
           globalToolCallGuard.protect(toolRequest.callId);
+          return;
+        }
+
+        const { GeminiEventType: ServerGeminiEventType } = require('@office-ai/aioncli-core');
+        if (data.type === ServerGeminiEventType.ContextWindowWillOverflow) {
+          this.handleContextOverflow(data.data);
           return;
         }
 
@@ -715,6 +727,8 @@ export class GeminiAgent {
       isContinuation?: boolean;
     }
   ): string | undefined {
+    this.lastQuery = query;
+    this.lastOptions = options;
     try {
       this.activeMsgId = msg_id;
       let prompt_id = options?.prompt_id;
@@ -787,6 +801,67 @@ export class GeminiAgent {
     // 将 files 参数中的文件路径作为 @ 引用添加到消息末尾
     // Append files from files parameter as @ references to the message
     if (files && files.length > 0) {
+      const { summarizationService } = require('@/process/services/summarizationService');
+      const fs = require('fs');
+      const path = require('path');
+      
+      const filesToAppend: string[] = [];
+      
+      for (const filePath of files) {
+        const absolutePath = path.isAbsolute(filePath) ? filePath : path.resolve(this.workspace || process.cwd(), filePath);
+        let shouldAppend = true;
+        
+        if (fs.existsSync(absolutePath)) {
+          const stats = fs.statSync(absolutePath);
+          if (stats.size > 1 * 1024 * 1024) {
+            this.onStreamEvent({
+              type: 'text',
+              data: `\n\n*File ${path.basename(filePath)} is large. Running auto-summarization...*\n\n`,
+              msg_id: uuid(),
+            });
+            
+            let content = '';
+            const ext = path.extname(absolutePath).toLowerCase();
+            if (['.txt', '.md', '.json', '.js', '.ts', '.css', '.html'].includes(ext)) {
+              content = fs.readFileSync(absolutePath, 'utf8');
+            } else {
+              try {
+                const officeparser = require('officeparser');
+                content = await new Promise((resolve, reject) => {
+                  officeparser.parseOffice(absolutePath, (data: any, err: any) => {
+                    if (err) reject(err);
+                    else resolve(data);
+                  });
+                });
+              } catch (e) {
+                console.error(`[GeminiAgent] Failed to parse office file ${filePath}:`, e);
+              }
+            }
+            
+            if (content) {
+              const result = await summarizationService.summarizeFile(absolutePath, content);
+              if (result.success && result.summary) {
+                const summaryText = `\n\n[Auto-Summary of ${path.basename(filePath)}]:\n${result.summary}\n\n`;
+                if (Array.isArray(message)) {
+                  if (message[0]?.text) message[0].text += summaryText;
+                } else if (typeof message === 'string') {
+                  message += summaryText;
+                }
+                shouldAppend = false;
+              }
+            }
+          }
+        }
+        
+        if (shouldAppend) {
+          filesToAppend.push(filePath);
+        }
+      }
+      
+      files = filesToAppend;
+    }
+
+    if (files && files.length > 0) {
       const fileRefs = files.map((filePath) => `@${filePath}`).join(' ');
       if (Array.isArray(message)) {
         if (message[0]?.text) {
@@ -829,9 +904,29 @@ export class GeminiAgent {
     let skillsPrefix = '';
 
     if (!this.skillsIndexPrependedOnce) {
-      // 优先使用 presetRules，否则回退到 contextContent
-      // Prefer presetRules, fallback to contextContent
-      const rulesContent = this.presetRules || this.contextContent;
+      let rulesContent = this.presetRules || this.contextContent || '';
+
+      // Dynamically inject attached agents guide without hardcoding
+      try {
+        const { attachedAgentService } = require('@/process/services/attachedAgentService');
+        const attachedConfigs = attachedAgentService.getAllConfigs();
+        if (attachedConfigs && attachedConfigs.length > 0) {
+          let agentGuide = '\n\n[Available Attached Agents]\n';
+          agentGuide +=
+            'You can call the following attached agents directly or use their specialized capabilities. Use the list to refer to available agent names:\n';
+          for (const agent of attachedConfigs) {
+            if (agent.enabled) {
+              agentGuide += `- \`${agent.id}\`: ${agent.description} (Type: ${agent.type})\n`;
+            }
+          }
+          agentGuide +=
+            '\nTo inspect or execute tools from these attached agents, use the `list_external_tools()` and `execute_external_tool()` capabilities.';
+          rulesContent += agentGuide;
+        }
+      } catch (e) {
+        console.warn('[GeminiAgent] Failed to inject attached agents into prompt:', e);
+      }
+
       if (rulesContent) {
         skillsPrefix = `[Assistant Rules - You MUST follow these instructions]\n${rulesContent}\n\n`;
       }
@@ -846,6 +941,55 @@ export class GeminiAgent {
           message = prefix + message;
         }
       }
+    }
+
+    const rawQuery = Array.isArray(message) ? message[0].text : message;
+    const queryTrimmed = typeof rawQuery === 'string' ? rawQuery.trim() : '';
+    let matchedAgent = null;
+
+    try {
+      const { DEFAULT_ATTACHED_AGENTS } = require('@/common/types/attachedAgents');
+      for (const agent of DEFAULT_ATTACHED_AGENTS) {
+        const prefix = `@${agent.id}`;
+        if (queryTrimmed.startsWith(prefix)) {
+          matchedAgent = agent;
+          break;
+        }
+      }
+    } catch (e) {
+      console.warn('[GeminiAgent] Failed to parse attached agents:', e);
+    }
+
+    if (matchedAgent) {
+      const prefix = `@${matchedAgent.id}`;
+      const instruction = queryTrimmed.substring(prefix.length).trim();
+
+      this.onStreamEvent({ type: 'start', data: '', msg_id });
+      this.onStreamEvent({
+        type: 'text',
+        data: `#### Direct Dispatch to **${matchedAgent.name}**\n\n`,
+        msg_id,
+      });
+
+      try {
+        const { attachedAgentService } = require('@/process/services/attachedAgentService');
+        const result = await attachedAgentService.executeTask({
+          agentId: matchedAgent.id,
+          taskId: `direct_${Date.now()}`,
+          instruction: instruction,
+        });
+
+        if (result.success) {
+          this.onStreamEvent({ type: 'text', data: result.result || 'Task completed successfully.', msg_id });
+        } else {
+          this.onStreamEvent({ type: 'error', data: `Agent execution failed: ${result.error}`, msg_id });
+        }
+      } catch (e: any) {
+        this.onStreamEvent({ type: 'error', data: `Failed to execute agent: ${e.message}`, msg_id });
+      }
+
+      this.onStreamEvent({ type: 'finish', data: '', msg_id });
+      return;
     }
 
     // Track error messages from @ command processing
@@ -903,6 +1047,77 @@ export class GeminiAgent {
   }
   stop(): void {
     this.abortController?.abort();
+  }
+
+  private async handleContextOverflow(overflowData: any) {
+    console.log('[GeminiAgent] Context window will overflow, auto-triggering summarization...');
+    this.onStreamEvent({
+      type: 'text',
+      data: '\n\n*Context window overflow detected. Running auto-summarization to free up space...*\n\n',
+      msg_id: uuid(),
+    });
+    
+    const historyText = this.convertHistoryToText();
+    
+    const { summarizationService } = require('@/process/services/summarizationService');
+    const result = await summarizationService.summarizeText(historyText);
+    
+    if (result.success && result.summary) {
+      console.log('[GeminiAgent] Summarization successful, replacing history...');
+      this.onStreamEvent({
+        type: 'text',
+        data: '\n\n*Summarization complete. Resuming conversation with compressed context.*\n\n',
+        msg_id: uuid(),
+      });
+      
+      if (this.geminiClient) {
+        this.geminiClient.setHistory([
+          {
+            role: 'user',
+            parts: [{ text: `Here is a summary of the conversation so far to fit the context window:\n\n${result.summary}` }]
+          },
+          {
+            role: 'model',
+            parts: [{ text: "Understood. I will continue the conversation based on this summary." }]
+          }
+        ]);
+      }
+      
+      console.log('[GeminiAgent] Retrying request...');
+      if (this.lastQuery) {
+        this.submitQuery(this.lastQuery, this.activeMsgId ?? uuid(), this.createAbortController(), this.lastOptions);
+      }
+    } else {
+      console.error('[GeminiAgent] Summarization failed:', result.error);
+      this.onStreamEvent({
+        type: 'error',
+        data: `Context window overflow occurred and auto-summarization failed. ${result.error || ''}`,
+        msg_id: uuid(),
+      });
+    }
+  }
+
+  private convertHistoryToText(): string {
+    if (!this.geminiClient) return '';
+    const history = this.geminiClient.getHistory();
+    let text = '';
+    for (const content of history) {
+      const role = content.role === 'user' ? 'User' : 'Assistant';
+      text += `${role}:\n`;
+      if (content.parts) {
+        for (const part of content.parts) {
+          if ((part as any).text) {
+            text += `${(part as any).text}\n`;
+          } else if ((part as any).functionCall) {
+            text += `[Called Tool: ${(part as any).functionCall.name}]\n`;
+          } else if ((part as any).functionResponse) {
+            text += `[Tool Result: ${(part as any).functionResponse.name}]\n`;
+          }
+        }
+      }
+      text += '\n';
+    }
+    return text;
   }
 
   async injectConversationHistory(text: string): Promise<void> {

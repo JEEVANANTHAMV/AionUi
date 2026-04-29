@@ -1013,6 +1013,15 @@ ${collectedResponses.join('\n')}`;
           contentToSend = contentToSend.split(FORJINN_DESK_FILES_MARKER)[0].trimEnd();
         }
 
+        if (data.files && data.files.length > 0) {
+          const nodePath = require('node:path');
+          contentToSend += `\n\n[Uploaded Files in Workspace - please read or use them directly if needed]:\n`;
+          for (const filePath of data.files) {
+            const fileName = nodePath.basename(filePath);
+            contentToSend += `- ${fileName} (path: ${filePath})\n`;
+          }
+        }
+
         // 首条消息时注入预设规则和 skills
         // Inject preset rules and skills on first message
         //

@@ -42,7 +42,8 @@ export class ListExternalToolsTool extends BaseDeclarativeTool<ListExternalTools
         properties: {
           search_query: {
             type: Type.STRING,
-            description: 'A search pattern to filter tools by name or description (e.g., "git", "browser"). If omitted, lists a summary of available tools.',
+            description:
+              'A search pattern to filter tools by name or description (e.g., "git", "browser"). If omitted, lists a summary of available tools.',
           },
         },
       },
@@ -106,9 +107,9 @@ class ListExternalToolsInvocation extends BaseToolInvocation<ListExternalToolsPa
           schema: uiTool.schema || {
             parameters: {
               type: 'object',
-              properties: {}
-            }
-          }
+              properties: {},
+            },
+          },
         });
       }
 
@@ -132,14 +133,19 @@ class ListExternalToolsInvocation extends BaseToolInvocation<ListExternalToolsPa
         const desc = tool.description || '';
         const displayName = tool.displayName || name;
 
-        if (!query || name.toLowerCase().includes(query) || desc.toLowerCase().includes(query) || displayName.toLowerCase().includes(query)) {
+        if (
+          !query ||
+          name.toLowerCase().includes(query) ||
+          desc.toLowerCase().includes(query) ||
+          displayName.toLowerCase().includes(query)
+        ) {
           matchedTools.push(tool);
         }
       }
 
       if (matchedTools.length === 0) {
         return {
-          llmContent: query 
+          llmContent: query
             ? `No external tools found matching "${this.params.search_query}".`
             : 'No external tools found in the system.',
           returnDisplay: 'No tools found.',
@@ -159,7 +165,7 @@ class ListExternalToolsInvocation extends BaseToolInvocation<ListExternalToolsPa
         const schema = tool.schema || {};
         output += `#### \`${tool.name}\`\n`;
         output += `- **Description**: ${tool.description || 'No description available.'}\n`;
-        
+
         if (isDetailed) {
           if (schema.parametersJsonSchema) {
             output += `- **Parameters**:\n\`\`\`json\n${JSON.stringify(schema.parametersJsonSchema, null, 2)}\n\`\`\`\n`;
@@ -278,11 +284,12 @@ class ExecuteExternalToolInvocation extends BaseToolInvocation<ExecuteExternalTo
       const toolResponse = await executeToolCall(this.config, requestInfo, signal);
 
       const resultDisplay = toolResponse.response?.resultDisplay;
-      const displayString = typeof resultDisplay === 'string'
-        ? resultDisplay
-        : resultDisplay && typeof resultDisplay === 'object' && 'fileDiff' in resultDisplay
-          ? resultDisplay.fileDiff
-          : JSON.stringify(resultDisplay);
+      const displayString =
+        typeof resultDisplay === 'string'
+          ? resultDisplay
+          : resultDisplay && typeof resultDisplay === 'object' && 'fileDiff' in resultDisplay
+            ? resultDisplay.fileDiff
+            : JSON.stringify(resultDisplay);
 
       if (toolResponse?.response?.error) {
         throw new Error(displayString || toolResponse.response.error.message);
@@ -293,7 +300,7 @@ class ExecuteExternalToolInvocation extends BaseToolInvocation<ExecuteExternalTo
         const parts = Array.isArray(toolResponse.response.responseParts)
           ? toolResponse.response.responseParts
           : [toolResponse.response.responseParts];
-        
+
         for (const part of parts) {
           if (typeof part === 'string') {
             llmContent += part;

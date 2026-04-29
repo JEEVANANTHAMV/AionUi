@@ -42,6 +42,10 @@ class ExtendedToolsService extends EventEmitter {
   private agentTools: Map<string, ExtendedToolDefinition> = new Map();
   private executionHistory: ToolExecutionResult[] = [];
   private maxHistorySize = 100;
+  private browserInstance: any = null;
+  private browserContext: any = null;
+  private currentPage: any = null;
+  private taskRegistry: Map<string, any> = new Map();
 
   constructor() {
     super();
@@ -408,29 +412,246 @@ class ExtendedToolsService extends EventEmitter {
    * Execute built-in tool
    */
   private async executeBuiltinTool(toolId: string, params: Record<string, unknown>): Promise<string> {
-    const { execSync } = require('child_process');
+    const fs = require('fs');
+    const path = require('path');
 
-    // Git tools have been removed. Use shell instead.
+    switch (toolId) {
+      case 'http_get':
+      case 'http_post': {
+        const url = params.url as string;
+        if (!url) throw new Error('URL is required');
 
-    if (toolId === 'http_get' || toolId === 'http_post') {
-      const url = params.url as string;
-      if (!url) throw new Error('URL is required');
-      
-      try {
-        const response = await fetch(url, {
-          method: toolId === 'http_get' ? 'GET' : 'POST',
-          headers: (params.headers as any) || {},
-          body: toolId === 'http_post' ? JSON.stringify(params.body || {}) : undefined,
-        });
-        const text = await response.text();
-        return `HTTP ${response.status}\n\n${text}`;
-      } catch (e: any) {
-        return `Error making HTTP request: ${e.message}`;
+        try {
+          const response = await fetch(url, {
+            method: toolId === 'http_get' ? 'GET' : 'POST',
+            headers: (params.headers as any) || {},
+            body: toolId === 'http_post' ? JSON.stringify(params.body || {}) : undefined,
+          });
+          const text = await response.text();
+          return `HTTP ${response.status}\n\n${text}`;
+        } catch (e: any) {
+          return `Error making HTTP request: ${e.message}`;
+        }
       }
+
+      case 'ocr_document': {
+        const filePath = (params.image_path || params.path || params.filePath || params.file_path) as string;
+        if (!filePath) throw new Error('Image path is required');
+
+        const absolutePath = path.isAbsolute(filePath) ? filePath : path.resolve(process.cwd(), filePath);
+        if (!fs.existsSync(absolutePath)) {
+          throw new Error(`File not found: ${absolutePath}`);
+        }
+
+        try {
+          const imageBuffer = fs.readFileSync(absolutePath);
+          const base64Image = imageBuffer.toString('base64');
+
+          const ocrUrl = process.env.OCR_ENDPOINT || 'http://101.53.140.251:8000/v1/chat/completions';
+
+          const response = await fetch(ocrUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model: 'glm-ocr',
+              messages: [
+                {
+                  role: 'user',
+                  content: [
+                    { type: 'text', text: 'Extract all text from this image.' },
+                    {
+                      type: 'image_url',
+                      image_url: {
+                        url: `data:image/png;base64,${base64Image}`,
+                      },
+                    },
+                  ],
+                },
+              ],
+              max_tokens: 1000,
+            }),
+          });
+
+          const data = (await response.json()) as any;
+          if (data && data.choices && data.choices[0] && data.choices[0].message) {
+            return data.choices[0].message.content;
+          }
+          return `OCR execution failed: ${JSON.stringify(data)}`;
+        } catch (e: any) {
+          return `Error executing OCR: ${e.message}`;
+        }
+      }
+
+      case 'vision_analyze': {
+        const filePath = (params.image_path || params.path || params.filePath || params.file_path) as string;
+        const prompt = (params.prompt || 'Describe this image in detail and analyze its content.') as string;
+        if (!filePath) throw new Error('Image path is required');
+
+        const absolutePath = path.isAbsolute(filePath) ? filePath : path.resolve(process.cwd(), filePath);
+        if (!fs.existsSync(absolutePath)) {
+          throw new Error(`File not found: ${absolutePath}`);
+        }
+
+        try {
+          const imageBuffer = fs.readFileSync(absolutePath);
+          const base64Image = imageBuffer.toString('base64');
+
+          let openaiBaseUrl = process.env.OPENAI_BASE_URL || 'http://101.53.140.44:8001/v1';
+          if (!openaiBaseUrl.endsWith('/chat/completions')) {
+            openaiBaseUrl = openaiBaseUrl.replace(/\/+$/, '') + '/chat/completions';
+          }
+
+          const response = await fetch(openaiBaseUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${process.env.OPENAI_API_KEY || 'local-inference-key'}`,
+            },
+            body: JSON.stringify({
+              model: 'qwen3-max',
+              messages: [
+                {
+                  role: 'user',
+                  content: [
+                    { type: 'text', text: prompt },
+                    {
+                      type: 'image_url',
+                      image_url: {
+                        url: `data:image/png;base64,${base64Image}`,
+                      },
+                    },
+                  ],
+                },
+              ],
+              max_tokens: 1000,
+            }),
+          });
+
+          const data = (await response.json()) as any;
+          if (data && data.choices && data.choices[0] && data.choices[0].message) {
+            return data.choices[0].message.content;
+          }
+          return `Vision analysis failed: ${JSON.stringify(data)}`;
+        } catch (e: any) {
+          return `Error executing vision analysis: ${e.message}`;
+        }
+      }
+
+      case 'parse_document': {
+        const filePath = (params.file_path || params.path || params.filePath) as string;
+        if (!filePath) throw new Error('File path is required');
+
+        const absolutePath = path.isAbsolute(filePath) ? filePath : path.resolve(process.cwd(), filePath);
+        if (!fs.existsSync(absolutePath)) {
+          throw new Error(`File not found: ${absolutePath}`);
+        }
+
+        const ext = path.extname(absolutePath).toLowerCase();
+
+        try {
+          if (['.txt', '.md', '.json', '.js', '.ts', '.css', '.html'].includes(ext)) {
+            return fs.readFileSync(absolutePath, 'utf8');
+          }
+
+          try {
+            const officeparser = require('officeparser');
+            return new Promise((resolve, reject) => {
+              officeparser.parseOffice(absolutePath, (data: any, err: any) => {
+                if (err) resolve(`Error parsing document: ${err}`);
+                else resolve(data);
+              });
+            });
+          } catch (officeErr) {
+            return `Unsupported file extension for direct reading: ${ext}. Officeparser is not fully working or available. File size: ${fs.statSync(absolutePath).size} bytes`;
+          }
+        } catch (e: any) {
+          return `Error parsing file: ${e.message}`;
+        }
+      }
+
+      case 'agent_spawn': {
+        const agentId = params.agentId as string;
+        if (!agentId) throw new Error('Agent ID is required');
+        const { attachedAgentService } = require('./attachedAgentService');
+        const success = await attachedAgentService.startAgent(agentId);
+        return success ? `Successfully spawned agent: ${agentId}` : `Failed to spawn agent: ${agentId}`;
+      }
+
+      case 'agent_status': {
+        const agentId = params.agentId as string;
+        if (!agentId) throw new Error('Agent ID is required');
+        const { attachedAgentService } = require('./attachedAgentService');
+        const state = attachedAgentService.getState(agentId);
+        return state ? JSON.stringify(state) : `Agent state not found for: ${agentId}`;
+      }
+
+      case 'agent_delegate': {
+        const { attachedAgentService } = require('./attachedAgentService');
+        const result = await attachedAgentService.executeTask(params as any);
+        return JSON.stringify(result);
+      }
+
+      case 'team_delete': {
+        const { attachedAgentService } = require('./attachedAgentService');
+        await attachedAgentService.stopAll();
+        return `Successfully stopped all team agents.`;
+      }
+
+      case 'task_create': {
+        const taskId = `task_${Date.now()}`;
+        const task: any = {
+          id: taskId,
+          title: params.title || 'Untitled Task',
+          description: params.description || '',
+          status: 'pending',
+          createdAt: Date.now(),
+          output: null,
+          ...params,
+        };
+        this.taskRegistry.set(taskId, task);
+        return `Task created successfully with ID: ${taskId}`;
+      }
+
+      case 'task_get': {
+        const taskId = params.taskId as string;
+        if (!taskId) throw new Error('Task ID is required');
+        const task = this.taskRegistry.get(taskId);
+        if (!task) throw new Error(`Task not found: ${taskId}`);
+        return JSON.stringify(task);
+      }
+
+      case 'task_list': {
+        return JSON.stringify(Array.from(this.taskRegistry.values()));
+      }
+
+      case 'task_update': {
+        const taskId = params.taskId as string;
+        if (!taskId) throw new Error('Task ID is required');
+        const task = this.taskRegistry.get(taskId);
+        if (!task) throw new Error(`Task not found: ${taskId}`);
+        const updatedTask = { ...task, ...params, updatedAt: Date.now() };
+        this.taskRegistry.set(taskId, updatedTask);
+        return `Task ${taskId} updated successfully.`;
+      }
+
+      case 'task_output': {
+        const taskId = params.taskId as string;
+        const output = params.output;
+        if (!taskId) throw new Error('Task ID is required');
+        const task = this.taskRegistry.get(taskId);
+        if (!task) throw new Error(`Task not found: ${taskId}`);
+        task.output = output;
+        task.status = 'completed';
+        task.updatedAt = Date.now();
+        this.taskRegistry.set(taskId, task);
+        return `Output recorded for task ${taskId}. Status set to completed.`;
+      }
+
+      default:
+        return `Executed built-in tool: ${toolId} (Underlying implementation pending)`;
     }
 
-    // Fallback for others
-    return `Executed built-in tool: ${toolId} (Underlying implementation pending)`;
+    return `Executed built-in tool: ${toolId}`;
   }
 
   /**

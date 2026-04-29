@@ -42,8 +42,8 @@ export class AcpRuntime {
   private readonly sessions = new Map<string, SessionEntry>();
   private readonly idleReclaimer: IdleReclaimer;
 
-  onStreamEvent: StreamEventHandler = () => { };
-  onSignalEvent: SignalEventHandler = () => { };
+  onStreamEvent: StreamEventHandler = () => {};
+  onSignalEvent: SignalEventHandler = () => {};
 
   constructor(
     // TODO(ACP Discovery): Re-enable acp_session persistence.

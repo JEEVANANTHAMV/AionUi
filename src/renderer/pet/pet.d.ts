@@ -21,6 +21,7 @@ interface PetConfirmAPI {
   respond: (data: { conversation_id: string; msg_id: string; callId: string; data: any }) => void;
   dragStart: () => void;
   dragEnd: () => void;
+  setYoloMode: (data: { conversation_id: string; enabled: boolean }) => void;
 }
 
 interface Window {

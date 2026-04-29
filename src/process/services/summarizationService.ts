@@ -43,6 +43,11 @@ class SummarizationService extends EventEmitter {
   private jobs: Map<string, SummarizationJob> = new Map();
   private config: SummarizerAgentConfig;
   private isProcessing: Map<string, boolean> = new Map();
+  private geminiClient: any = null;
+
+  setGeminiClient(client: any) {
+    this.geminiClient = client;
+  }
 
   constructor() {
     super();
@@ -211,8 +216,17 @@ class SummarizationService extends EventEmitter {
    */
   async createJob(filePath: string, content: string): Promise<SummarizationJob> {
     const estimatedTokens = this.estimateTokens(content);
-    const { recommendedStrategy, recommendedChunkCount } = this.determineStrategy(estimatedTokens);
-    const chunks = this.createChunks(content, recommendedStrategy);
+    const { recommendedStrategy } = this.determineStrategy(estimatedTokens);
+    
+    const path = require('path');
+    const ext = path.extname(filePath).toLowerCase();
+    
+    let chunks: DocumentChunk[] = [];
+    if (ext === '.pdf' || ['.docx', '.doc'].includes(ext)) {
+      chunks = await this.createPageChunks(filePath, content);
+    } else {
+      chunks = this.createChunks(content, recommendedStrategy);
+    }
 
     const job: SummarizationJob = {
       id: `summary-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -231,6 +245,105 @@ class SummarizationService extends EventEmitter {
     this.emit('job-created', { jobId: job.id, filePath });
 
     return job;
+  }
+
+  /**
+   * Create chunks based on pages (for PDF/DOCX)
+   */
+  async createPageChunks(filePath: string, content: string): Promise<DocumentChunk[]> {
+    const path = require('path');
+    const ext = path.extname(filePath).toLowerCase();
+    const chunks: DocumentChunk[] = [];
+    
+    let pages: string[] = [];
+    
+    if (ext === '.pdf') {
+      try {
+        pages = await this.readPdfPages(filePath);
+      } catch (e) {
+        console.error('Failed to read PDF pages, falling back to token chunking:', e);
+      }
+    } else if (['.docx', '.doc'].includes(ext)) {
+      try {
+        pages = await this.readDocxPages(filePath);
+      } catch (e) {
+        console.error('Failed to read DOCX pages, falling back to token chunking:', e);
+      }
+    }
+    
+    if (pages.length === 0) {
+      return this.createChunks(content, SummarizationStrategy.SLIDING_WINDOW);
+    }
+    
+    const pagesPerChunk = 50;
+    const overlapPages = 5;
+    
+    let index = 0;
+    for (let i = 0; i < pages.length; i += (pagesPerChunk - overlapPages)) {
+      const chunkPages = pages.slice(i, i + pagesPerChunk);
+      const chunkContent = chunkPages.join('\n\n');
+      const chunkTokens = this.estimateTokens(chunkContent);
+      
+      chunks.push({
+        id: `chunk-page-${index}`,
+        index,
+        startToken: i,
+        endToken: i + chunkPages.length,
+        content: chunkContent,
+        isProcessed: false,
+      });
+      
+      index++;
+      if (i + pagesPerChunk >= pages.length) break;
+    }
+    
+    return chunks;
+  }
+
+  private async readPdfPages(filePath: string): Promise<string[]> {
+    const fs = require('fs');
+    try {
+      const pdfjsLib = await import('pdfjs-dist');
+      const data = new Uint8Array(fs.readFileSync(filePath));
+      const loadingTask = pdfjsLib.getDocument({
+        data,
+        useSystemFonts: true,
+        disableFontFace: true,
+      });
+      
+      const pdf = await loadingTask.promise;
+      const pages: string[] = [];
+      
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map((item: any) => item.str).join(' ');
+        pages.push(pageText);
+      }
+      
+      return pages;
+    } catch (e) {
+      console.error('Error reading PDF pages with pdfjs-dist:', e);
+      throw e;
+    }
+  }
+
+  private async readDocxPages(filePath: string): Promise<string[]> {
+    const fs = require('fs');
+    const mammoth = require('mammoth');
+    
+    const result = await mammoth.extractRawText({ path: filePath });
+    const text = result.value;
+    
+    const words = text.split(/\s+/);
+    const wordsPerPage = 500;
+    const pages: string[] = [];
+    
+    for (let i = 0; i < words.length; i += wordsPerPage) {
+      pages.push(words.slice(i, i + wordsPerPage).join(' '));
+    }
+    
+    return pages;
   }
 
   /**
@@ -328,14 +441,29 @@ class SummarizationService extends EventEmitter {
    * Summarize a single chunk
    */
   private async summarizeChunk(chunk: DocumentChunk, index: number, total: number): Promise<string> {
-    // This would typically call the AI model API
-    // For now, return a placeholder
     const prompt = this.config.promptTemplate.replace('{content}', chunk.content);
 
-    // In actual implementation, this would call the model API
-    // const response = await this.callModel(prompt);
+    if (this.geminiClient) {
+      try {
+        const { DEFAULT_GEMINI_FLASH_MODEL, LlmRole } = require('@office-ai/aioncli-core');
+        const result = await this.geminiClient.generateContent(
+          { model: DEFAULT_GEMINI_FLASH_MODEL },
+          [{ role: 'user', parts: [{ text: prompt }] }],
+          new AbortController().signal,
+          LlmRole.UTILITY_TOOL
+        );
+        
+        const parts = result.candidates?.[0]?.content?.parts;
+        if (parts) {
+          const text = parts.map((part: any) => part.text).filter(Boolean).join('');
+          if (text) return text;
+        }
+      } catch (e) {
+        console.error('Failed to summarize chunk using Gemini API:', e);
+      }
+    }
 
-    // Placeholder: truncate and add summary prefix
+    // Fallback: truncate and add summary prefix
     const words = chunk.content.split(/\s+/).slice(0, 50).join(' ');
     return `[Summary of section ${index + 1}/${total}]: ${words}${chunk.content.length > words.length ? '...' : ''}`;
   }
@@ -351,13 +479,10 @@ class SummarizationService extends EventEmitter {
     const combinedText = summaries.join('\n\n---\n\n');
 
     if (strategy === SummarizationStrategy.MAP_REDUCE && summaries.length > 5) {
-      // For map-reduce, we might need another round of summarization
-      // if the combined text is still too large
       const estimatedTokens = this.estimateTokens(combinedText);
       const { maxChunkSize } = this.getContextConfig();
 
       if (estimatedTokens > maxChunkSize) {
-        // Create intermediate summaries
         const midPoint = Math.ceil(summaries.length / 2);
         const firstHalf = await this.combineSummaries(summaries.slice(0, midPoint), SummarizationStrategy.HIERARCHICAL);
         const secondHalf = await this.combineSummaries(summaries.slice(midPoint), SummarizationStrategy.HIERARCHICAL);
@@ -376,13 +501,28 @@ class SummarizationService extends EventEmitter {
       }
     }
 
-    // Use combine prompt
     const prompt = this.config.combinePromptTemplate.replace('{summaries}', combinedText);
 
-    // In actual implementation, this would call the model API
-    // const response = await this.callModel(prompt);
+    if (this.geminiClient) {
+      try {
+        const { DEFAULT_GEMINI_FLASH_MODEL, LlmRole } = require('@office-ai/aioncli-core');
+        const result = await this.geminiClient.generateContent(
+          { model: DEFAULT_GEMINI_FLASH_MODEL },
+          [{ role: 'user', parts: [{ text: prompt }] }],
+          new AbortController().signal,
+          LlmRole.UTILITY_TOOL
+        );
+        
+        const parts = result.candidates?.[0]?.content?.parts;
+        if (parts) {
+          const text = parts.map((part: any) => part.text).filter(Boolean).join('');
+          if (text) return text;
+        }
+      } catch (e) {
+        console.error('Failed to combine summaries using Gemini API:', e);
+      }
+    }
 
-    // Placeholder
     return `Combined Summary:\n\n${summaries.length} sections summarized.\n\nKey points:\n${summaries.map((s, i) => `${i + 1}. ${s.substring(0, 100)}...`).join('\n')}`;
   }
 

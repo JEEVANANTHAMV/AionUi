@@ -372,6 +372,25 @@ function registerIpcHandlers(): void {
       }
     }
   );
+  ipcMain.on('pet:confirm-set-yolo', async (_event, data: { conversation_id: string; enabled: boolean }) => {
+    console.log('[PetConfirm] Setting YOLO mode:', data.enabled, 'for', data.conversation_id);
+    try {
+      const config = (await ProcessConfig.get('gemini.config')) || {};
+      await ProcessConfig.set('gemini.config', {
+        authType: '',
+        proxy: '',
+        ...config,
+        yoloMode: data.enabled,
+      });
+
+      const task = workerTaskManager.getTask(data.conversation_id);
+      if (task && task.type === 'gemini') {
+        (task as any).currentMode = data.enabled ? 'yolo' : 'default';
+      }
+    } catch (error) {
+      console.error('[PetConfirm] Failed to set YOLO mode config:', error);
+    }
+  });
 }
 
 /**
@@ -381,4 +400,5 @@ function unregisterIpcHandlers(): void {
   ipcMain.removeAllListeners('pet:confirm-respond');
   ipcMain.removeAllListeners('pet:confirm-drag-start');
   ipcMain.removeAllListeners('pet:confirm-drag-end');
+  ipcMain.removeAllListeners('pet:confirm-set-yolo');
 }

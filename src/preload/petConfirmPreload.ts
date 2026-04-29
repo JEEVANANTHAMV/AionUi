@@ -28,4 +28,7 @@ contextBridge.exposeInMainWorld('petConfirmAPI', {
   dragEnd: () => {
     ipcRenderer.send('pet:confirm-drag-end');
   },
+  setYoloMode: (data: { conversation_id: string; enabled: boolean }) => {
+    ipcRenderer.send('pet:confirm-set-yolo', data);
+  },
 });

@@ -5,8 +5,8 @@
  */
 
 import type { IMessageAcpPermission } from '@/common/chat/chatLib';
-import { conversation } from '@/common/adapter/ipcBridge';
-import { Button, Card, Radio, Typography } from '@arco-design/web-react';
+import { conversation, acpConversation } from '@/common/adapter/ipcBridge';
+import { Button, Card, Radio, Typography, Switch, Tooltip } from '@arco-design/web-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -50,6 +50,55 @@ const MessageAcpPermission: React.FC<MessageAcpPermissionProps> = React.memo(({ 
   const [selected, setSelected] = useState<string | null>(null);
   const [isResponding, setIsResponding] = useState(false);
   const [hasResponded, setHasResponded] = useState(false);
+  const [yoloMode, setYoloMode] = useState(false);
+
+  const handleToggleYolo = async (checked: boolean) => {
+    setYoloMode(checked);
+    if (checked) {
+      try {
+        await acpConversation.setMode.invoke({
+          conversationId: message.conversation_id,
+          mode: 'yolo',
+        });
+        
+        // Auto-confirm with selected or first available option
+        const optionToConfirm = selected || (options && options.length > 0 ? options[0]?.optionId || 'option_0' : null);
+        if (optionToConfirm) {
+          setSelected(optionToConfirm);
+          setTimeout(async () => {
+            setIsResponding(true);
+            try {
+              const invokeData = {
+                confirmKey: optionToConfirm,
+                msg_id: message.id,
+                conversation_id: message.conversation_id,
+                callId: toolCall?.toolCallId || message.id,
+              };
+              const result = await conversation.confirmMessage.invoke(invokeData);
+              if (result.success) {
+                setHasResponded(true);
+              }
+            } catch (err) {
+              console.error('YOLO auto-confirm failed:', err);
+            } finally {
+              setIsResponding(false);
+            }
+          }, 100);
+        }
+      } catch (error) {
+        console.error('Failed to enable YOLO mode:', error);
+      }
+    } else {
+      try {
+        await acpConversation.setMode.invoke({
+          conversationId: message.conversation_id,
+          mode: 'default',
+        });
+      } catch (error) {
+        console.error('Failed to disable YOLO mode:', error);
+      }
+    }
+  };
 
   const handleConfirm = async () => {
     if (hasResponded || !selected) return;
@@ -84,12 +133,41 @@ const MessageAcpPermission: React.FC<MessageAcpPermissionProps> = React.memo(({ 
   }
 
   return (
-    <Card className='mb-4' bordered={false} style={{ background: 'var(--bg-1)' }}>
+    <Card 
+      className={`mb-4 transition-all duration-300 ${yoloMode ? 'border border-yellow-500 shadow-md' : ''}`} 
+      bordered={false} 
+      style={{ background: 'var(--bg-1)' }}
+    >
       <div className='space-y-4'>
-        {/* Header with icon and title */}
-        <div className='flex items-center space-x-2'>
-          <span className='text-2xl'>{icon}</span>
-          <Text className='block'>{title}</Text>
+        {/* Header with icon, title, and YOLO mode toggle */}
+        <div className='flex items-center justify-between'>
+          <div className='flex items-center space-x-2'>
+            <span className='text-2xl'>{icon}</span>
+            <Text className='block font-medium'>{title}</Text>
+          </div>
+          <div className='flex items-center space-x-2 bg-2 p-1 px-2 rounded-full'>
+            <Tooltip
+              content={
+                <div className='p-2 max-w-240px space-y-2 text-xs'>
+                  <div className='font-bold text-sm text-yellow-500'>⚠️ YOLO Mode (Full Auto)</div>
+                  <div>Turning this on allows the agent to execute all future tool calls automatically without asking for permission.</div>
+                  <div className='text-red-400 font-bold'>Precaution:</div>
+                  <div className='text-t-secondary'>The agent could run commands, delete files, or consume API credits without your review. Use only on trusted codebases.</div>
+                </div>
+              }
+            >
+              <span className='text-t-tertiary cursor-pointer text-sm hover:text-t-primary leading-none'>
+                ❔
+              </span>
+            </Tooltip>
+            <span className='text-xs text-t-secondary select-none'>YOLO Mode</span>
+            <Switch
+              size='small'
+              checked={yoloMode}
+              onChange={handleToggleYolo}
+              disabled={isResponding || hasResponded}
+            />
+          </div>
         </div>
         {(toolCall.rawInput?.command || toolCall.title) && (
           <div>

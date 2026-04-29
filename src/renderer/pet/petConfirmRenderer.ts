@@ -22,9 +22,34 @@ interface IConfirmation<Option = any> {
 const titleEl = document.getElementById('title')!;
 const descriptionEl = document.getElementById('description')!;
 const optionsEl = document.getElementById('options')!;
+const yoloToggleEl = document.getElementById('yolo-toggle') as HTMLInputElement;
+const yoloHelpBtn = document.getElementById('yolo-help-btn')!;
+const yoloPopover = document.getElementById('yolo-popover')!;
+const popoverClose = document.getElementById('popover-close')!;
 
 let currentConfirmation: IConfirmation | null = null;
 let msgId = '';
+
+yoloHelpBtn.addEventListener('click', () => {
+  yoloPopover.classList.toggle('visible');
+});
+
+popoverClose.addEventListener('click', () => {
+  yoloPopover.classList.remove('visible');
+});
+
+yoloToggleEl.addEventListener('change', () => {
+  if (currentConfirmation) {
+    window.petConfirmAPI.setYoloMode({
+      conversation_id: currentConfirmation.conversation_id,
+      enabled: yoloToggleEl.checked,
+    });
+
+    if (yoloToggleEl.checked && currentConfirmation.options.length > 0) {
+      respond(currentConfirmation.options[0].value);
+    }
+  }
+});
 
 /**
  * Render confirmation UI.

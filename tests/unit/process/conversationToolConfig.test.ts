@@ -6,7 +6,7 @@ const { configCtorMock } = vi.hoisted(() => ({
 }));
 
 vi.mock('@office-ai/aioncli-core', async (importOriginal) => {
-  const actual = await importOriginal() as any;
+  const actual = (await importOriginal()) as any;
   return {
     ...actual,
     AuthType: {

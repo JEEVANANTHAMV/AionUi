@@ -242,19 +242,13 @@ export const processGeminiStreamEvents = async (
           break;
         case ServerGeminiEventType.ContextWindowWillOverflow:
           {
-            // Handle context window overflow - extract token counts for user-friendly message
             const overflowEvent = event as {
               type: string;
               value: { estimatedRequestTokenCount: number; remainingTokenCount: number };
             };
-            const estimated = overflowEvent.value?.estimatedRequestTokenCount || 0;
-            const remaining = overflowEvent.value?.remainingTokenCount || 0;
-            const estimatedK = Math.round(estimated / 1000);
-            const remainingK = Math.round(remaining / 1000);
-
             onStreamEvent({
-              type: ServerGeminiEventType.Error,
-              data: `Context window overflow: Request size (${estimatedK}K tokens) exceeds model capacity (${remainingK}K tokens). Try: 1) Start a new conversation, 2) Reduce workspace files, 3) Clear conversation history, or 4) Use smaller files.`,
+              type: ServerGeminiEventType.ContextWindowWillOverflow,
+              data: overflowEvent.value,
             });
           }
           break;

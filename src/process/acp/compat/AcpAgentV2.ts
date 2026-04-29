@@ -911,6 +911,6 @@ export class AcpAgentV2 {
         });
       }
     });
-    AcpAgentV2.cacheQueue = job.catch(() => { });
+    AcpAgentV2.cacheQueue = job.catch(() => {});
   }
 }

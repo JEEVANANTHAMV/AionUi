@@ -116,7 +116,7 @@ export class ForjinnrsManager extends BaseAgentManager<ForjinnrsManagerData, str
     this.init();
 
     // Start the agent bootstrap — store promise so sendMessage can await it
-    this.agentReady = this.start().catch(() => { });
+    this.agentReady = this.start().catch(() => {});
   }
 
   /**
