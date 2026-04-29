@@ -409,7 +409,7 @@ class AttachedAgentService extends EventEmitter {
           throw new Error(`Failed to create OpenCode session: ${sessionRes.statusText}`);
         }
 
-        const sessionData = await sessionRes.json() as { id: string };
+        const sessionData = (await sessionRes.json()) as { id: string };
         const sessionId = sessionData.id;
 
         // 2. Send instruction
@@ -430,7 +430,7 @@ class AttachedAgentService extends EventEmitter {
         try {
           const worktreeRes = await fetch(`${endpoint}/project/current`);
           if (worktreeRes.ok) {
-            const worktreeData = await worktreeRes.json() as { worktree: string };
+            const worktreeData = (await worktreeRes.json()) as { worktree: string };
             worktree = worktreeData.worktree;
           }
         } catch (e) {
@@ -439,7 +439,11 @@ class AttachedAgentService extends EventEmitter {
 
         let sessionUrl = `${endpoint}/session/${sessionId}`;
         if (worktree) {
-          const encodedWorktree = Buffer.from(worktree).toString('base64').replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
+          const encodedWorktree = Buffer.from(worktree)
+            .toString('base64')
+            .replace(/=+$/, '')
+            .replace(/\+/g, '-')
+            .replace(/\//g, '_');
           sessionUrl = `${endpoint}/${encodedWorktree}/session/${sessionId}`;
         }
 

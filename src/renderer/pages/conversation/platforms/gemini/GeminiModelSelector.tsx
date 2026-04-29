@@ -123,7 +123,10 @@ const GeminiModelSelector: React.FC<{
             if (!models.length) return null;
 
             return (
-              <Menu.ItemGroup title={provider.name} key={provider.id}>
+              <Menu.ItemGroup
+                title={provider.name === 'Gemini' || provider.name === 'Innosynth' ? 'Forjinn AI' : provider.name}
+                key={provider.id}
+              >
                 {models.map((modelName) => {
                   const isGoogleProvider = provider.platform?.toLowerCase().includes('gemini-with-google-auth');
                   const option = isGoogleProvider ? geminiModeLookup.get(modelName) : undefined;

@@ -52,25 +52,16 @@ class AgentRegistry {
   private createGeminiAgent(): GeminiDetectedAgent {
     return {
       id: 'gemini',
-      name: 'Gemini CLI',
+      name: 'Forjinn AI',
       kind: 'gemini',
       available: true,
       backend: 'gemini',
     };
   }
 
-  private createForjinnrsAgent(): ForjinnrsDetectedAgent {
-    return {
-      id: 'forjinnrs',
-      name: 'Forjinn CLI',
-      kind: 'forjinnrs',
-      available: true,
-      backend: 'forjinnrs',
-    };
-  }
-
   /**
    * Detect non-ACP CLI agents (openclaw-gateway, nanobot) via CLI availability.
+
    * Uses the same `which`/`where` check as AcpDetector.
    */
   private detectOtherCliAgents(): DetectedAgent[] {
@@ -149,7 +140,6 @@ class AgentRegistry {
   // prettier-ignore
   private merge(): void {
     this.detectedAgents = this.deduplicate([
-      this.createForjinnrsAgent(),
       this.createGeminiAgent(),
       ...this.builtinAgents,
       ...this.otherAgents,
@@ -158,6 +148,7 @@ class AgentRegistry {
       ...this.customAgents,
     ]);
   }
+
 
   private async runExclusiveMutation<T>(task: () => Promise<T>): Promise<T> {
     const previousMutation = this.mutationQueue;

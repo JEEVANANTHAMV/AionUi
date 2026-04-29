@@ -15,13 +15,9 @@ import type {
   McpServerRuntimeState,
   OfflineMcpTool,
   McpBundleInfo,
-
-  OfflineMcpServerType} from '@/common/types/offlineMcp';
-import {
-  DEFAULT_OFFLINE_MCP_SERVERS,
-  DEFAULT_OFFLINE_MCP_BUNDLES,
-  McpBundleStatus,
+  OfflineMcpServerType,
 } from '@/common/types/offlineMcp';
+import { DEFAULT_OFFLINE_MCP_SERVERS, DEFAULT_OFFLINE_MCP_BUNDLES, McpBundleStatus } from '@/common/types/offlineMcp';
 import { ConfigStorage } from '@/common/config/storage';
 
 export interface OfflineMcpServiceEvents {

@@ -110,6 +110,55 @@ const ConversationRow: React.FC<ConversationRowProps> = (props) => {
     );
   };
 
+  const menuNode = (
+    <Menu
+      onClickMenuItem={(key) => {
+        if (key === 'pin') {
+          onTogglePin(conversation);
+          return;
+        }
+        if (key === 'rename') {
+          onEditStart(conversation);
+          return;
+        }
+        if (key === 'export') {
+          onExport?.(conversation);
+          return;
+        }
+        if (key === 'delete') {
+          onDelete(conversation.id);
+        }
+      }}
+    >
+      <Menu.Item key='pin'>
+        <div className='flex items-center gap-8px'>
+          <Pushpin theme='outline' size='14' />
+          <span>{isPinned ? t('conversation.history.unpin') : t('conversation.history.pin')}</span>
+        </div>
+      </Menu.Item>
+      <Menu.Item key='rename'>
+        <div className='flex items-center gap-8px'>
+          <EditOne theme='outline' size='14' />
+          <span>{t('conversation.history.rename')}</span>
+        </div>
+      </Menu.Item>
+      {onExport && (
+        <Menu.Item key='export'>
+          <div className='flex items-center gap-8px'>
+            <Export theme='outline' size='14' />
+            <span>{t('conversation.history.export')}</span>
+          </div>
+        </Menu.Item>
+      )}
+      <Menu.Item key='delete'>
+        <div className='flex items-center gap-8px text-[rgb(var(--warning-6))]'>
+          <DeleteOne theme='outline' size='14' />
+          <span>{t('conversation.history.deleteTitle')}</span>
+        </div>
+      </Menu.Item>
+    </Menu>
+  );
+
   return (
     <Tooltip
       key={conversation.id}
@@ -117,168 +166,129 @@ const ConversationRow: React.FC<ConversationRowProps> = (props) => {
       content={conversation.name || t('conversation.welcome.newConversation')}
       position='right'
     >
-      <div
-        id={'c-' + conversation.id}
-        className={classNames(
-          'chat-history__item h-40px rd-8px flex items-center group cursor-pointer relative overflow-hidden shrink-0 conversation-item [&.conversation-item+&.conversation-item]:mt-2px min-w-0 transition-colors',
-          collapsed ? 'justify-center px-0' : 'justify-start gap-8px px-10px',
-          {
-            'hover:bg-[rgba(var(--primary-6),0.14)]': !batchMode,
-            '!bg-active': selected,
-            'bg-[rgba(var(--primary-6),0.08)]': batchMode && checked,
-          }
-        )}
-        onClick={handleRowClick}
-        onContextMenu={handleRowContextMenu}
+      <Dropdown
+        droplist={menuNode}
+        trigger='contextMenu'
+        position='bl'
+        disabled={batchMode}
+        getPopupContainer={() => document.body}
       >
-        {batchMode && (
-          <span
-            className='mr-8px flex-center'
-            onClick={(event) => {
-              event.stopPropagation();
-              onToggleChecked(conversation);
-            }}
-          >
-            <Checkbox checked={checked} />
-          </span>
-        )}
-        <span className='w-28px h-28px flex items-center justify-center shrink-0'>
-          {isGenerating && !batchMode ? <Spin size={16} /> : renderLeadingIcon()}
-        </span>
-        <FlexFullContainer
+        <div
+          id={'c-' + conversation.id}
           className={classNames(
-            'h-24px min-w-0 flex-1 collapsed-hidden',
-            isPinned && !isMobile ? siderStyles.pinnedTextSlot : 'pr-18px'
+            'chat-history__item h-40px rd-8px flex items-center group cursor-pointer relative overflow-hidden shrink-0 conversation-item [&.conversation-item+&.conversation-item]:mt-2px min-w-0 transition-colors',
+            collapsed ? 'justify-center px-0' : 'justify-start gap-8px px-10px',
+            {
+              'hover:bg-[rgba(var(--primary-6),0.14)]': !batchMode,
+              '!bg-active': selected,
+              'bg-[rgba(var(--primary-6),0.08)]': batchMode && checked,
+            }
           )}
+          onClick={handleRowClick}
         >
-          <Tooltip
-            content={conversation.name}
-            disabled={!inlineNameTooltipEnabled}
-            trigger='hover'
-            popupVisible={inlineNameTooltipEnabled ? undefined : false}
-            unmountOnExit
-            popupHoverStay={false}
-            position='top'
+          {batchMode && (
+            <span
+              className='mr-8px flex-center'
+              onClick={(event) => {
+                event.stopPropagation();
+                onToggleChecked(conversation);
+              }}
+            >
+              <Checkbox checked={checked} />
+            </span>
+          )}
+          <span className='w-28px h-28px flex items-center justify-center shrink-0'>
+            {isGenerating && !batchMode ? <Spin size={16} /> : renderLeadingIcon()}
+          </span>
+          <FlexFullContainer
+            className={classNames(
+              'h-24px min-w-0 flex-1 collapsed-hidden',
+              isPinned && !isMobile ? siderStyles.pinnedTextSlot : 'pr-18px'
+            )}
           >
+            <Tooltip
+              content={conversation.name}
+              disabled={!inlineNameTooltipEnabled}
+              trigger='hover'
+              popupVisible={inlineNameTooltipEnabled ? undefined : false}
+              unmountOnExit
+              popupHoverStay={false}
+              position='top'
+            >
+              <div
+                className={classNames(
+                  'chat-history__item-name overflow-hidden text-ellipsis block w-full text-14px lh-24px whitespace-nowrap min-w-0 group-hover:text-1',
+                  selected && !batchMode ? 'text-1 font-medium' : 'text-2'
+                )}
+              >
+                <span className='block overflow-hidden text-ellipsis whitespace-nowrap'>{conversation.name}</span>
+              </div>
+            </Tooltip>
+          </FlexFullContainer>
+
+          {renderCompletionUnreadDot()}
+          {!batchMode && isPinned && !menuVisible && !isMobile && (
+            <span className='absolute right-8px top-1/2 -translate-y-1/2 flex-center text-t-secondary pointer-events-none !collapsed-hidden group-hover:hidden'>
+              <Pushpin theme='outline' size='16' />
+            </span>
+          )}
+          {!batchMode && (
             <div
               className={classNames(
-                'chat-history__item-name overflow-hidden text-ellipsis block w-full text-14px lh-24px whitespace-nowrap min-w-0 group-hover:text-1',
-                selected && !batchMode ? 'text-1 font-medium' : 'text-2'
+                'absolute right-0px top-0px h-full items-center justify-end !collapsed-hidden pr-8px',
+                {
+                  flex: isMobile || menuVisible,
+                  'hidden group-hover:flex': !isMobile && !menuVisible,
+                }
               )}
+              style={{
+                backgroundImage: selected
+                  ? `linear-gradient(to right, transparent, var(--forjinn-2) 100%)`
+                  : `linear-gradient(to right, transparent, var(--forjinn-1) 100%)`,
+              }}
+              onClick={(event) => {
+                event.stopPropagation();
+              }}
             >
-              <span className='block overflow-hidden text-ellipsis whitespace-nowrap'>{conversation.name}</span>
-            </div>
-          </Tooltip>
-        </FlexFullContainer>
-
-        {renderCompletionUnreadDot()}
-        {!batchMode && isPinned && !menuVisible && !isMobile && (
-          <span className='absolute right-8px top-1/2 -translate-y-1/2 flex-center text-t-secondary pointer-events-none !collapsed-hidden group-hover:hidden'>
-            <Pushpin theme='outline' size='16' />
-          </span>
-        )}
-        {!batchMode && (
-          <div
-            className={classNames(
-              'absolute right-0px top-0px h-full items-center justify-end !collapsed-hidden pr-8px',
-              {
-                flex: isMobile || menuVisible,
-                'hidden group-hover:flex': !isMobile && !menuVisible,
-              }
-            )}
-            style={{
-              backgroundImage: selected
-                ? `linear-gradient(to right, transparent, var(--forjinn-2) 100%)`
-                : `linear-gradient(to right, transparent, var(--forjinn-1) 100%)`,
-            }}
-            onClick={(event) => {
-              event.stopPropagation();
-            }}
-          >
-            <Dropdown
-              droplist={
-                <Menu
-                  onClickMenuItem={(key) => {
-                    if (key === 'pin') {
-                      onTogglePin(conversation);
-                      return;
+              <Dropdown
+                droplist={menuNode}
+                trigger='click'
+                position='br'
+                popupVisible={menuVisible}
+                onVisibleChange={(visible) => onMenuVisibleChange(conversation.id, visible)}
+                getPopupContainer={() => document.body}
+                unmountOnExit={false}
+              >
+                <span
+                  className={classNames(
+                    'flex-center cursor-pointer hover:bg-fill-2 rd-4px p-4px transition-colors relative text-t-primary',
+                    {
+                      flex: isMobile || menuVisible,
+                      'hidden group-hover:flex': !isMobile && !menuVisible,
                     }
-                    if (key === 'rename') {
-                      onEditStart(conversation);
-                      return;
-                    }
-                    if (key === 'export') {
-                      onExport?.(conversation);
-                      return;
-                    }
-                    if (key === 'delete') {
-                      onDelete(conversation.id);
-                    }
+                  )}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onOpenMenu(conversation);
                   }}
                 >
-                  <Menu.Item key='pin'>
-                    <div className='flex items-center gap-8px'>
-                      <Pushpin theme='outline' size='14' />
-                      <span>{isPinned ? t('conversation.history.unpin') : t('conversation.history.pin')}</span>
-                    </div>
-                  </Menu.Item>
-                  <Menu.Item key='rename'>
-                    <div className='flex items-center gap-8px'>
-                      <EditOne theme='outline' size='14' />
-                      <span>{t('conversation.history.rename')}</span>
-                    </div>
-                  </Menu.Item>
-                  {onExport && (
-                    <Menu.Item key='export'>
-                      <div className='flex items-center gap-8px'>
-                        <Export theme='outline' size='14' />
-                        <span>{t('conversation.history.export')}</span>
-                      </div>
-                    </Menu.Item>
-                  )}
-                  <Menu.Item key='delete'>
-                    <div className='flex items-center gap-8px text-[rgb(var(--warning-6))]'>
-                      <DeleteOne theme='outline' size='14' />
-                      <span>{t('conversation.history.deleteTitle')}</span>
-                    </div>
-                  </Menu.Item>
-                </Menu>
-              }
-              trigger='click'
-              position='br'
-              popupVisible={menuVisible}
-              onVisibleChange={(visible) => onMenuVisibleChange(conversation.id, visible)}
-              getPopupContainer={() => document.body}
-              unmountOnExit={false}
-            >
-              <span
-                className={classNames(
-                  'flex-center cursor-pointer hover:bg-fill-2 rd-4px p-4px transition-colors relative text-t-primary',
-                  {
-                    flex: isMobile || menuVisible,
-                    'hidden group-hover:flex': !isMobile && !menuVisible,
-                  }
-                )}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onOpenMenu(conversation);
-                }}
-              >
-                <div
-                  className='flex flex-col gap-2px items-center justify-center'
-                  style={{ width: '16px', height: '16px' }}
-                >
-                  <div className='w-2px h-2px rounded-full bg-current'></div>
-                  <div className='w-2px h-2px rounded-full bg-current'></div>
-                  <div className='w-2px h-2px rounded-full bg-current'></div>
-                </div>
-              </span>
-            </Dropdown>
-          </div>
-        )}
-      </div>
+                  <div
+                    className='flex flex-col gap-2px items-center justify-center'
+                    style={{ width: '16px', height: '16px' }}
+                  >
+                    <div className='w-2px h-2px rounded-full bg-current'></div>
+                    <div className='w-2px h-2px rounded-full bg-current'></div>
+                    <div className='w-2px h-2px rounded-full bg-current'></div>
+                  </div>
+                </span>
+              </Dropdown>
+            </div>
+          )}
+        </div>
+      </Dropdown>
     </Tooltip>
   );
 };
+
 
 export default ConversationRow;

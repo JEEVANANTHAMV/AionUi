@@ -41,7 +41,8 @@ import QwenLogo from '@/renderer/assets/logos/ai-china/qwen.svg';
 const AGENT_LOGO_MAP = {
   forjinnrs: ForjinnLogo,
   claude: ClaudeLogo,
-  gemini: GeminiLogo,
+  gemini: ForjinnLogo,
+
   qwen: QwenLogo,
   codex: CodexLogo,
   codebuddy: CodeBuddyLogo,

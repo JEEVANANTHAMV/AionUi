@@ -773,11 +773,11 @@ export const handleAgentSelect: ActionHandler = async (context, params) => {
  */
 function getAgentDisplayName(agentType: ChannelAgentType): string {
   const names: Record<ChannelAgentType, string> = {
-    gemini: '🤖 Gemini',
+    gemini: '🤖 Forjinn AI',
     acp: '🧠 Claude',
     codex: '⚡ Codex',
-    'openclaw-gateway': '🦞 OpenClaw',
-    forjinnrs: '🚀 Forjinn',
+    forjinnrs: '🤖 Forjinn AI',
+    'openclaw-gateway': '🤖 Forjinn AI',
   };
   return names[agentType] || agentType;
 }
@@ -792,7 +792,6 @@ function backendToChannelAgentType(backend: string): ChannelAgentType | null {
     claude: 'acp',
     codex: 'codex',
     'openclaw-gateway': 'openclaw-gateway',
-    forjinnrs: 'forjinnrs',
   };
   return mapping[backend] || null;
 }
@@ -806,7 +805,6 @@ function getAgentEmoji(backend: string): string {
     claude: '🧠',
     codex: '⚡',
     'openclaw-gateway': '🦞',
-    forjinnrs: '🚀',
   };
   return emojis[backend] || '🤖';
 }
@@ -820,12 +818,8 @@ function getAvailableChannelAgents(): AgentDisplayInfo[] {
   const availableAgents: AgentDisplayInfo[] = [];
   const seenTypes = new Set<ChannelAgentType>();
 
-  // Always include Forjinn as it's the new default
-  availableAgents.push({ type: 'forjinnrs', emoji: '🚀', name: 'Forjinn' });
-  seenTypes.add('forjinnrs');
-
-  // Always include Gemini as it's built-in
-  availableAgents.push({ type: 'gemini', emoji: '🤖', name: 'Gemini' });
+  // Always include Aion AI as it's built-in
+  availableAgents.push({ type: 'gemini', emoji: '🤖', name: 'Aion AI' });
   seenTypes.add('gemini');
 
   // Add detected ACP agents (claude, codex, etc.)

@@ -99,7 +99,7 @@ const ChatLayout: React.FC<{
     agentName ||
     (backend === 'custom' && customAgents?.[0]?.name) ||
     ACP_BACKENDS_ALL[backend as keyof typeof ACP_BACKENDS_ALL]?.name ||
-    backend;
+    (backend === 'gemini' ? 'Forjinn AI' : backend);
 
   const {
     splitRatio: workspaceSplitRatio,
