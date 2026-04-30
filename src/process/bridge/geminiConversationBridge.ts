@@ -24,4 +24,19 @@ export function initGeminiConversationBridge(workerTaskManager: IWorkerTaskManag
     void (task as GeminiAgentManager).confirm(msg_id, callId, confirmKey);
     return { success: true };
   });
+
+  // Gemini setYoloMode provider (for 'gemini.set-yolo-mode' channel)
+  ipcBridge.geminiConversation.setYoloMode.provider(async ({ conversationId, yoloMode }) => {
+    const task = workerTaskManager.getTask(conversationId);
+    if (!task) {
+      return { success: false, msg: 'conversation not found' };
+    }
+    if (task.type !== 'gemini') {
+      return { success: false, msg: 'only supported for gemini' };
+    }
+
+    // Call GeminiAgentManager.setYoloMode() to update yolo mode in worker
+    void (task as GeminiAgentManager).setYoloMode(yoloMode);
+    return { success: true };
+  });
 }

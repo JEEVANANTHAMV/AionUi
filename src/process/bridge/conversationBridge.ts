@@ -213,20 +213,26 @@ export function initConversationBridge(
         return [];
       }
 
+      const normalize = (p?: string) => (p || '').replace(/[\\/]+$/, '');
+      const targetWorkspace = normalize(currentConversation.extra?.workspace);
+
       let allConversations: TChatConversation[] = await conversationService.listAllConversations();
 
       // If database is empty or doesn't have enough conversations, merge with file storage
       const history = await ProcessChat.get('chat.history');
-      if (allConversations.length < (history?.length || 0)) {
-        // Database doesn't have all conversations yet, use file storage
-        allConversations = history || [];
-
-        // Lazy migrate all conversations in background
-        void Promise.all(allConversations.map((conv) => migrateConversationToDatabase(conv)));
+      if (history?.length) {
+        // Merge strategy: prioritize DB, fill in missing from file storage by ID
+        const dbIds = new Set(allConversations.map((c) => c.id));
+        const fileOnly = (history || []).filter((c) => !dbIds.has(c.id));
+        if (fileOnly.length > 0) {
+          allConversations = [...allConversations, ...fileOnly];
+          // Lazy migrate missing ones
+          void Promise.all(fileOnly.map((conv) => migrateConversationToDatabase(conv)));
+        }
       }
 
       // Filter by workspace
-      return allConversations.filter((item) => item.extra?.workspace === currentConversation.extra.workspace);
+      return allConversations.filter((item) => normalize(item.extra?.workspace) === targetWorkspace);
     } catch (error) {
       console.error('[conversationBridge] Failed to get associate conversations:', error);
       return [];

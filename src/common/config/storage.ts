@@ -193,8 +193,6 @@ export interface IConfigStorageRefer {
     customAgentId?: string;
     name?: string;
   };
-  // Skills Market: whether the forjinn-desk-skills builtin skill is enabled
-  'skillsMarket.enabled'?: boolean;
   // Desktop Pet: whether the desktop pet feature is enabled
   'pet.enabled'?: boolean;
   // Desktop Pet: size in pixels (200, 280, or 360)

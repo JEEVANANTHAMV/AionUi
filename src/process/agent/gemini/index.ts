@@ -52,6 +52,7 @@ import {
 } from './utils';
 import path from 'path';
 import os from 'os';
+import { summarizationService } from '@/process/services/summarizationService';
 
 // Global registry for current agent instance (used by flashFallbackHandler)
 let currentGeminiAgent: GeminiAgent | null = null;
@@ -454,8 +455,51 @@ export class GeminiAgent {
     );
 
     this.geminiClient = this.config.getGeminiClient();
+    
+    // [Vision Patch] Fix OpenAI/Qwen vision support by re-injecting multimodal parts
+    // The core OpenAIContentGenerator currently strips inlineData/image_url
+    const generator = (this.geminiClient as any).getContentGeneratorOrFail?.();
+    if (generator && generator.constructor.name === 'OpenAIContentGenerator') {
+      console.log('[GeminiAgent] Applying vision patch to OpenAIContentGenerator');
+      const originalConvert = generator.convertToOpenAIFormat.bind(generator);
+      generator.convertToOpenAIFormat = (request: any) => {
+        const messages = originalConvert(request);
+        // Match request contents with generated messages to re-inject images
+        if (Array.isArray(request.contents)) {
+          // We iterate backwards to match the most recent messages (most likely to have images)
+          for (let i = request.contents.length - 1; i >= 0; i--) {
+            const content = request.contents[i];
+            const role = content.role === 'model' ? 'assistant' : 'user';
+            // Find the corresponding message in the converted array
+            // Note: this is a heuristic match based on role and recentness
+            const message = messages.reverse().find((m: any) => m.role === role && typeof m.content === 'string');
+            messages.reverse(); // put it back
+
+            if (message && content.parts) {
+              const imageParts = content.parts.filter((p: any) => p.inlineData || p.image_url);
+              if (imageParts.length > 0) {
+                const text = message.content;
+                const newContent: any[] = [{ type: 'text', text }];
+                imageParts.forEach((part: any) => {
+                  if (part.inlineData) {
+                    newContent.push({
+                      type: 'image_url',
+                      image_url: { url: `data:${part.inlineData.mimeType};base64,${part.inlineData.data}` }
+                    });
+                  } else if (part.image_url) {
+                    newContent.push(part);
+                  }
+                });
+                message.content = newContent;
+              }
+            }
+          }
+        }
+        return messages;
+      };
+    }
+
     try {
-      const { summarizationService } = require('@/process/services/summarizationService');
       summarizationService.setGeminiClient(this.geminiClient);
     } catch (e) {
       console.warn('[GeminiAgent] Failed to set GeminiClient in SummarizationService:', e);
@@ -466,15 +510,20 @@ export class GeminiAgent {
     // Rules 定义系统行为规则，在会话开始时就应该生效
     // Rules define system behavior, should be effective from session start
     console.log(`[GeminiAgent] presetRules length: ${this.presetRules?.length || 0}`);
+    const visionInstruction = `\n\n[Vision Capability]\nIf you see image references (e.g. @uploads/image.png) and need to analyze their content, use the 'vision_analyze' tool. Do NOT use 'read_file' for images.`;
+    const currentMemory = this.config.getUserMemory();
+    
+    let rulesSection = '';
     if (this.presetRules) {
-      const currentMemory = this.config.getUserMemory();
-      const rulesSection = `[Assistant System Rules]\n${this.presetRules}`;
-      const combined = currentMemory ? `${rulesSection}\n\n${currentMemory}` : rulesSection;
-      this.config.setUserMemory(combined);
-      console.log(`[GeminiAgent] Injected presetRules into userMemory, total length: ${combined.length}`);
+      rulesSection = `[Assistant System Rules]\n${this.presetRules}${visionInstruction}`;
+      console.log(`[GeminiAgent] Injected presetRules and visionInstruction into userMemory`);
     } else {
-      console.log(`[GeminiAgent] No presetRules to inject`);
+      rulesSection = `[Assistant System Rules]${visionInstruction}`;
+      console.log(`[GeminiAgent] Injected visionInstruction into userMemory`);
     }
+    
+    const combined = currentMemory ? `${rulesSection}\n\n${currentMemory}` : rulesSection;
+    this.config.setUserMemory(combined);
 
     // Note: Skills (技能定义) are prepended to the first message in send() method
     // Skills provide capabilities/tools descriptions, injected at runtime
@@ -800,28 +849,62 @@ export class GeminiAgent {
 
     // 将 files 参数中的文件路径作为 @ 引用添加到消息末尾
     // Append files from files parameter as @ references to the message
+    const imageParts: any[] = [];
     if (files && files.length > 0) {
-      const { summarizationService } = require('@/process/services/summarizationService');
       const fs = require('fs');
       const path = require('path');
-      
+
       const filesToAppend: string[] = [];
-      
+
       for (const filePath of files) {
-        const absolutePath = path.isAbsolute(filePath) ? filePath : path.resolve(this.workspace || process.cwd(), filePath);
+        const absolutePath = path.isAbsolute(filePath)
+          ? filePath
+          : path.resolve(this.workspace || process.cwd(), filePath);
         let shouldAppend = true;
-        
+
         if (fs.existsSync(absolutePath)) {
+          const ext = path.extname(absolutePath).toLowerCase();
+          const isImage = ['.png', '.jpg', '.jpeg', '.webp', '.gif'].includes(ext);
+
+          if (isImage) {
+            try {
+              const base64Data = fs.readFileSync(absolutePath, 'base64');
+              const mimeType = ext === '.jpg' ? 'image/jpeg' : `image/${ext.replace('.', '')}`;
+              
+              const isGoogleModel = this.model.platform === 'gemini' || this.model.platform === 'vertex-ai' || this.model.platform === 'gemini-with-google-auth';
+              
+              if (isGoogleModel) {
+                imageParts.push({
+                  inlineData: {
+                    mimeType,
+                    data: base64Data,
+                  },
+                });
+              } else {
+                // OpenAI format for non-Google models (like qwen3-max)
+                imageParts.push({
+                  type: 'image_url',
+                  image_url: {
+                    url: `data:${mimeType};base64,${base64Data}`,
+                  },
+                } as any);
+              }
+              // We keep shouldAppend = true so the @path is added to the query text,
+              // but we'll skip the summarization logic below for images.
+            } catch (e) {
+              console.error(`[GeminiAgent] Failed to read image file ${filePath}:`, e);
+            }
+          }
+
           const stats = fs.statSync(absolutePath);
-          if (stats.size > 1 * 1024 * 1024) {
+          if (!isImage && stats.size > 1 * 1024 * 1024) {
             this.onStreamEvent({
               type: 'text',
               data: `\n\n*File ${path.basename(filePath)} is large. Running auto-summarization...*\n\n`,
               msg_id: uuid(),
             });
-            
+
             let content = '';
-            const ext = path.extname(absolutePath).toLowerCase();
             if (['.txt', '.md', '.json', '.js', '.ts', '.css', '.html'].includes(ext)) {
               content = fs.readFileSync(absolutePath, 'utf8');
             } else {
@@ -837,7 +920,7 @@ export class GeminiAgent {
                 console.error(`[GeminiAgent] Failed to parse office file ${filePath}:`, e);
               }
             }
-            
+
             if (content) {
               const result = await summarizationService.summarizeFile(absolutePath, content);
               if (result.success && result.summary) {
@@ -852,12 +935,19 @@ export class GeminiAgent {
             }
           }
         }
-        
+
         if (shouldAppend) {
           filesToAppend.push(filePath);
         }
       }
-      
+
+      // Force save to workspace for multimodal requests so tools can access files if needed
+      // This fixes ENOENT when model tries to read an image file from a temp folder outside workspace
+      if (imageParts.length > 0) {
+        const { ProcessConfig } = require('@process/config');
+        await ProcessConfig.set('upload.saveToWorkspace', true).catch(() => {});
+      }
+
       files = filesToAppend;
     }
 
@@ -1042,11 +1132,32 @@ export class GeminiAgent {
       });
       return;
     }
-    const requestId = this.submitQuery(processedQuery, msg_id, abortController);
+    let finalQuery: any = processedQuery;
+    if (imageParts.length > 0) {
+      if (typeof finalQuery === 'string') {
+        finalQuery = [{ text: finalQuery }, ...imageParts];
+      } else if (Array.isArray(finalQuery)) {
+        // Ensure existing parts are in Gemini format (text instead of {type: 'text', text: ...})
+        const normalizedParts = finalQuery.map((part: any) => {
+          if (part && typeof part === 'object' && part.type === 'text' && 'text' in part) {
+            return { text: part.text };
+          }
+          // If it's already in {text: ...} or {inlineData: ...} format, keep it
+          return part;
+        });
+        finalQuery = [...normalizedParts, ...imageParts];
+      }
+    }
+    const requestId = this.submitQuery(finalQuery, msg_id, abortController);
     return requestId;
   }
   stop(): void {
     this.abortController?.abort();
+  }
+
+  setYoloMode(yoloMode: boolean): void {
+    this.yoloMode = yoloMode;
+    console.log(`[GeminiAgent] YOLO mode set to: ${yoloMode}`);
   }
 
   private async handleContextOverflow(overflowData: any) {
@@ -1056,12 +1167,11 @@ export class GeminiAgent {
       data: '\n\n*Context window overflow detected. Running auto-summarization to free up space...*\n\n',
       msg_id: uuid(),
     });
-    
+
     const historyText = this.convertHistoryToText();
-    
-    const { summarizationService } = require('@/process/services/summarizationService');
+
     const result = await summarizationService.summarizeText(historyText);
-    
+
     if (result.success && result.summary) {
       console.log('[GeminiAgent] Summarization successful, replacing history...');
       this.onStreamEvent({
@@ -1069,20 +1179,22 @@ export class GeminiAgent {
         data: '\n\n*Summarization complete. Resuming conversation with compressed context.*\n\n',
         msg_id: uuid(),
       });
-      
+
       if (this.geminiClient) {
         this.geminiClient.setHistory([
           {
             role: 'user',
-            parts: [{ text: `Here is a summary of the conversation so far to fit the context window:\n\n${result.summary}` }]
+            parts: [
+              { text: `Here is a summary of the conversation so far to fit the context window:\n\n${result.summary}` },
+            ],
           },
           {
             role: 'model',
-            parts: [{ text: "Understood. I will continue the conversation based on this summary." }]
-          }
+            parts: [{ text: 'Understood. I will continue the conversation based on this summary.' }],
+          },
         ]);
       }
-      
+
       console.log('[GeminiAgent] Retrying request...');
       if (this.lastQuery) {
         this.submitQuery(this.lastQuery, this.activeMsgId ?? uuid(), this.createAbortController(), this.lastOptions);

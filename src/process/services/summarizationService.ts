@@ -217,10 +217,10 @@ class SummarizationService extends EventEmitter {
   async createJob(filePath: string, content: string): Promise<SummarizationJob> {
     const estimatedTokens = this.estimateTokens(content);
     const { recommendedStrategy } = this.determineStrategy(estimatedTokens);
-    
+
     const path = require('path');
     const ext = path.extname(filePath).toLowerCase();
-    
+
     let chunks: DocumentChunk[] = [];
     if (ext === '.pdf' || ['.docx', '.doc'].includes(ext)) {
       chunks = await this.createPageChunks(filePath, content);
@@ -254,9 +254,9 @@ class SummarizationService extends EventEmitter {
     const path = require('path');
     const ext = path.extname(filePath).toLowerCase();
     const chunks: DocumentChunk[] = [];
-    
+
     let pages: string[] = [];
-    
+
     if (ext === '.pdf') {
       try {
         pages = await this.readPdfPages(filePath);
@@ -270,20 +270,20 @@ class SummarizationService extends EventEmitter {
         console.error('Failed to read DOCX pages, falling back to token chunking:', e);
       }
     }
-    
+
     if (pages.length === 0) {
       return this.createChunks(content, SummarizationStrategy.SLIDING_WINDOW);
     }
-    
+
     const pagesPerChunk = 50;
     const overlapPages = 5;
-    
+
     let index = 0;
-    for (let i = 0; i < pages.length; i += (pagesPerChunk - overlapPages)) {
+    for (let i = 0; i < pages.length; i += pagesPerChunk - overlapPages) {
       const chunkPages = pages.slice(i, i + pagesPerChunk);
       const chunkContent = chunkPages.join('\n\n');
       const chunkTokens = this.estimateTokens(chunkContent);
-      
+
       chunks.push({
         id: `chunk-page-${index}`,
         index,
@@ -292,11 +292,11 @@ class SummarizationService extends EventEmitter {
         content: chunkContent,
         isProcessed: false,
       });
-      
+
       index++;
       if (i + pagesPerChunk >= pages.length) break;
     }
-    
+
     return chunks;
   }
 
@@ -310,17 +310,17 @@ class SummarizationService extends EventEmitter {
         useSystemFonts: true,
         disableFontFace: true,
       });
-      
+
       const pdf = await loadingTask.promise;
       const pages: string[] = [];
-      
+
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const textContent = await page.getTextContent();
         const pageText = textContent.items.map((item: any) => item.str).join(' ');
         pages.push(pageText);
       }
-      
+
       return pages;
     } catch (e) {
       console.error('Error reading PDF pages with pdfjs-dist:', e);
@@ -331,18 +331,18 @@ class SummarizationService extends EventEmitter {
   private async readDocxPages(filePath: string): Promise<string[]> {
     const fs = require('fs');
     const mammoth = require('mammoth');
-    
+
     const result = await mammoth.extractRawText({ path: filePath });
     const text = result.value;
-    
+
     const words = text.split(/\s+/);
     const wordsPerPage = 500;
     const pages: string[] = [];
-    
+
     for (let i = 0; i < words.length; i += wordsPerPage) {
       pages.push(words.slice(i, i + wordsPerPage).join(' '));
     }
-    
+
     return pages;
   }
 
@@ -452,10 +452,13 @@ class SummarizationService extends EventEmitter {
           new AbortController().signal,
           LlmRole.UTILITY_TOOL
         );
-        
+
         const parts = result.candidates?.[0]?.content?.parts;
         if (parts) {
-          const text = parts.map((part: any) => part.text).filter(Boolean).join('');
+          const text = parts
+            .map((part: any) => part.text)
+            .filter(Boolean)
+            .join('');
           if (text) return text;
         }
       } catch (e) {
@@ -512,10 +515,13 @@ class SummarizationService extends EventEmitter {
           new AbortController().signal,
           LlmRole.UTILITY_TOOL
         );
-        
+
         const parts = result.candidates?.[0]?.content?.parts;
         if (parts) {
-          const text = parts.map((part: any) => part.text).filter(Boolean).join('');
+          const text = parts
+            .map((part: any) => part.text)
+            .filter(Boolean)
+            .join('');
           if (text) return text;
         }
       } catch (e) {

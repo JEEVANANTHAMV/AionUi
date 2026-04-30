@@ -1184,7 +1184,7 @@ const SendBox: React.FC<{
       message.warning(t('messages.conversationInProgress'));
       return;
     }
-    if (!input.trim() && domSnippets.length === 0) {
+    if (!input.trim() && domSnippets.length === 0 && !hasPendingAttachments) {
       return;
     }
     console.info('[sendbox]', {
@@ -1250,10 +1250,11 @@ const SendBox: React.FC<{
   );
   const speechLocale = i18n?.language || 'en-US';
 
-  const hasDraftToSend = input.trim().length > 0 || domSnippets.length > 0;
+  const hasDraftToSend = input.trim().length > 0 || domSnippets.length > 0 || hasPendingAttachments;
 
   // Calculate button disabled state
-  const isButtonDisabled = disabled || isUploading || (!input.trim() && domSnippets.length === 0);
+  const isButtonDisabled =
+    disabled || isUploading || (!input.trim() && domSnippets.length === 0 && !hasPendingAttachments);
 
   // Reusable send button component
   const sendButton = (
@@ -1262,7 +1263,7 @@ const SendBox: React.FC<{
       type='primary'
       disabled={isButtonDisabled}
       className='send-button-custom'
-      icon={<ArrowUp theme='filled' size='14' fill='white' strokeWidth={5} />}
+      icon={<ArrowUp theme='filled' size='18' fill='white' strokeWidth={5} />}
       onClick={() => {
         sendMessageHandler();
       }}
@@ -1274,7 +1275,7 @@ const SendBox: React.FC<{
       shape='circle'
       type='secondary'
       className='bg-animate sendbox-stop-button'
-      icon={<div className='mx-auto size-12px bg-6'></div>}
+      icon={<div className='mx-auto size-14px bg-6 rounded-2px'></div>}
       onClick={stopHandler}
     ></Button>
   );

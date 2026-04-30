@@ -60,7 +60,7 @@ const MessageAcpPermission: React.FC<MessageAcpPermissionProps> = React.memo(({ 
           conversationId: message.conversation_id,
           mode: 'yolo',
         });
-        
+
         // Auto-confirm with selected or first available option
         const optionToConfirm = selected || (options && options.length > 0 ? options[0]?.optionId || 'option_0' : null);
         if (optionToConfirm) {
@@ -133,9 +133,9 @@ const MessageAcpPermission: React.FC<MessageAcpPermissionProps> = React.memo(({ 
   }
 
   return (
-    <Card 
-      className={`mb-4 transition-all duration-300 ${yoloMode ? 'border border-yellow-500 shadow-md' : ''}`} 
-      bordered={false} 
+    <Card
+      className={`mb-4 transition-all duration-300 ${yoloMode ? 'border border-yellow-500 shadow-md' : ''}`}
+      bordered={false}
       style={{ background: 'var(--bg-1)' }}
     >
       <div className='space-y-4'>
@@ -150,15 +150,19 @@ const MessageAcpPermission: React.FC<MessageAcpPermissionProps> = React.memo(({ 
               content={
                 <div className='p-2 max-w-240px space-y-2 text-xs'>
                   <div className='font-bold text-sm text-yellow-500'>⚠️ YOLO Mode (Full Auto)</div>
-                  <div>Turning this on allows the agent to execute all future tool calls automatically without asking for permission.</div>
+                  <div>
+                    Turning this on allows the agent to execute all future tool calls automatically without asking for
+                    permission.
+                  </div>
                   <div className='text-red-400 font-bold'>Precaution:</div>
-                  <div className='text-t-secondary'>The agent could run commands, delete files, or consume API credits without your review. Use only on trusted codebases.</div>
+                  <div className='text-t-secondary'>
+                    The agent could run commands, delete files, or consume API credits without your review. Use only on
+                    trusted codebases.
+                  </div>
                 </div>
               }
             >
-              <span className='text-t-tertiary cursor-pointer text-sm hover:text-t-primary leading-none'>
-                ❔
-              </span>
+              <span className='text-t-tertiary cursor-pointer text-sm hover:text-t-primary leading-none'>❔</span>
             </Tooltip>
             <span className='text-xs text-t-secondary select-none'>YOLO Mode</span>
             <Switch

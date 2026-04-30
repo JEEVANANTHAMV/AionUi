@@ -67,6 +67,9 @@ export default forkTask(({ data }, pipe) => {
   pipe.on('send.message', (event: { input: string; msg_id: string; files?: string[] }, deferred) => {
     deferred.with(agent.send(event.input, event.msg_id, event.files));
   });
+  pipe.on('set_yolo_mode', (event: { yoloMode: boolean }) => {
+    agent.setYoloMode(event.yoloMode);
+  });
 
   return agent.bootstrap;
 });

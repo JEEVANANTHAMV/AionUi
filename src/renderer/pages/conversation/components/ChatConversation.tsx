@@ -11,8 +11,8 @@ import addChatIcon from '@/renderer/assets/icons/add-chat.svg';
 import { CronJobManager } from '@/renderer/pages/cron';
 import { usePresetAssistantInfo, resolveAssistantConfigId } from '@/renderer/hooks/agent/usePresetAssistantInfo';
 import { iconColors } from '@/renderer/styles/colors';
-import { Button, Dropdown, Menu, Tooltip, Typography } from '@arco-design/web-react';
-import { History } from '@icon-park/react';
+import { Button, Popover, Menu, Tooltip, Typography } from '@arco-design/web-react';
+import { History, Plus } from '@icon-park/react';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -42,51 +42,76 @@ const hasLoadedSkill = (conversation: TChatConversation | undefined, skillName: 
   return loadedSkills?.some((s) => s.name === skillName) ?? false;
 };
 
-const _AssociatedConversation: React.FC<{ conversation_id: string }> = ({ conversation_id }) => {
+const _AssociatedConversation: React.FC<{ conversation: TChatConversation }> = ({ conversation }) => {
+  const { id: conversation_id } = conversation;
+  const { t } = useTranslation();
   const { data } = useSWR(['getAssociateConversation', conversation_id], () =>
     ipcBridge.conversation.getAssociateConversation.invoke({ conversation_id })
   );
   const navigate = useNavigate();
+
+  // Sort by modifyTime descending
   const list = useMemo(() => {
     if (!data?.length) return [];
-    return data.filter((conversation) => conversation.id !== conversation_id);
+    return [...data].sort((a, b) => (b.modifyTime || 0) - (a.modifyTime || 0));
   }, [data]);
-  if (!list.length) return null;
+
+  if (!list.length || (list.length === 1 && list[0].id === conversation_id)) return null;
+
   return (
-    <Dropdown
-      droplist={
-        <Menu
-          onClickMenuItem={(key) => {
-            Promise.resolve(navigate(`/conversation/${key}`)).catch((error) => {
-              console.error('Navigation failed:', error);
-            });
-          }}
-        >
-          {list.map((conversation) => {
-            return (
-              <Menu.Item key={conversation.id}>
-                <Typography.Ellipsis className={'max-w-300px'}>{conversation.name}</Typography.Ellipsis>
-              </Menu.Item>
-            );
-          })}
-        </Menu>
+    <Popover
+      position='br'
+      trigger='click'
+      content={
+        <div className='w-280px flex flex-col bg-1 overflow-hidden rd-8px'>
+          <div className='px-12px py-10px b-b-1 b-solid b-[var(--border-base)] flex items-center justify-between bg-2'>
+            <span className='text-12px font-bold color-[var(--text-secondary)]'>
+              {t('conversation.history.sessions', 'Workspace Sessions')}
+            </span>
+            <span className='text-11px color-[var(--text-tertiary)]'>
+              {list.length} {t('common.items', 'items')}
+            </span>
+          </div>
+          <div className='max-h-400px overflow-y-auto py-4px'>
+            {list.map((item) => {
+              const isActive = item.id === conversation_id;
+              const date = item.modifyTime ? new Date(item.modifyTime).toLocaleString() : '';
+              return (
+                <div
+                  key={item.id}
+                  className={`group relative px-12px py-10px cursor-pointer transition-colors flex flex-col gap-2px ${isActive ? 'bg-[var(--primary-1)]' : 'hover:bg-[var(--bg-3)]'}`}
+                  onClick={() => {
+                    if (!isActive) navigate(`/conversation/${item.id}`);
+                  }}
+                >
+                  <div className='flex items-center justify-between gap-8px'>
+                    <Typography.Ellipsis
+                      className={`text-13px font-medium truncate ${isActive ? 'color-[var(--color-primary)]' : 'color-[var(--text-primary)]'}`}
+                    >
+                      {item.name || 'Untitled Session'}
+                    </Typography.Ellipsis>
+                    {isActive && <div className='w-6px h-6px rd-full bg-[var(--color-primary)] shrink-0' />}
+                  </div>
+                  <div className='text-11px color-[var(--text-tertiary)]'>{date}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       }
-      trigger={['click']}
     >
       <Button
         size='mini'
         icon={
           <History
-            theme='filled'
-            size='14'
-            fill={iconColors.primary}
-            strokeWidth={2}
-            strokeLinejoin='miter'
-            strokeLinecap='square'
+            theme='outline'
+            size='16'
+            fill={iconColors.secondary}
+            strokeWidth={3}
           />
         }
-      ></Button>
-    </Dropdown>
+      />
+    </Popover>
   );
 };
 
@@ -99,7 +124,14 @@ const _AddNewConversation: React.FC<{ conversation: TChatConversation }> = ({ co
     <Tooltip content={t('conversation.workspace.createNewConversation')}>
       <Button
         size='mini'
-        icon={<img src={addChatIcon} alt='Add chat' className='w-14px h-14px block m-auto' />}
+        icon={
+          <Plus
+            theme='outline'
+            size='14'
+            fill={iconColors.primary}
+            strokeWidth={3}
+          />
+        }
         onClick={async () => {
           if (isCreatingRef.current) return;
           isCreatingRef.current = true;
@@ -340,12 +372,19 @@ const ChatConversation: React.FC<{
   }, [conversation, isGeminiConversation, isForjinnrsConversation, assistantDisplayName, hideSendBox]);
 
   const sliderTitle = useMemo(() => {
+    if (!conversation) return null;
     return (
-      <div className='flex items-center justify-between'>
-        <span className='text-16px font-bold text-t-primary'>{t('conversation.workspace.title')}</span>
+      <div className='flex items-center justify-between w-full'>
+        <span className='text-16px font-bold text-t-primary truncate pr-8px'>
+          {t('conversation.workspace.title')}
+        </span>
+        <div className='flex items-center gap-4px shrink-0'>
+          <_AssociatedConversation conversation={conversation} />
+          <_AddNewConversation conversation={conversation} />
+        </div>
       </div>
     );
-  }, [t]);
+  }, [t, conversation]);
 
   // For ACP/Codex conversations, use AcpModelSelector that can show/switch models.
   // For other non-Gemini conversations, show disabled GeminiModelSelector.

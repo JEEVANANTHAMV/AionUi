@@ -51,7 +51,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({ path, onRemove, readonly = fa
   // Extract filename directly from path without cleaning timestamp suffix
   const fileName = path.split(/[\\/]/).pop() || '';
   const fileExt = getFileExtension(path).toUpperCase().replace('.', '');
-  const [imageUrl, setImageUrl] = useState<string>('');
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [fileSize, setFileSize] = useState<string>('');
 
   useEffect(() => {
@@ -111,16 +111,18 @@ const FilePreview: React.FC<FilePreviewProps> = ({ path, onRemove, readonly = fa
     return (
       <div className='relative inline-block'>
         <div className='rd-8px overflow-hidden border-1 border-solid b-color-border-2'>
-          <Image
-            src={imageUrl}
-            alt={fileName}
-            width={60}
-            height={60}
-            className='object-cover cursor-pointer'
-            style={{ display: imageUrl ? 'block' : 'none' }}
-            preview={Boolean(imageUrl)}
-          />
-          {!imageUrl && <div className='w-60px h-60px bg-bg-3'></div>}
+          {imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt={fileName}
+              width={60}
+              height={60}
+              className='object-cover cursor-pointer'
+              preview
+            />
+          ) : (
+            <div className='w-60px h-60px bg-bg-3'></div>
+          )}
         </div>
         {!readonly && (
           <div

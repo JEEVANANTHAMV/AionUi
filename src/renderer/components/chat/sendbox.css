@@ -1,5 +1,17 @@
 /* Sendbox component styles */
 
+/* Send button - larger and more prominent */
+.send-button-custom {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  transition: all 0.2s ease !important;
+}
+
+.send-button-custom:hover:not(:disabled) {
+  transform: scale(1.05) !important;
+}
+
 /* Send button disabled state - override Arco Design default disabled styles */
 .send-button-custom:disabled,
 .send-button-custom.arco-btn:disabled,
@@ -9,8 +21,10 @@
   opacity: 1 !important;
 }
 
-/* Make arrow icon thicker */
+/* Make arrow icon larger and thicker */
 .send-button-custom .arco-icon > svg {
+  width: 18px !important;
+  height: 18px !important;
   stroke-width: 5 !important;
   filter: drop-shadow(0 0 0.5px currentColor);
 }
@@ -31,8 +45,18 @@
 .sendbox-stop-button,
 .sendbox-stop-button.arco-btn,
 .sendbox-stop-button.arco-btn-secondary {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
   border: none !important;
   box-shadow: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.sendbox-stop-button:hover,
+.sendbox-stop-button.arco-btn:hover,
+.sendbox-stop-button.arco-btn-secondary:hover {
+  transform: scale(1.05) !important;
 }
 
 [data-theme='dark'] .sendbox-stop-button,
@@ -155,25 +179,28 @@
 }
 
 .speech-input-button {
-  width: 32px;
-  min-width: 32px;
-  height: 32px;
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
   padding: 0 !important;
   border: none !important;
   box-shadow: none !important;
   background: transparent !important;
-  color: var(--color-text-3) !important;
+  color: var(--color-text-2) !important;
   border-radius: 999px !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease !important;
 }
 
 .speech-input-button .arco-btn-icon,
 .speech-input-button .arco-icon {
   margin: 0 !important;
-  width: 18px !important;
-  height: 18px !important;
+  width: 20px !important;
+  height: 20px !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -185,10 +212,10 @@
 }
 
 .speech-loader-spinner {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 999px;
-  border: 1.75px solid color-mix(in srgb, currentColor 22%, transparent);
+  border: 2px solid color-mix(in srgb, currentColor 22%, transparent);
   border-top-color: currentColor;
   display: block;
   box-sizing: border-box;
@@ -207,8 +234,8 @@
 }
 
 .speech-input-button--processing svg {
-  width: 18px !important;
-  height: 18px !important;
+  width: 20px !important;
+  height: 20px !important;
   transform-origin: center center !important;
 }
 
@@ -222,7 +249,25 @@
 .speech-input-button:focus-visible {
   border: none !important;
   box-shadow: none !important;
-  background: color-mix(in srgb, var(--color-fill-2) 78%, transparent) !important;
+  background: color-mix(in srgb, var(--color-fill-3) 82%, transparent) !important;
+  color: var(--color-text-1) !important;
+}
+
+/* File attach button styles */
+.file-attach-btn {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease !important;
+}
+
+.file-attach-btn:hover,
+.file-attach-btn:active,
+.file-attach-btn:focus,
+.file-attach-btn:focus-visible {
+  background: color-mix(in srgb, var(--color-fill-3) 82%, transparent) !important;
   color: var(--color-text-1) !important;
 }
 

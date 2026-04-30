@@ -74,6 +74,8 @@
   "fileAttach.failed": "Upload failed",
   "fileAttach.uploading": "Uploading...",
   "fileAttach.uploadSuccess": "Upload successful",
+  "fileAttach.browseFiles": "Browse files",
+  "fileAttach.chooseSource": "Choose file source",
   "expand": "Expand",
   "name": "Name",
   "added": "Added",

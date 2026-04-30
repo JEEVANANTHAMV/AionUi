@@ -590,6 +590,7 @@ export function compactToolResponsesInHistory(geminiClient: GeminiClient): void 
 
     for (let i = 0; i < content.parts.length; i++) {
       const part = content.parts[i] as Record<string, unknown>;
+
       if (!('functionResponse' in part) || !part.functionResponse) continue;
 
       const fnResp = part.functionResponse as Record<string, unknown>;

@@ -7,7 +7,7 @@
 import { ipcBridge } from '@/common';
 import type { IMessageToolGroup } from '@/common/chat/chatLib';
 import { iconColors } from '@/renderer/styles/colors';
-import { Alert, Button, Image, Message, Radio, Tag, Tooltip } from '@arco-design/web-react';
+import { Alert, Button, Image, Message, Radio, Switch, Tag, Tooltip } from '@arco-design/web-react';
 import { Copy, Download, LoadingOne } from '@icon-park/react';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -157,9 +157,11 @@ const EditConfirmationDiff: React.FC<{ diff: string; fileName: string; title: st
 const ConfirmationDetails: React.FC<{
   content: IMessageToolGroupProps['message']['content'][number];
   onConfirm: (outcome: ToolConfirmationOutcome) => void;
-}> = ({ content, onConfirm }) => {
+  conversationId: string;
+}> = ({ content, onConfirm, conversationId }) => {
   const { t } = useTranslation();
   const { confirmationDetails } = content;
+  const [yoloMode, setYoloMode] = useState(false);
   if (!confirmationDetails) return;
   const node = useMemo(() => {
     if (!confirmationDetails) return null;
@@ -184,11 +186,67 @@ const ConfirmationDetails: React.FC<{
   const { question = '', options = [] } = useConfirmationButtons(confirmationDetails, t);
 
   const [selected, setSelected] = useState<ToolConfirmationOutcome | null>(null);
+  const [isResponding, setIsResponding] = useState(false);
 
   const isConfirm = content.status === 'Confirming';
 
+  const handleToggleYolo = async (checked: boolean) => {
+    setYoloMode(checked);
+    if (checked) {
+      try {
+        await ipcBridge.geminiConversation.setYoloMode.invoke({ conversationId, yoloMode: true });
+        // Auto-confirm the first "allow" option
+        const allowOpt = options.find((opt) => opt.value === ToolConfirmationOutcome.ProceedAlways || opt.value === ToolConfirmationOutcome.ProceedOnce);
+        if (allowOpt && isConfirm) {
+          setIsResponding(true);
+          try {
+            onConfirm(allowOpt.value);
+          } finally {
+            setIsResponding(false);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to enable YOLO mode:', error);
+        setYoloMode(false);
+      }
+    } else {
+      try {
+        await ipcBridge.geminiConversation.setYoloMode.invoke({ conversationId, yoloMode: false });
+      } catch (error) {
+        console.error('Failed to disable YOLO mode:', error);
+        setYoloMode(true);
+      }
+    }
+  };
+
   return (
     <div>
+      {isConfirm && (
+        <div className='flex items-center justify-between mb-4'>
+          <div className='flex items-center space-x-2 bg-2 p-1 px-2 rounded-full'>
+            <Tooltip
+              content={
+                <div className='p-2 max-w-240px space-y-2 text-xs'>
+                  <div className='font-bold text-sm text-yellow-500'>⚠️ YOLO Mode (Full Auto)</div>
+                  <div>
+                    Turning this on allows the agent to execute all future tool calls automatically without asking for
+                    permission.
+                  </div>
+                  <div className='text-red-400 font-bold'>Precaution:</div>
+                  <div className='text-t-secondary'>
+                    The agent could run commands, delete files, or consume API credits without your review. Use only on
+                    trusted codebases.
+                  </div>
+                </div>
+              }
+            >
+              <span className='text-t-tertiary cursor-pointer text-sm hover:text-t-primary leading-none'>❔</span>
+            </Tooltip>
+            <span className='text-xs text-t-secondary select-none'>YOLO Mode</span>
+            <Switch size='small' checked={yoloMode} onChange={handleToggleYolo} disabled={isResponding} />
+          </div>
+        </div>
+      )}
       {confirmationDetails.type === 'edit' ? (
         <EditConfirmationDiff
           diff={confirmationDetails?.fileDiff || ''}
@@ -211,7 +269,14 @@ const ConfirmationDetails: React.FC<{
             })}
           </Radio.Group>
           <div className='flex justify-start pl-20px'>
-            <Button type='primary' size='mini' disabled={!selected} onClick={() => onConfirm(selected)}>
+            <Button
+              type='primary'
+              size='mini'
+              disabled={!selected || isResponding}
+              onClick={() => {
+                if (selected) onConfirm(selected);
+              }}
+            >
               {t('messages.confirm')}
             </Button>
           </div>
@@ -486,6 +551,7 @@ const MessageToolGroup: React.FC<IMessageToolGroupProps> = ({ message }) => {
             <ConfirmationDetails
               key={callId}
               content={content}
+              conversationId={message.conversation_id}
               onConfirm={(outcome) => {
                 ipcBridge.geminiConversation.confirmMessage
                   .invoke({

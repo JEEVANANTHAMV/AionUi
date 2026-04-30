@@ -106,6 +106,9 @@ export const geminiConversation = {
   sendMessage: conversation.sendMessage,
   confirmMessage: bridge.buildProvider<IBridgeResponse, IConfirmMessageParams>('input.confirm.message'),
   responseStream: conversation.responseStream,
+  setYoloMode: bridge.buildProvider<IBridgeResponse, { conversationId: string; yoloMode: boolean }>(
+    'gemini.set-yolo-mode'
+  ),
 };
 
 // CDP status interface
@@ -330,9 +333,6 @@ export const fs = {
     'add-custom-external-path'
   ),
   removeCustomExternalPath: bridge.buildProvider<IBridgeResponse, { path: string }>('remove-custom-external-path'),
-  // Skills Market: inject/remove the forjinn-desk-skills builtin skill
-  enableSkillsMarket: bridge.buildProvider<IBridgeResponse, void>('enable-skills-market'),
-  disableSkillsMarket: bridge.buildProvider<IBridgeResponse, void>('disable-skills-market'),
 };
 
 export const speechToText = {

@@ -4,10 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Button, Dropdown, Menu, Message } from '@arco-design/web-react';
-import { Plus } from '@icon-park/react';
+import { Button, Dropdown, Menu, Message, Tooltip } from '@arco-design/web-react';
+import { FolderOpen, UploadOne } from '@icon-park/react';
 import { useConversationContextSafe } from '@/renderer/hooks/context/ConversationContext';
-import { iconColors } from '@/renderer/styles/colors';
 import { isElectronDesktop } from '@/renderer/utils/platform';
 import { FileService } from '@/renderer/services/FileService';
 import type { FileMetadata } from '@/renderer/services/FileService';
@@ -55,11 +54,22 @@ const FileAttachButton: React.FC<FileAttachButtonProps> = ({ openFileSelector, o
     [conversationContext?.conversationId, onLocalFilesAdded, t]
   );
 
-  const plusIcon = <Plus theme='outline' size='14' strokeWidth={2} fill={iconColors.primary} />;
+  const folderIcon = <FolderOpen theme='outline' size='20' strokeWidth={1.75} />;
+  const uploadIcon = <UploadOne theme='outline' size='16' strokeWidth={1.75} />;
 
-  // Electron desktop: simple button, no dropdown needed
+  // Electron desktop: simple button with tooltip, no dropdown needed
   if (isElectronDesktop()) {
-    return <Button type='secondary' shape='circle' icon={plusIcon} onClick={openFileSelector} />;
+    return (
+      <Tooltip content={t('common.fileAttach.browseFiles', { defaultValue: 'Browse files' })} position='top' mini>
+        <Button
+          type='secondary'
+          shape='circle'
+          icon={folderIcon}
+          onClick={openFileSelector}
+          className='file-attach-btn'
+        />
+      </Tooltip>
+    );
   }
 
   // WebUI: dropdown with two options
@@ -70,15 +80,38 @@ const FileAttachButton: React.FC<FileAttachButtonProps> = ({ openFileSelector, o
         if (key === 'device') fileInputRef.current?.click();
       }}
     >
-      <Menu.Item key='host'>{t('common.fileAttach.hostFiles')}</Menu.Item>
-      <Menu.Item key='device'>{t('common.fileAttach.myDevice')}</Menu.Item>
+      <Menu.Item key='host'>
+        <span className='flex items-center gap-8px'>
+          <FolderOpen theme='outline' size='16' strokeWidth={1.75} />
+          {t('common.fileAttach.hostFiles')}
+        </span>
+      </Menu.Item>
+      <Menu.Item key='device'>
+        <span className='flex items-center gap-8px'>
+          <UploadOne theme='outline' size='16' strokeWidth={1.75} />
+          {t('common.fileAttach.myDevice')}
+        </span>
+      </Menu.Item>
     </Menu>
   );
 
   return (
     <>
       <Dropdown droplist={dropdownMenu} trigger='click' position='top'>
-        <Button type='secondary' shape='circle' icon={plusIcon} loading={uploading} disabled={uploading} />
+        <Tooltip
+          content={t('common.fileAttach.chooseSource', { defaultValue: 'Choose file source' })}
+          position='top'
+          mini
+        >
+          <Button
+            type='secondary'
+            shape='circle'
+            icon={folderIcon}
+            loading={uploading}
+            disabled={uploading}
+            className='file-attach-btn'
+          />
+        </Tooltip>
       </Dropdown>
       <input ref={fileInputRef} type='file' multiple style={{ display: 'none' }} onChange={handleLocalFileChange} />
     </>

@@ -15,6 +15,8 @@ import { WebFetchTool } from './web-fetch';
 import { WebSearchTool } from './web-search';
 import { CustomHttpTool } from './custom-http-tool';
 import { ListExternalToolsTool, ExecuteExternalToolTool } from './external-tools';
+import { SafeReadFileTool, SafeReadManyFilesTool } from './fs-safe';
+import { VisionAnalyzeTool } from './vision';
 import type { ICustomHttpTool } from '@/common/config/storage';
 
 interface ConversationToolConfigOptions {
@@ -52,9 +54,10 @@ export class ConversationToolConfig {
    * @param authType 认证类型（平台类型）
    */
   async initializeForConversation(authType: AuthType): Promise<void> {
-    // 所有模型都使用 forjinn-desk_web_fetch 替换内置的 web_fetch
     this.useAionuiWebFetch = true;
     this.excludeTools.push('web_fetch');
+    this.excludeTools.push('read_file');
+    this.excludeTools.push('read_many_files');
 
     // 根据 webSearchEngine 配置决定启用哪个搜索工具
     // gemini_web_search 只能在 Google OAuth 认证下使用，因为它需要创建 Google OAuth 客户端
@@ -151,6 +154,17 @@ export class ConversationToolConfig {
       const customWebFetchTool = new WebFetchTool(geminiClient, config.getMessageBus());
       toolRegistry.registerTool(customWebFetchTool);
     }
+
+    // Register safe file reading tools
+    const safeReadFileTool = new SafeReadFileTool(config, config.getMessageBus());
+    toolRegistry.registerTool(safeReadFileTool);
+
+    const safeReadManyFilesTool = new SafeReadManyFilesTool(config, config.getMessageBus());
+    toolRegistry.registerTool(safeReadManyFilesTool);
+
+    // 注册视觉分析工具 / Register vision analysis tool
+    const visionAnalyzeTool = new VisionAnalyzeTool(config, geminiClient, config.getMessageBus());
+    toolRegistry.registerTool(visionAnalyzeTool);
 
     // 注册外部工具发现与代理执行工具 / Register external tools discovery and proxy execution tools
     const listExternalToolsTool = new ListExternalToolsTool(config, config.getMessageBus());

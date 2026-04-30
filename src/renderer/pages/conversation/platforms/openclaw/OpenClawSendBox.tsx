@@ -604,7 +604,7 @@ const OpenClawSendBox: React.FC<{ conversation_id: string }> = ({ conversation_i
   };
 
   return (
-    <div className='max-w-800px w-full mx-auto flex flex-col mt-auto mb-16px'>
+    <div className='max-w-full w-full mx-auto flex flex-col mt-auto mb-16px'>
       <CommandQueuePanel
         items={items}
         paused={isQueuePaused}

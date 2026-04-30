@@ -10,7 +10,7 @@ import type { CronMessageMeta, IMessageText, IMessageToolGroup, TMessage } from 
 import { transformMessage } from '@/common/chat/chatLib';
 import type { IResponseMessage } from '@/common/adapter/ipcBridge';
 import type { IMcpServer, TProviderWithModel, ICustomHttpTool } from '@/common/config/storage';
-import { ProcessConfig, getSkillsDir } from '@process/utils/initStorage';
+import { ProcessConfig, getSkillsDir, getSystemDir } from '@process/utils/initStorage';
 import { ExtensionRegistry } from '@process/extensions';
 import { buildSystemInstructionsWithSkillsIndex } from './agentUtils';
 import { detectSkillLoadRequest, AcpSkillManager, buildSkillContentText } from './AcpSkillManager';
@@ -724,6 +724,16 @@ export class GeminiAgentManager extends BaseAgentManager<
         return true;
       }
     }
+
+    // Auto-approve access to gemini-temp directories or workspaces directory (internal app paths)
+    // Avoids redundant confirmations for directories created by the app itself
+    const description = content.description || '';
+    if (description.includes('gemini-temp') || description.includes('workspaces')) {
+      console.log(`[GeminiAgentManager] Auto-approving safe path access: ${description}`);
+      void this.postMessagePromise(content.callId, ToolConfirmationOutcome.ProceedOnce);
+      return true;
+    }
+
     return false;
   }
 
@@ -1108,6 +1118,11 @@ export class GeminiAgentManager extends BaseAgentManager<
     // 发送确认到 worker，使用 callId 作为消息类型
     // Send confirmation to worker, using callId as message type
     return this.postMessagePromise(callId, data);
+  }
+
+  setYoloMode(yoloMode: boolean): void {
+    // Send yolo mode update to worker
+    this.postMessage('set_yolo_mode', { yoloMode });
   }
 
   // Manually trigger context reload

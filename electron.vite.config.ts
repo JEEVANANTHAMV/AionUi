@@ -10,6 +10,7 @@ import { viteStaticCopy } from 'vite-plugin-static-copy';
 function buildMcpServersPlugin() {
   return {
     name: 'vite-plugin-build-mcp-servers',
+    apply: 'build' as const,
     closeBundle() {
       execSync(`node "${resolve('scripts/build-mcp-servers.js')}"`, { stdio: 'inherit' });
     },
@@ -78,18 +79,6 @@ export default defineConfig(({ mode }) => {
         // externalizeDepsPlugin replaces our custom getExternalDeps() + pluginExternalizeDynamicImports.
         // 'fix-path' excluded so it gets bundled inline (only 3KB).
         externalizeDepsPlugin({ exclude: ['fix-path'] }),
-        ...(isDevelopment
-          ? [
-              {
-                name: 'dev-build-mcp-servers',
-                closeBundle() {
-                  execSync(`node "${resolve(__dirname, 'scripts/build-mcp-servers.js')}"`, {
-                    stdio: 'inherit',
-                  });
-                },
-              },
-            ]
-          : []),
         ...(!isDevelopment
           ? [
               viteStaticCopy({
@@ -108,7 +97,6 @@ export default defineConfig(({ mode }) => {
             ]
           : []),
         ...(enableSentrySourceMaps ? [sentryVitePlugin(sentryPluginOptions)] : []),
-        ...(isDevelopment ? [buildMcpServersPlugin()] : []),
       ],
       resolve: { alias: mainAliases, extensions: ['.ts', '.tsx', '.js', '.json'] },
       build: {

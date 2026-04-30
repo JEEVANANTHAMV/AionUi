@@ -347,7 +347,7 @@ const ForjinnrsSendBox: React.FC<{
   };
 
   return (
-    <div className='max-w-800px w-full mx-auto flex flex-col mt-auto mb-16px'>
+    <div className='max-w-full w-full mx-auto flex flex-col mt-auto mb-16px'>
       <CommandQueuePanel
         items={queuedCommands}
         paused={isQueuePaused}

@@ -259,12 +259,30 @@ class FileServiceClass {
   ): Promise<FileMetadata[]> {
     const processedFiles: FileMetadata[] = [];
 
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      // In Electron environment, dragged files have additional path property
-      const electronFile = file as File & { path?: string };
+    // Capture all file data immediately to avoid NotReadableError.
+    // The drag event's File objects become unreadable once the synchronous event handler returns.
+    // We map them to buffers immediately so they can be processed asynchronously.
+    const filesWithData = await Promise.all(
+      Array.from(files).map(async (file) => {
+        const electronFile = file as File & { path?: string };
+        const path = electronFile.path || '';
+        let data: Uint8Array | null = null;
 
-      let filePath = electronFile.path || '';
+        // If no valid path (WebUI or some special drag sources in Electron), read content eagerly
+        if (!path) {
+          try {
+            const buffer = await file.arrayBuffer();
+            data = new Uint8Array(buffer);
+          } catch (e) {
+            console.error(`[FileService] Failed to eagerly read ${file.name}:`, e);
+          }
+        }
+        return { file, path, data };
+      })
+    );
+
+    for (const { file, path: initialPath, data } of filesWithData) {
+      let filePath = initialPath;
 
       // If no valid path (WebUI or some dragged files may not have paths), create temporary file
       if (!filePath) {
@@ -277,13 +295,11 @@ class FileServiceClass {
             } finally {
               tracker.finish();
             }
-          } else {
-            // Electron: use IPC to create upload file (respects saveToWorkspace setting)
-            const arrayBuffer = await file.arrayBuffer();
-            const uint8Array = new Uint8Array(arrayBuffer);
+          } else if (data) {
+            // Electron with eager data: write the captured buffer to a temp file
             const uploadPath = await ipcBridge.fs.createUploadFile.invoke({ fileName: file.name, conversationId });
             if (uploadPath) {
-              await ipcBridge.fs.writeFile.invoke({ path: uploadPath, data: uint8Array });
+              await ipcBridge.fs.writeFile.invoke({ path: uploadPath, data });
               filePath = uploadPath;
             }
           }
@@ -293,6 +309,20 @@ class FileServiceClass {
             throw error;
           }
           console.error('Failed to create temp file for dragged file:', error);
+          continue;
+        }
+      } else if (isElectronDesktop()) {
+        // File has a valid path from drag event - copy it to the upload location via IPC
+        try {
+          const uploadPath = await ipcBridge.fs.createUploadFile.invoke({ fileName: file.name, conversationId });
+          if (uploadPath) {
+            const fileBuffer = await ipcBridge.fs.readFileBuffer.invoke({ path: filePath });
+            const uint8Array = new Uint8Array(fileBuffer);
+            await ipcBridge.fs.writeFile.invoke({ path: uploadPath, data: uint8Array });
+            filePath = uploadPath;
+          }
+        } catch (error) {
+          console.error('Failed to copy dragged file to upload location:', error);
           continue;
         }
       }
