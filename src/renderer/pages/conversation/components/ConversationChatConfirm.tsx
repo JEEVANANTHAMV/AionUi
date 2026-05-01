@@ -23,9 +23,8 @@ const ConversationChatConfirm: React.FC<PropsWithChildren<{ conversation_id: str
   const agentType = conversationContext?.type || 'unknown';
   const yoloEnabledRef = React.useRef(false);
 
-  const { data: conversation } = useSWR(
-    conversation_id ? ['conversation', conversation_id] : null,
-    () => (conversation_id ? ipcBridge.conversation.get.invoke({ id: conversation_id }) : null)
+  const { data: conversation } = useSWR(conversation_id ? ['conversation', conversation_id] : null, () =>
+    conversation_id ? ipcBridge.conversation.get.invoke({ id: conversation_id }) : null
   );
 
   // Each agent's ConversationChatConfirm handles only its own conversation_id.
@@ -93,9 +92,11 @@ const ConversationChatConfirm: React.FC<PropsWithChildren<{ conversation_id: str
           const data = await ipcBridge.conversation.confirmation.list.invoke({ conversation_id: cid });
           allData.push(...data.map((c) => ({ ...c, conversation_id: cid })));
         }
-        // Filter out confirmations that should be auto-confirmed (async)
+        // Filter out confirmations that should be auto-confirmed (async) or are unsupported by this global dialog
         const manualConfirmations: StoredConfirmation[] = [];
         for (const c of allData) {
+          if (c.action === 'ask_user') continue; // ask_user needs an interactive form, handled by MessageToolGroup
+
           const shouldAutoConfirm = await checkAndAutoConfirm(c);
           if (!shouldAutoConfirm) {
             manualConfirmations.push(c);
@@ -121,6 +122,8 @@ const ConversationChatConfirm: React.FC<PropsWithChildren<{ conversation_id: str
       ipcBridge.conversation.confirmation.add.on((data) => {
         if (!idSet.has(data.conversation_id)) return;
         if (yoloEnabledRef.current) return;
+        if (data.action === 'ask_user') return; // ask_user is handled inline by MessageToolGroup
+
         // Check if should auto-confirm (async)
         const stored: StoredConfirmation = { ...data, conversation_id: data.conversation_id };
         void checkAndAutoConfirm(stored).then((autoConfirmed) => {

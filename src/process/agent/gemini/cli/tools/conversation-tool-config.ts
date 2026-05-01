@@ -17,6 +17,8 @@ import { CustomHttpTool } from './custom-http-tool';
 import { ListExternalToolsTool, ExecuteExternalToolTool } from './external-tools';
 import { SafeReadFileTool, SafeReadManyFilesTool } from './fs-safe';
 import { VisionAnalyzeTool } from './vision';
+import { RemoteRunCommandTool } from './remote-run-command';
+import { DocumentConverterTool } from './document-converter';
 import type { ICustomHttpTool } from '@/common/config/storage';
 
 interface ConversationToolConfigOptions {
@@ -172,6 +174,14 @@ export class ConversationToolConfig {
 
     const executeExternalToolTool = new ExecuteExternalToolTool(config, config.getMessageBus());
     toolRegistry.registerTool(executeExternalToolTool);
+
+    // Register remote execution tool
+    const remoteRunCommandTool = new RemoteRunCommandTool(config.getMessageBus());
+    toolRegistry.registerTool(remoteRunCommandTool);
+
+    // Register document conversion tool
+    const documentConverterTool = new DocumentConverterTool(config, config.getMessageBus());
+    toolRegistry.registerTool(documentConverterTool);
 
     // 注册 gemini_web_search 工具（仅OpenAI模型）
     if (this.useGeminiWebSearch) {

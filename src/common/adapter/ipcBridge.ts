@@ -333,6 +333,7 @@ export const fs = {
     'add-custom-external-path'
   ),
   removeCustomExternalPath: bridge.buildProvider<IBridgeResponse, { path: string }>('remove-custom-external-path'),
+  saveLibrarySkill: bridge.buildProvider<IBridgeResponse, { name: string; content: string }>('save-library-skill'),
 };
 
 export const speechToText = {
@@ -910,6 +911,7 @@ export interface IConfirmMessageParams {
   msg_id: string;
   conversation_id: string;
   callId: string;
+  payload?: any;
 }
 
 export interface ICreateConversationParams {

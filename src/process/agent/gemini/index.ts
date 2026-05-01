@@ -8,13 +8,13 @@
 export { GeminiApprovalStore } from './GeminiApprovalStore';
 
 // src/core/ConfigManager.ts
-import { FORJINN_DESK_FILES_MARKER } from '@/common/config/constants';
-import { NavigationInterceptor } from '@/common/chat/navigation';
-import type { TProviderWithModel, ICustomHttpTool } from '@/common/config/storage';
-import { uuid } from '@/common/utils';
-import { getProviderAuthType } from '@/common/utils/platformAuthType';
-import { isNewApiPlatform } from '@/common/utils/platformConstants';
-import { normalizeNewApiBaseUrl } from '@/common/api/ClientFactory';
+import { FORJINN_DESK_FILES_MARKER } from '../../../common/config/constants';
+import { NavigationInterceptor } from '../../../common/chat/navigation';
+import type { TProviderWithModel, ICustomHttpTool } from '../../../common/config/storage';
+import { uuid } from '../../../common/utils';
+import { getProviderAuthType } from '../../../common/utils/platformAuthType';
+import { isNewApiPlatform } from '../../../common/utils/platformConstants';
+import { normalizeNewApiBaseUrl } from '../../../common/api/ClientFactory';
 import type {
   CompletedToolCall,
   Config,
@@ -29,11 +29,12 @@ import {
   clearOauthClientCache,
   CoreToolScheduler,
   FileDiscoveryService,
+  GeminiEventType,
   refreshServerHierarchicalMemory,
   sessionId,
 } from '@office-ai/aioncli-core';
 import fs from 'fs';
-import { ApiKeyManager } from '@/common/api/ApiKeyManager';
+import { ApiKeyManager } from '../../../common/api/ApiKeyManager';
 import { handleAtCommand } from './cli/atCommandProcessor';
 import { loadCliConfig } from './cli/config';
 import { loadExtensions } from './cli/extension';
@@ -52,7 +53,11 @@ import {
 } from './utils';
 import path from 'path';
 import os from 'os';
-import { summarizationService } from '@/process/services/summarizationService';
+import { summarizationService } from '../../services/summarizationService';
+import { attachedAgentService } from '../../services/attachedAgentService';
+import { DEFAULT_ATTACHED_AGENTS } from '../../../common/types/attachedAgents';
+import { ProcessConfig } from '../../utils/initStorage';
+import officeparser from 'officeparser';
 
 // Global registry for current agent instance (used by flashFallbackHandler)
 let currentGeminiAgent: GeminiAgent | null = null;
@@ -455,7 +460,7 @@ export class GeminiAgent {
     );
 
     this.geminiClient = this.config.getGeminiClient();
-    
+
     // [Vision Patch] Fix OpenAI/Qwen vision support by re-injecting multimodal parts
     // The core OpenAIContentGenerator currently strips inlineData/image_url
     const generator = (this.geminiClient as any).getContentGeneratorOrFail?.();
@@ -484,7 +489,7 @@ export class GeminiAgent {
                   if (part.inlineData) {
                     newContent.push({
                       type: 'image_url',
-                      image_url: { url: `data:${part.inlineData.mimeType};base64,${part.inlineData.data}` }
+                      image_url: { url: `data:${part.inlineData.mimeType};base64,${part.inlineData.data}` },
                     });
                   } else if (part.image_url) {
                     newContent.push(part);
@@ -512,7 +517,7 @@ export class GeminiAgent {
     console.log(`[GeminiAgent] presetRules length: ${this.presetRules?.length || 0}`);
     const visionInstruction = `\n\n[Vision Capability]\nIf you see image references (e.g. @uploads/image.png) and need to analyze their content, use the 'vision_analyze' tool. Do NOT use 'read_file' for images.`;
     const currentMemory = this.config.getUserMemory();
-    
+
     let rulesSection = '';
     if (this.presetRules) {
       rulesSection = `[Assistant System Rules]\n${this.presetRules}${visionInstruction}`;
@@ -521,7 +526,7 @@ export class GeminiAgent {
       rulesSection = `[Assistant System Rules]${visionInstruction}`;
       console.log(`[GeminiAgent] Injected visionInstruction into userMemory`);
     }
-    
+
     const combined = currentMemory ? `${rulesSection}\n\n${currentMemory}` : rulesSection;
     this.config.setUserMemory(combined);
 
@@ -657,7 +662,7 @@ export class GeminiAgent {
           return;
         }
 
-        const { GeminiEventType: ServerGeminiEventType } = require('@office-ai/aioncli-core');
+        const ServerGeminiEventType = GeminiEventType;
         if (data.type === ServerGeminiEventType.ContextWindowWillOverflow) {
           this.handleContextOverflow(data.data);
           return;
@@ -870,9 +875,12 @@ export class GeminiAgent {
             try {
               const base64Data = fs.readFileSync(absolutePath, 'base64');
               const mimeType = ext === '.jpg' ? 'image/jpeg' : `image/${ext.replace('.', '')}`;
-              
-              const isGoogleModel = this.model.platform === 'gemini' || this.model.platform === 'vertex-ai' || this.model.platform === 'gemini-with-google-auth';
-              
+
+              const isGoogleModel =
+                this.model.platform === 'gemini' ||
+                this.model.platform === 'vertex-ai' ||
+                this.model.platform === 'gemini-with-google-auth';
+
               if (isGoogleModel) {
                 imageParts.push({
                   inlineData: {
@@ -909,7 +917,6 @@ export class GeminiAgent {
               content = fs.readFileSync(absolutePath, 'utf8');
             } else {
               try {
-                const officeparser = require('officeparser');
                 content = await new Promise((resolve, reject) => {
                   officeparser.parseOffice(absolutePath, (data: any, err: any) => {
                     if (err) reject(err);
@@ -944,7 +951,6 @@ export class GeminiAgent {
       // Force save to workspace for multimodal requests so tools can access files if needed
       // This fixes ENOENT when model tries to read an image file from a temp folder outside workspace
       if (imageParts.length > 0) {
-        const { ProcessConfig } = require('@process/config');
         await ProcessConfig.set('upload.saveToWorkspace', true).catch(() => {});
       }
 
@@ -998,7 +1004,6 @@ export class GeminiAgent {
 
       // Dynamically inject attached agents guide without hardcoding
       try {
-        const { attachedAgentService } = require('@/process/services/attachedAgentService');
         const attachedConfigs = attachedAgentService.getAllConfigs();
         if (attachedConfigs && attachedConfigs.length > 0) {
           let agentGuide = '\n\n[Available Attached Agents]\n';
@@ -1038,8 +1043,8 @@ export class GeminiAgent {
     let matchedAgent = null;
 
     try {
-      const { DEFAULT_ATTACHED_AGENTS } = require('@/common/types/attachedAgents');
-      for (const agent of DEFAULT_ATTACHED_AGENTS) {
+      const agents = DEFAULT_ATTACHED_AGENTS;
+      for (const agent of agents) {
         const prefix = `@${agent.id}`;
         if (queryTrimmed.startsWith(prefix)) {
           matchedAgent = agent;
@@ -1062,7 +1067,6 @@ export class GeminiAgent {
       });
 
       try {
-        const { attachedAgentService } = require('@/process/services/attachedAgentService');
         const result = await attachedAgentService.executeTask({
           agentId: matchedAgent.id,
           taskId: `direct_${Date.now()}`,
@@ -1250,6 +1254,49 @@ export class GeminiAgent {
       this.config.setUserMemory(combined);
     } catch (e) {
       // ignore injection errors
+    }
+  }
+
+  /**
+   * Manually confirm/resume a pending tool call.
+   * This ensures we are interacting with the REAL tool objects in the scheduler.
+   */
+  async confirmTool(callId: string, outcome: string, payload?: any): Promise<void> {
+    if (!this.scheduler) return;
+
+    // CoreToolScheduler stores active tool calls in its internal state.
+    // We need to find the one matching callId.
+    const toolCalls = (this.scheduler as any).toolCalls as any[];
+    if (!toolCalls) {
+      console.warn(`[GeminiAgent] Scheduler has no active tool calls to confirm for ${callId}`);
+      return;
+    }
+
+    const tool = toolCalls.find((tc: any) => tc.request.callId === callId);
+    if (tool && tool.confirmationDetails?.onConfirm) {
+      try {
+        // LIBRARY BUG BYPASS: CoreToolScheduler.handleConfirmationResponse (v0.30.6) 
+        // fails to pass the 'payload' argument to the original onConfirm callback.
+        // We must manually populate the invocation state for AskUser tools.
+        if (tool.request.name === 'ask_user' && tool.invocation) {
+          const answers = (payload && typeof payload === 'object' && 'answers' in payload) 
+            ? payload.answers 
+            : (payload || {});
+          
+          tool.invocation.confirmationOutcome = outcome === 'proceed_once' ? 'proceed' : outcome;
+          tool.invocation.userAnswers = answers;
+        }
+
+        // Now trigger the scheduler's confirmation handler to advance the tool state
+        await tool.confirmationDetails.onConfirm(outcome, payload);
+      } catch (e) {
+        console.error(`[GeminiAgent] Error in tool.onConfirm for ${callId}:`, e);
+      }
+    } else {
+      console.warn(
+        `[GeminiAgent] Could not find pending tool with onConfirm for ${callId}. ` +
+        `Available IDs: ${toolCalls.map((tc: any) => tc.request.callId).join(', ')}`
+      );
     }
   }
 }

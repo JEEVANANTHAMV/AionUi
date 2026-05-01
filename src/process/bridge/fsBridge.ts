@@ -1754,4 +1754,33 @@ export function initFsBridge(): void {
     }
   });
 
+  // 保存新的 skill 到库中 / Save a new skill to the library
+  ipcBridge.fs.saveLibrarySkill.provider(async ({ name, content }) => {
+    try {
+      const userSkillsDir = getSkillsDir();
+      // Sanitize name for directory
+      const safeName = name.replace(/[<>:"/\\|?*]/g, '_').trim();
+      const targetDir = path.join(userSkillsDir, safeName);
+
+      // Create directory
+      await fs.mkdir(targetDir, { recursive: true });
+
+      // Write SKILL.md
+      const skillMdPath = path.join(targetDir, 'SKILL.md');
+      await fs.writeFile(skillMdPath, content, 'utf-8');
+
+      // Reset SkillManager instance so the new skill can be discovered
+      const { AcpSkillManager } = await import('@process/task/AcpSkillManager');
+      AcpSkillManager.resetInstance();
+
+      console.log(`[fsBridge] Saved new library skill: ${safeName} at ${targetDir}`);
+      return { success: true, msg: `Skill "${name}" saved to library` };
+    } catch (error) {
+      console.error('[fsBridge] Failed to save library skill:', error);
+      return {
+        success: false,
+        msg: `Failed to save skill: ${error instanceof Error ? error.message : String(error)}`,
+      };
+    }
+  });
 }

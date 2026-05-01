@@ -1046,6 +1046,12 @@ ${collectedResponses.join('\n')}`;
               );
               parts.push(getTeamGuidePrompt({ backend: this.options.backend, leaderLabel }));
             }
+            if (this.workspace) {
+              parts.push(`[Workspace Info]
+Your current workspace directory is: ${this.workspace}
+All file operations (read, write, list, etc.) MUST be performed within this directory.
+Prefer using relative paths from the workspace root. Do NOT attempt to access paths outside this directory.`);
+            }
             if (parts.length > 0) {
               contentToSend = `[Assistant Rules - You MUST follow these instructions]\n${parts.join(
                 '\n\n'
@@ -1060,6 +1066,7 @@ ${collectedResponses.join('\n')}`;
               enableTeamGuide: !isInTeam && (await shouldInjectTeamGuideMcp(this.options.backend)),
               backend: this.options.backend,
               presetAssistantId: this.options.presetAssistantId || this.options.customAgentId,
+              workspace: this.workspace,
             });
             contentToSend = injectedContent;
           }

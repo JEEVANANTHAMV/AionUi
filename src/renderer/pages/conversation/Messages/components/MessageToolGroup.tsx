@@ -7,7 +7,8 @@
 import { ipcBridge } from '@/common';
 import type { IMessageToolGroup } from '@/common/chat/chatLib';
 import { iconColors } from '@/renderer/styles/colors';
-import { Alert, Button, Image, Message, Radio, Switch, Tag, Tooltip } from '@arco-design/web-react';
+import { jsonrepair } from 'jsonrepair';
+import { Alert, Button, Checkbox, Image, Input, Message, Radio, Switch, Tag, Tooltip } from '@arco-design/web-react';
 import { Copy, Download, LoadingOne } from '@icon-park/react';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -33,18 +34,87 @@ const ALERT_CLASSES =
 // CollapsibleContent 高度常量 CollapsibleContent height constants
 const RESULT_MAX_HEIGHT = COLLAPSE_CONFIG.MAX_HEIGHT;
 
+// Helper to parse questions for ask_user tool
+const parseAskUserQuestions = (details: any, description?: string) => {
+  let questions: any[] = [];
+  const extractQuestionsFromObj = (obj: any) => {
+    if (Array.isArray(obj)) return obj;
+    if (obj && Array.isArray(obj.questions)) return obj.questions;
+    return null;
+  };
+
+  // 1. Try to use details.questions directly if it's already an array
+  if (details?.questions && Array.isArray(details.questions)) {
+    questions = details.questions;
+  }
+  // 2. Try to parse details.questions if it's a string
+  else if (typeof details?.questions === 'string') {
+    try {
+      const repaired = jsonrepair(details.questions);
+      const parsed = JSON.parse(repaired);
+      const extracted = extractQuestionsFromObj(parsed);
+      if (extracted) questions = extracted;
+    } catch (e) {
+      console.warn('Failed to parse details.questions string:', e);
+    }
+  }
+  // 3. Fallback to description if we still have no questions
+  if (questions.length === 0 && description) {
+    try {
+      let jsonStr = description;
+      const startBrace = jsonStr.indexOf('{');
+      const endBrace = jsonStr.lastIndexOf('}');
+      const startBracket = jsonStr.indexOf('[');
+      const endBracket = jsonStr.lastIndexOf(']');
+
+      if (
+        startBrace !== -1 &&
+        endBrace !== -1 &&
+        endBrace > startBrace &&
+        (startBracket === -1 || startBrace < startBracket)
+      ) {
+        jsonStr = jsonStr.substring(startBrace, endBrace + 1);
+      } else if (startBracket !== -1 && endBracket !== -1 && endBracket > startBracket) {
+        jsonStr = jsonStr.substring(startBracket, endBracket + 1);
+      }
+
+      if (jsonStr.trim()) {
+        const repaired = jsonrepair(jsonStr);
+        const parsed = JSON.parse(repaired);
+        const extracted = extractQuestionsFromObj(parsed);
+        if (extracted) questions = extracted;
+      }
+    } catch (e) {
+      console.warn('Failed to parse ask_user description:', e);
+    }
+  }
+
+  if (questions.length === 0 && description) {
+    questions = [
+      {
+        question: description,
+        type: 'text',
+        header: 'Question',
+      },
+    ];
+  }
+  return questions;
+};
+
 interface IMessageToolGroupProps {
   message: IMessageToolGroup;
 }
 
 const useConfirmationButtons = (
   confirmationDetails: IMessageToolGroupProps['message']['content'][number]['confirmationDetails'],
-  t: (key: string, options?: any) => string
+  t: (key: string, options?: any) => string,
+  toolName?: string,
+  description?: string
 ) => {
   return useMemo(() => {
     if (!confirmationDetails) return {};
     let question: string;
-    const options: Array<{ label: string; value: ToolConfirmationOutcome }> = [];
+    const options: Array<{ label: string; value: ToolConfirmationOutcome; payload?: any }> = [];
     switch (confirmationDetails.type) {
       case 'edit':
         {
@@ -94,12 +164,82 @@ const useConfirmationButtons = (
           );
         }
         break;
+      case 'ask_user':
+        {
+          const questions = parseAskUserQuestions(confirmationDetails, description);
+          question = questions[0]?.question || t('messages.confirmation.proceed');
+
+          if (questions.length === 1 && questions[0].type === 'choice' && !questions[0].multiSelect) {
+            const q = questions[0];
+            q.options?.forEach((opt: any) => {
+              const label = typeof opt === 'string' ? opt : opt.label || opt.name;
+              options.push({
+                label: label,
+                value: ToolConfirmationOutcome.ProceedOnce,
+                payload: { answers: { '0': label } },
+              });
+            });
+            options.push({ label: t('messages.confirmation.no'), value: ToolConfirmationOutcome.Cancel });
+          } else if (questions.length > 0) {
+            options.push(
+              {
+                label: questions.length > 1 ? 'Submit Answers' : 'Submit Answer',
+                value: ToolConfirmationOutcome.ProceedOnce,
+              },
+              { label: t('messages.confirmation.no'), value: ToolConfirmationOutcome.Cancel }
+            );
+          } else {
+            options.push(
+              {
+                label: t('messages.confirmation.yesAllowOnce'),
+                value: ToolConfirmationOutcome.ProceedOnce,
+              },
+              { label: t('messages.confirmation.no'), value: ToolConfirmationOutcome.Cancel }
+            );
+          }
+        }
+        break;
+      case 'exit_plan_mode':
+        {
+          question = t('messages.confirmation.proceed');
+          options.push(
+            {
+              label: t('messages.confirmation.yesAllowOnce'),
+              value: ToolConfirmationOutcome.ProceedOnce,
+            },
+            { label: t('messages.confirmation.no'), value: ToolConfirmationOutcome.Cancel }
+          );
+        }
+        break;
       default: {
-        const mcpProps = confirmationDetails;
-        question = t('messages.confirmation.allowMCPTool', {
-          toolName: mcpProps.toolName,
-          serverName: mcpProps.serverName,
-        });
+        const mcpProps = confirmationDetails as any;
+
+        // Robust check for "undefined" strings that might come from serialized state
+        const rawToolName = mcpProps?.toolDisplayName || mcpProps?.toolName || toolName;
+        const effectiveToolName =
+          rawToolName && String(rawToolName) !== 'undefined' ? String(rawToolName) : 'unknown tool';
+
+        const rawServerName = mcpProps?.serverName;
+        const serverName = rawServerName && String(rawServerName) !== 'undefined' ? String(rawServerName) : null;
+
+        if (serverName) {
+          question = t('messages.confirmation.allowMCPTool', {
+            toolName: effectiveToolName,
+            serverName: serverName,
+          });
+          // Fallback if i18n returns placeholders or "undefined:undefined"
+          if (!question || question.includes('{{') || question.includes('undefined:undefined')) {
+            question = `Allow execution of tool "${effectiveToolName}" from server "${serverName}"?`;
+          }
+        } else {
+          question = t('messages.confirmation.allowExecution', {
+            command: effectiveToolName,
+          });
+          if (!question || question.includes('{{') || question.includes('undefined:undefined')) {
+            question = `Allow execution of tool "${effectiveToolName}"?`;
+          }
+        }
+
         options.push(
           {
             label: t('messages.confirmation.yesAllowOnce'),
@@ -107,26 +247,163 @@ const useConfirmationButtons = (
           },
           {
             label: t('messages.confirmation.yesAlwaysAllowTool', {
-              toolName: mcpProps.toolName,
-              serverName: mcpProps.serverName,
+              toolName: effectiveToolName,
+              serverName: serverName || 'local',
             }),
             value: ToolConfirmationOutcome.ProceedAlwaysTool,
-          },
-          {
+          }
+        );
+
+        if (serverName) {
+          options.push({
             label: t('messages.confirmation.yesAlwaysAllowServer', {
-              serverName: mcpProps.serverName,
+              serverName: serverName,
             }),
             value: ToolConfirmationOutcome.ProceedAlwaysServer,
-          },
-          { label: t('messages.confirmation.no'), value: ToolConfirmationOutcome.Cancel }
-        );
+          });
+        }
+
+        options.push({ label: t('messages.confirmation.no'), value: ToolConfirmationOutcome.Cancel });
       }
     }
     return {
       question,
       options,
     };
-  }, [confirmationDetails, t]);
+  }, [confirmationDetails, t, toolName, description]);
+};
+
+const QuestionForm: React.FC<{
+  questions: any[];
+  answers: Record<string, any>;
+  onAnswerChange: (index: string, value: any) => void;
+  title?: string;
+  isReadOnly?: boolean;
+}> = ({ questions, answers, onAnswerChange, title, isReadOnly }) => {
+  return (
+    <div className='flex flex-col gap-16px p-16px bg-[var(--color-fill-1)] rd-12px mt-8px mb-16px'>
+      <div className='font-600 text-[var(--color-text-1)] text-14px flex items-center gap-8px'>
+        <div className='flex items-center justify-center w-24px h-24px rd-full bg-[rgba(var(--primary-6),0.1)] text-[rgb(var(--primary-6))]'>
+          <span className='i-icon-park-outline:help w-14px h-14px'></span>
+        </div>
+        {title || 'Questions from Agent'}
+      </div>
+      <div className='flex flex-col gap-12px'>
+        {questions.map((q: any, i: number) => {
+          const indexStr = String(i);
+          return (
+            <div
+              key={i}
+              className='bg-[var(--color-bg-1)] p-16px rd-8px border border-solid border-[var(--color-border)] shadow-sm transition-all hover:border-[rgb(var(--primary-6))] hover:shadow-md group'
+            >
+              <div className='font-500 text-[var(--color-text-1)] text-14px leading-relaxed group-hover:text-[rgb(var(--primary-6))] transition-colors'>
+                {q.header || q.question}
+              </div>
+              {q.header && q.question && (
+                <div className='text-[var(--color-text-3)] text-12px mt-4px leading-relaxed'>{q.question}</div>
+              )}
+
+              <div className='mt-16px'>
+                {q.type === 'choice' &&
+                  q.options &&
+                  (q.multiSelect ? (
+                    <Checkbox.Group
+                      className='grid grid-cols-1 sm:grid-cols-2 gap-8px w-full'
+                      value={answers[indexStr] || []}
+                      onChange={(val) => onAnswerChange(indexStr, val)}
+                      disabled={isReadOnly}
+                    >
+                      {q.options.map((opt: any, j: number) => {
+                        const label = typeof opt === 'string' ? opt : opt.label || opt.name;
+                        const description = typeof opt === 'object' ? opt.description : null;
+                        return (
+                          <Checkbox
+                            key={j}
+                            value={label}
+                            className='!m-0 p-10px rd-6px bg-[var(--color-fill-1)] hover:bg-[var(--color-fill-3)] transition-colors w-full border border-solid border-transparent hover:border-[var(--color-border-2)] items-start min-w-0'
+                          >
+                            <div className='flex flex-col ml-4px whitespace-normal break-words w-full'>
+                              <span className='text-13px font-500 text-[var(--color-text-2)] leading-normal'>
+                                {label}
+                              </span>
+                              {description && (
+                                <span className='text-11px text-[var(--color-text-4)] mt-4px leading-normal'>
+                                  {description}
+                                </span>
+                              )}
+                            </div>
+                          </Checkbox>
+                        );
+                      })}
+                    </Checkbox.Group>
+                  ) : (
+                    <Radio.Group
+                      className='grid grid-cols-1 sm:grid-cols-2 gap-8px w-full'
+                      value={answers[indexStr]}
+                      onChange={(val) => onAnswerChange(indexStr, val)}
+                      disabled={isReadOnly}
+                    >
+                      {q.options.map((opt: any, j: number) => {
+                        const label = typeof opt === 'string' ? opt : opt.label || opt.name;
+                        const description = typeof opt === 'object' ? opt.description : null;
+                        return (
+                          <Radio
+                            key={j}
+                            value={label}
+                            className='!m-0 p-10px rd-6px bg-[var(--color-fill-1)] hover:bg-[var(--color-fill-3)] transition-colors w-full border border-solid border-transparent hover:border-[var(--color-border-2)] items-start min-w-0'
+                          >
+                            <div className='flex flex-col ml-4px whitespace-normal break-words w-full'>
+                              <span className='text-13px font-500 text-[var(--color-text-2)] leading-normal'>
+                                {label}
+                              </span>
+                              {description && (
+                                <span className='text-11px text-[var(--color-text-4)] mt-4px leading-normal'>
+                                  {description}
+                                </span>
+                              )}
+                            </div>
+                          </Radio>
+                        );
+                      })}
+                    </Radio.Group>
+                  ))}
+
+                {q.type === 'text' && (
+                  <Input
+                    className='w-full !text-13px !bg-[var(--color-fill-1)] !border-transparent hover:!bg-[var(--color-fill-3)] focus:!bg-[var(--color-bg-1)] focus:!border-[rgb(var(--primary-6))] transition-colors !h-36px !px-12px !rd-6px'
+                    placeholder={q.placeholder || 'Type your answer...'}
+                    value={answers[indexStr] || ''}
+                    onChange={(val) => onAnswerChange(indexStr, val)}
+                    disabled={isReadOnly}
+                    allowClear
+                  />
+                )}
+
+                {q.type === 'yesno' && (
+                  <Radio.Group
+                    type='button'
+                    className='flex w-full [&>label]:flex-1 [&>label]:text-center'
+                    value={answers[indexStr]}
+                    onChange={(val) => onAnswerChange(indexStr, val)}
+                    disabled={isReadOnly}
+                  >
+                    <Radio value='yes'>Yes</Radio>
+                    <Radio value='no'>No</Radio>
+                  </Radio.Group>
+                )}
+
+                {isReadOnly && answers[indexStr] && !q.multiSelect && !['choice', 'yesno'].includes(q.type) && (
+                  <div className='p-10px bg-[var(--color-fill-2)] rd-6px text-13px font-500 text-[var(--color-text-2)] border border-solid border-[var(--color-border)]'>
+                    {answers[indexStr]}
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 };
 
 const EditConfirmationDiff: React.FC<{ diff: string; fileName: string; title: string }> = ({
@@ -156,13 +433,15 @@ const EditConfirmationDiff: React.FC<{ diff: string; fileName: string; title: st
 
 const ConfirmationDetails: React.FC<{
   content: IMessageToolGroupProps['message']['content'][number];
-  onConfirm: (outcome: ToolConfirmationOutcome) => void;
+  onConfirm: (outcome: ToolConfirmationOutcome, payload?: any) => void;
   conversationId: string;
 }> = ({ content, onConfirm, conversationId }) => {
   const { t } = useTranslation();
   const { confirmationDetails } = content;
   const [yoloMode, setYoloMode] = useState(false);
   if (!confirmationDetails) return;
+  const [answers, setAnswers] = useState<Record<string, any>>({});
+
   const node = useMemo(() => {
     if (!confirmationDetails) return null;
     switch (confirmationDetails.type) {
@@ -176,16 +455,31 @@ const ConfirmationDetails: React.FC<{
           </div>
         );
       }
-      case 'info':
-        return <span className='text-t-primary'>{confirmationDetails.prompt}</span>;
-      case 'mcp':
-        return <span className='text-t-primary'>{confirmationDetails.toolDisplayName}</span>;
+      case 'ask_user': {
+        const questions = parseAskUserQuestions(confirmationDetails, content.description);
+        return (
+          <QuestionForm
+            questions={questions}
+            answers={answers}
+            onAnswerChange={(index, val) => setAnswers((prev) => ({ ...prev, [index]: val }))}
+            title={(confirmationDetails as any).title}
+          />
+        );
+      }
+      case 'exit_plan_mode':
+        return <span className='text-t-primary'>{confirmationDetails.title}</span>;
+      default:
+        return null; // Handle via description rendering in ConfirmationDetails
     }
-  }, [confirmationDetails]);
+  }, [confirmationDetails, answers, content.description]);
 
-  const { question = '', options = [] } = useConfirmationButtons(confirmationDetails, t);
+  const { question = '', options = [] } = useConfirmationButtons(
+    confirmationDetails,
+    t,
+    content.name,
+    content.description
+  );
 
-  const [selected, setSelected] = useState<ToolConfirmationOutcome | null>(null);
   const [isResponding, setIsResponding] = useState(false);
 
   const isConfirm = content.status === 'Confirming';
@@ -196,11 +490,14 @@ const ConfirmationDetails: React.FC<{
       try {
         await ipcBridge.geminiConversation.setYoloMode.invoke({ conversationId, yoloMode: true });
         // Auto-confirm the first "allow" option
-        const allowOpt = options.find((opt) => opt.value === ToolConfirmationOutcome.ProceedAlways || opt.value === ToolConfirmationOutcome.ProceedOnce);
-        if (allowOpt && isConfirm) {
+        const allowOptIdx = options.findIndex(
+          (opt) =>
+            opt.value === ToolConfirmationOutcome.ProceedAlways || opt.value === ToolConfirmationOutcome.ProceedOnce
+        );
+        if (allowOptIdx !== -1 && isConfirm) {
           setIsResponding(true);
           try {
-            onConfirm(allowOpt.value);
+            onConfirm(options[allowOptIdx].value, options[allowOptIdx].payload);
           } finally {
             setIsResponding(false);
           }
@@ -220,7 +517,7 @@ const ConfirmationDetails: React.FC<{
   };
 
   return (
-    <div>
+    <div className='w-full min-w-0'>
       {isConfirm && (
         <div className='flex items-center justify-between mb-4'>
           <div className='flex items-center space-x-2 bg-2 p-1 px-2 rounded-full'>
@@ -251,36 +548,56 @@ const ConfirmationDetails: React.FC<{
         <EditConfirmationDiff
           diff={confirmationDetails?.fileDiff || ''}
           fileName={confirmationDetails.fileName}
-          title={isConfirm ? confirmationDetails.title : content.description}
+          title={isConfirm ? confirmationDetails.title || content.name : content.description}
         />
       ) : (
-        node
+        <>{node}</>
       )}
       {content.status === 'Confirming' && (
-        <>
-          <div className='mt-10px text-t-primary'>{question}</div>
-          <Radio.Group direction='vertical' size='mini' value={selected} onChange={setSelected}>
-            {options.map((item) => {
+        <div className='mt-16px pt-16px border-t border-solid border-[var(--color-border-2)]'>
+          {/* Hide redundant question text for Ask User as it's already in the form */}
+          {confirmationDetails.type !== 'ask_user' && (
+            <div className='mb-12px text-[var(--color-text-1)] font-600 text-14px'>{question}</div>
+          )}
+          <div className='flex flex-wrap gap-12px justify-start'>
+            {options.map((opt, idx) => {
+              const isSubmit = opt.value === ToolConfirmationOutcome.ProceedOnce && !opt.payload;
+              const isAskUser = confirmationDetails.type === 'ask_user';
+
+              // Validation for Submit button
+              const isDisabled =
+                isResponding ||
+                (isSubmit &&
+                  isAskUser &&
+                  (() => {
+                    const questions = parseAskUserQuestions(confirmationDetails, content.description);
+                    if (questions.length > 0) {
+                      for (let i = 0; i < questions.length; i++) {
+                        if (!answers[i.toString()] && answers[i.toString()] !== 0) return true;
+                      }
+                    }
+                    return false;
+                  })());
+
               return (
-                <Radio key={item.value} value={item.value}>
-                  {item.label}
-                </Radio>
+                <Button
+                  key={idx}
+                  type={idx === 0 ? 'primary' : 'secondary'}
+                  size='default'
+                  className={idx === 0 ? 'min-w-120px' : 'min-w-80px'}
+                  disabled={isDisabled}
+                   onClick={() => {
+                     const mergedAnswers = { ...answers, ...(opt.payload?.answers || {}) };
+                     const payload = isAskUser ? { answers: mergedAnswers } : opt.payload;
+                     onConfirm(opt.value, payload);
+                   }}
+                >
+                  {opt.label}
+                </Button>
               );
             })}
-          </Radio.Group>
-          <div className='flex justify-start pl-20px'>
-            <Button
-              type='primary'
-              size='mini'
-              disabled={!selected || isResponding}
-              onClick={() => {
-                if (selected) onConfirm(selected);
-              }}
-            >
-              {t('messages.confirm')}
-            </Button>
           </div>
-        </>
+        </div>
       )}
     </div>
   );
@@ -552,13 +869,14 @@ const MessageToolGroup: React.FC<IMessageToolGroupProps> = ({ message }) => {
               key={callId}
               content={content}
               conversationId={message.conversation_id}
-              onConfirm={(outcome) => {
+              onConfirm={(outcome, payload) => {
                 ipcBridge.geminiConversation.confirmMessage
                   .invoke({
                     confirmKey: outcome,
                     msg_id: message.id,
                     callId: callId,
                     conversation_id: message.conversation_id,
+                    payload: payload,
                   })
                   .then(() => {
                     // confirmation sent successfully
@@ -631,7 +949,22 @@ const MessageToolGroup: React.FC<IMessageToolGroupProps> = ({ message }) => {
                   <div
                     className={`text-12px text-t-secondary mb-2 ${status === 'Error' ? 'whitespace-pre-wrap break-words' : 'truncate'}`}
                   >
-                    {description}
+                    {name === 'Ask User' || name === 'ask_user'
+                       ? (() => {
+                           const questions = parseAskUserQuestions(content.confirmationDetails, description);
+                           if (questions.length > 0) {
+                             return (
+                               <QuestionForm
+                                 questions={questions}
+                                 answers={{}}
+                                 onAnswerChange={() => {}}
+                                 isReadOnly={true}
+                               />
+                             );
+                           }
+                           return description;
+                         })()
+                       : description}
                   </div>
                 )}
                 {resultDisplay && (

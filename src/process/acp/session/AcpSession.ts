@@ -272,8 +272,9 @@ export class AcpSession {
    * Verify that an agent-requested file path is within the allowed directories
    * (cwd + additionalDirectories). Prevents path traversal attacks.
    */
-  private assertPathAllowed(filePath: string): void {
-    const resolved = path.resolve(filePath);
+  private resolveAndAssertPath(filePath: string): string {
+    const fullPath = path.isAbsolute(filePath) ? filePath : path.join(this.agentConfig.cwd, filePath);
+    const resolved = path.resolve(fullPath);
     const allowedRoots = [this.agentConfig.cwd, ...(this.agentConfig.additionalDirectories ?? [])];
     const withinAllowed = allowedRoots.some(
       (root) => resolved.startsWith(path.resolve(root) + path.sep) || resolved === path.resolve(root)
@@ -281,6 +282,7 @@ export class AcpSession {
     if (!withinAllowed) {
       throw new Error(`Path not allowed: ${filePath} is outside permitted directories`);
     }
+    return resolved;
   }
 
   // ─── Protocol handlers (glue) ─────────────────────────────────
@@ -290,18 +292,22 @@ export class AcpSession {
       onSessionUpdate: (notification) => this.handleMessage(notification),
       onRequestPermission: (request) => this.handlePermissionRequest(request),
       onReadTextFile: async (req) => {
-        this.assertPathAllowed(req.path);
+        const resolvedPath = this.resolveAndAssertPath(req.path);
         try {
-          const content = fs.readFileSync(req.path, 'utf-8');
+          const content = fs.readFileSync(resolvedPath, 'utf-8');
           return { content };
         } catch {
           throw new Error(`File not found: ${req.path}`);
         }
       },
       onWriteTextFile: async (req) => {
-        this.assertPathAllowed(req.path);
+        const resolvedPath = this.resolveAndAssertPath(req.path);
         try {
-          fs.writeFileSync(req.path, req.content, 'utf-8');
+          const dir = path.dirname(resolvedPath);
+          if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+          }
+          fs.writeFileSync(resolvedPath, req.content, 'utf-8');
           return {};
         } catch {
           throw new Error(`Write failed: ${req.path}`);

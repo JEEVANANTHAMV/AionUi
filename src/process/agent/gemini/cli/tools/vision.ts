@@ -5,14 +5,14 @@
  */
 
 import path from 'node:path';
-import { 
-  BaseDeclarativeTool, 
-  BaseToolInvocation, 
-  Kind, 
+import {
+  BaseDeclarativeTool,
+  BaseToolInvocation,
+  Kind,
   LlmRole,
   type ToolResult,
   type MessageBus,
-  type GeminiClient
+  type GeminiClient,
 } from '@office-ai/aioncli-core';
 import * as fs from 'node:fs/promises';
 
@@ -25,7 +25,14 @@ class VisionAnalyzeToolInvocation extends BaseToolInvocation<VisionAnalyzeParams
   private config: any;
   private geminiClient: GeminiClient;
 
-  constructor(config: any, geminiClient: GeminiClient, params: VisionAnalyzeParams, messageBus: MessageBus, toolName: string, toolDisplayName: string) {
+  constructor(
+    config: any,
+    geminiClient: GeminiClient,
+    params: VisionAnalyzeParams,
+    messageBus: MessageBus,
+    toolName: string,
+    toolDisplayName: string
+  ) {
     super(params, messageBus, toolName, toolDisplayName);
     this.config = config;
     this.geminiClient = geminiClient;
@@ -37,7 +44,7 @@ class VisionAnalyzeToolInvocation extends BaseToolInvocation<VisionAnalyzeParams
 
   async execute(signal: AbortSignal) {
     const resolvedPath = path.resolve(this.config.getTargetDir(), this.params.file_path);
-    
+
     // 1. Validate path
     const validationError = this.config.validatePathAccess(resolvedPath, 'read');
     if (validationError) {
@@ -57,18 +64,20 @@ class VisionAnalyzeToolInvocation extends BaseToolInvocation<VisionAnalyzeParams
       // 3. Prepare multimodal content for the SAME model
       const modelConfigKey = { model: this.config.getModel() };
       const isGoogleModel = this.config.getModel().startsWith('gemini') || this.config.getModel().startsWith('vertex');
-      
-      const visionPart: any = isGoogleModel ? {
-        inlineData: {
-          mimeType,
-          data: base64Data,
-        },
-      } : {
-        type: 'image_url',
-        image_url: {
-          url: `data:${mimeType};base64,${base64Data}`,
-        },
-      };
+
+      const visionPart: any = isGoogleModel
+        ? {
+            inlineData: {
+              mimeType,
+              data: base64Data,
+            },
+          }
+        : {
+            type: 'image_url',
+            image_url: {
+              url: `data:${mimeType};base64,${base64Data}`,
+            },
+          };
 
       const contents = [
         {
@@ -76,7 +85,7 @@ class VisionAnalyzeToolInvocation extends BaseToolInvocation<VisionAnalyzeParams
           parts: [
             visionPart,
             {
-              text: this.params.question || "Please describe this image in detail.",
+              text: this.params.question || 'Please describe this image in detail.',
             },
           ],
         },
@@ -96,7 +105,7 @@ class VisionAnalyzeToolInvocation extends BaseToolInvocation<VisionAnalyzeParams
             {
               role: 'user',
               content: [
-                { type: 'text', text: this.params.question || "Please describe this image in detail." },
+                { type: 'text', text: this.params.question || 'Please describe this image in detail.' },
                 {
                   type: 'image_url',
                   image_url: {
@@ -107,7 +116,7 @@ class VisionAnalyzeToolInvocation extends BaseToolInvocation<VisionAnalyzeParams
             },
           ],
         });
-        textResult = completion.choices[0]?.message?.content || "No description generated.";
+        textResult = completion.choices[0]?.message?.content || 'No description generated.';
       } else {
         // Fallback to standard GeminiClient (for native Google models)
         const response = await this.geminiClient.generateContent(
@@ -116,7 +125,7 @@ class VisionAnalyzeToolInvocation extends BaseToolInvocation<VisionAnalyzeParams
           signal,
           LlmRole.UTILITY_TOOL
         );
-        textResult = response.candidates?.[0]?.content?.parts?.[0]?.text || "No description generated.";
+        textResult = response.candidates?.[0]?.content?.parts?.[0]?.text || 'No description generated.';
       }
 
       return {
@@ -133,7 +142,11 @@ class VisionAnalyzeToolInvocation extends BaseToolInvocation<VisionAnalyzeParams
 }
 
 export class VisionAnalyzeTool extends BaseDeclarativeTool<VisionAnalyzeParams, ToolResult> {
-  constructor(private config: any, private geminiClient: GeminiClient, messageBus: MessageBus) {
+  constructor(
+    private config: any,
+    private geminiClient: GeminiClient,
+    messageBus: MessageBus
+  ) {
     super(
       'vision_analyze',
       'Vision Analyser',
@@ -143,7 +156,10 @@ export class VisionAnalyzeTool extends BaseDeclarativeTool<VisionAnalyzeParams, 
         type: 'object',
         properties: {
           file_path: { type: 'string', description: 'Relative path to the image file' },
-          question: { type: 'string', description: 'What you want to know about the image (e.g., "describe this", "what is the error text?")' },
+          question: {
+            type: 'string',
+            description: 'What you want to know about the image (e.g., "describe this", "what is the error text?")',
+          },
         },
         required: ['file_path', 'question'],
       } as any,
@@ -153,7 +169,19 @@ export class VisionAnalyzeTool extends BaseDeclarativeTool<VisionAnalyzeParams, 
     );
   }
 
-  protected createInvocation(params: VisionAnalyzeParams, messageBus: MessageBus, toolName?: string, toolDisplayName?: string) {
-    return new VisionAnalyzeToolInvocation(this.config, this.geminiClient, params, messageBus, toolName || this.name, toolDisplayName || this.displayName);
+  protected createInvocation(
+    params: VisionAnalyzeParams,
+    messageBus: MessageBus,
+    toolName?: string,
+    toolDisplayName?: string
+  ) {
+    return new VisionAnalyzeToolInvocation(
+      this.config,
+      this.geminiClient,
+      params,
+      messageBus,
+      toolName || this.name,
+      toolDisplayName || this.displayName
+    );
   }
 }

@@ -12,9 +12,10 @@ import type { IResponseMessage } from '@/common/adapter/ipcBridge';
 import type { IMcpServer, TProviderWithModel, ICustomHttpTool } from '@/common/config/storage';
 import { ProcessConfig, getSkillsDir, getSystemDir } from '@process/utils/initStorage';
 import { ExtensionRegistry } from '@process/extensions';
-import { buildSystemInstructionsWithSkillsIndex } from './agentUtils';
+import { buildSystemInstructions } from './agentUtils';
 import { detectSkillLoadRequest, AcpSkillManager, buildSkillContentText } from './AcpSkillManager';
 import { uuid } from '@/common/utils';
+import { jsonrepair } from 'jsonrepair';
 import { getProviderAuthType } from '@/common/utils/platformAuthType';
 import { AuthType, getOauthInfoWithCache, Storage } from '@office-ai/aioncli-core';
 import { GeminiApprovalStore } from '../agent/gemini/GeminiApprovalStore';
@@ -555,11 +556,20 @@ export class GeminiAgentManager extends BaseAgentManager<
       ]);
       const currentFingerprint = GeminiAgentManager.computeMcpFingerprint(mcpServers, customHttpTools);
 
-      if (currentFingerprint !== this.mcpFingerprint) {
+      // Also check for enabledSkills changes in the conversation
+      const conversation = await (await getDatabase()).getConversation(this.conversation_id);
+      const conversationData = conversation.data as any;
+      const currentEnabledSkills = (conversationData?.extra?.enabledSkills || []).sort().join(',');
+      const prevEnabledSkills = (this.enabledSkills || []).sort().join(',');
+
+      if (currentFingerprint !== this.mcpFingerprint || currentEnabledSkills !== prevEnabledSkills) {
         mainLog(
           '[GeminiAgentManager]',
-          `MCP config changed (${this.mcpFingerprint} -> ${currentFingerprint}), re-bootstrapping worker...`
+          `Config changed (fingerprint: ${this.mcpFingerprint === currentFingerprint}, skills: ${prevEnabledSkills === currentEnabledSkills}), re-bootstrapping worker...`
         );
+        // Update local state
+        this.enabledSkills = conversationData?.extra?.enabledSkills;
+        this.mcpFingerprint = currentFingerprint;
         // Kill old worker process and its child processes (MCP server connections)
         this.kill();
         // Re-bootstrap with fresh config (getMcpServers will update the fingerprint)
@@ -575,7 +585,8 @@ export class GeminiAgentManager extends BaseAgentManager<
 
   private getConfirmationButtons = (
     confirmationDetails: IMessageToolGroup['content'][number]['confirmationDetails'],
-    t: (key: string, options?: any) => string
+    t: (key: string, options?: any) => string,
+    rawDescription?: string
   ) => {
     if (!confirmationDetails) return {};
     let question: string;
@@ -584,6 +595,7 @@ export class GeminiAgentManager extends BaseAgentManager<
       label: string;
       value: ToolConfirmationOutcome;
       params?: Record<string, string>;
+      payload?: any;
     }> = [];
     switch (confirmationDetails.type) {
       case 'edit':
@@ -646,35 +658,180 @@ export class GeminiAgentManager extends BaseAgentManager<
           );
         }
         break;
+      case 'mcp':
+        {
+          const mcpProps = confirmationDetails;
+          question = t('messages.confirmation.allowMCPTool', {
+            toolName: mcpProps.toolName,
+            serverName: mcpProps.serverName,
+          });
+          description = mcpProps.serverName + ':' + mcpProps.toolName;
+          options.push(
+            {
+              label: t('messages.confirmation.yesAllowOnce'),
+              value: ToolConfirmationOutcome.ProceedOnce,
+            },
+            {
+              label: t('messages.confirmation.yesAlwaysAllowTool', {
+                toolName: mcpProps.toolName,
+                serverName: mcpProps.serverName,
+              }),
+              value: ToolConfirmationOutcome.ProceedAlwaysTool,
+              params: {
+                toolName: mcpProps.toolName,
+                serverName: mcpProps.serverName,
+              },
+            },
+            {
+              label: t('messages.confirmation.yesAlwaysAllowServer', {
+                serverName: mcpProps.serverName,
+              }),
+              value: ToolConfirmationOutcome.ProceedAlwaysServer,
+              params: { serverName: mcpProps.serverName },
+            },
+            {
+              label: t('messages.confirmation.no'),
+              value: ToolConfirmationOutcome.Cancel,
+            }
+          );
+        }
+        break;
+      case 'ask_user':
+        {
+          let questions: any[] = [];
+          const details = confirmationDetails as any;
+
+          const extractQuestionsFromObj = (obj: any) => {
+            if (Array.isArray(obj)) return obj;
+            if (obj && Array.isArray(obj.questions)) return obj.questions;
+            return null;
+          };
+
+          // 1. Try to use details.questions directly if it's already an array
+          if (details.questions && Array.isArray(details.questions)) {
+            questions = details.questions;
+          }
+          // 2. Try to parse details.questions if it's a string
+          else if (typeof details.questions === 'string') {
+            try {
+              const repaired = jsonrepair(details.questions);
+              const parsed = JSON.parse(repaired);
+              const extracted = extractQuestionsFromObj(parsed);
+              if (extracted) questions = extracted;
+            } catch (e) {
+              console.warn('Failed to parse details.questions string:', e);
+            }
+          }
+          // 3. Fallback to rawDescription if we still have no questions
+          if (questions.length === 0 && rawDescription) {
+            try {
+              let jsonStr = rawDescription;
+              const startBrace = jsonStr.indexOf('{');
+              const endBrace = jsonStr.lastIndexOf('}');
+              const startBracket = jsonStr.indexOf('[');
+              const endBracket = jsonStr.lastIndexOf(']');
+
+              // Extract the outermost JSON structure (object or array)
+              if (
+                startBrace !== -1 &&
+                endBrace !== -1 &&
+                endBrace > startBrace &&
+                (startBracket === -1 || startBrace < startBracket)
+              ) {
+                jsonStr = jsonStr.substring(startBrace, endBrace + 1);
+              } else if (startBracket !== -1 && endBracket !== -1 && endBracket > startBracket) {
+                jsonStr = jsonStr.substring(startBracket, endBracket + 1);
+              }
+
+              if (jsonStr.trim()) {
+                const repaired = jsonrepair(jsonStr);
+                const parsed = JSON.parse(repaired);
+                const extracted = extractQuestionsFromObj(parsed);
+                if (extracted) questions = extracted;
+              }
+            } catch (e) {
+              console.warn('Failed to parse ask_user description:', e);
+            }
+          }
+
+          if (questions.length === 0 && rawDescription) {
+            questions = [
+              {
+                question: rawDescription,
+                type: 'text',
+                header: 'Question',
+              },
+            ];
+          }
+
+          question = questions[0]?.question || t('messages.confirmation.proceed');
+          description = questions[0]?.header || 'Ask User';
+
+          // If there's only one question and it's a choice type, we can make the choices the buttons
+          if (questions.length === 1 && questions[0].type === 'choice' && !questions[0].multiSelect) {
+            const q = questions[0];
+            q.options?.forEach((opt: any) => {
+              const label = typeof opt === 'string' ? opt : opt.label || opt.name;
+              options.push({
+                label: label,
+                value: ToolConfirmationOutcome.ProceedOnce,
+                payload: { answers: { '0': label } },
+              });
+            });
+            options.push({
+              label: t('messages.confirmation.no'),
+              value: ToolConfirmationOutcome.Cancel,
+            });
+          } else if (questions.length > 0) {
+            // If there are questions (multi or single non-choice), provide a submit button
+            options.push(
+              {
+                label: questions.length > 1 ? 'Submit Answers' : 'Submit Answer',
+                value: ToolConfirmationOutcome.ProceedOnce,
+              },
+              {
+                label: t('messages.confirmation.no'),
+                value: ToolConfirmationOutcome.Cancel,
+              }
+            );
+          } else {
+            // Fallback for empty questions
+            options.push(
+              {
+                label: t('messages.confirmation.yesAllowOnce'),
+                value: ToolConfirmationOutcome.ProceedOnce,
+              },
+              {
+                label: t('messages.confirmation.no'),
+                value: ToolConfirmationOutcome.Cancel,
+              }
+            );
+          }
+        }
+        break;
+      case 'exit_plan_mode':
+        {
+          question = t('messages.confirmation.proceed');
+          description = t('common.exitPlanMode', { defaultValue: 'Exit Plan Mode' });
+          options.push(
+            {
+              label: t('messages.confirmation.yesAllowOnce'),
+              value: ToolConfirmationOutcome.ProceedOnce,
+            },
+            {
+              label: t('messages.confirmation.no'),
+              value: ToolConfirmationOutcome.Cancel,
+            }
+          );
+        }
+        break;
       default: {
-        const mcpProps = confirmationDetails;
-        question = t('messages.confirmation.allowMCPTool', {
-          toolName: mcpProps.toolName,
-          serverName: mcpProps.serverName,
-        });
-        description = confirmationDetails.serverName + ':' + confirmationDetails.toolName;
+        question = t('messages.confirmation.proceed');
+        description = 'Tool requires confirmation';
         options.push(
           {
             label: t('messages.confirmation.yesAllowOnce'),
             value: ToolConfirmationOutcome.ProceedOnce,
-          },
-          {
-            label: t('messages.confirmation.yesAlwaysAllowTool', {
-              toolName: mcpProps.toolName,
-              serverName: mcpProps.serverName,
-            }),
-            value: ToolConfirmationOutcome.ProceedAlwaysTool,
-            params: {
-              toolName: mcpProps.toolName,
-              serverName: mcpProps.serverName,
-            },
-          },
-          {
-            label: t('messages.confirmation.yesAlwaysAllowServer', {
-              serverName: mcpProps.serverName,
-            }),
-            value: ToolConfirmationOutcome.ProceedAlwaysServer,
-            params: { serverName: mcpProps.serverName },
           },
           {
             label: t('messages.confirmation.no'),
@@ -698,8 +855,8 @@ export class GeminiAgentManager extends BaseAgentManager<
     console.debug(
       `[GeminiAgentManager] tryAutoApprove: currentMode=${this.currentMode}, confirmationType=${type}, callId=${content.callId}`
     );
-    if (this.currentMode === 'yolo') {
-      // yolo: auto-approve ALL operations
+    if (this.currentMode === 'yolo' && type !== 'ask_user') {
+      // yolo: auto-approve ALL operations except ask_user which needs answers
       console.debug(`[GeminiAgentManager] YOLO auto-approving ${type}: callId=${content.callId}`);
       void this.postMessagePromise(content.callId, ToolConfirmationOutcome.ProceedOnce);
       return true;
@@ -744,7 +901,19 @@ export class GeminiAgentManager extends BaseAgentManager<
         // Check mode-based auto-approval before showing UI
         if (this.tryAutoApprove(content)) return;
 
-        const { question, options, description } = this.getConfirmationButtons(content.confirmationDetails, (k) => k);
+        // Use a simple translator that handles the common keys
+        const translator = (k: string) => {
+          if (k === 'messages.confirmation.no') return 'No';
+          if (k === 'messages.confirmation.yesAllowOnce') return 'Allow once';
+          if (k === 'messages.confirmation.proceed') return 'Proceed';
+          return k;
+        };
+
+        const { question, options, description } = this.getConfirmationButtons(
+          content.confirmationDetails,
+          translator,
+          content.description
+        );
         const hasDetails = Boolean(content.confirmationDetails);
         const hasOptions = options && options.length > 0;
         if (!question && !hasDetails) {
@@ -770,6 +939,11 @@ export class GeminiAgentManager extends BaseAgentManager<
           return;
         }
         if (!question || !hasOptions) return;
+
+        // ask_user tool requires the interactive QuestionForm which is only available in MessageToolGroup.tsx.
+        // We skip adding it to the global ConversationChatConfirm overlay.
+        if (content.confirmationDetails?.type === 'ask_user') return;
+
         // Extract commandType from exec confirmations for "always allow" memory
         const commandType =
           content.confirmationDetails?.type === 'exec'
@@ -1103,7 +1277,7 @@ export class GeminiAgentManager extends BaseAgentManager<
     }
   }
 
-  confirm(id: string, callId: string, data: string) {
+  confirm(id: string, callId: string, data: string, payload?: any) {
     // Store "always allow" decision before removing confirmation from cache
     // 在从缓存中移除确认之前，存储 "always allow" 决策
     if (data === ToolConfirmationOutcome.ProceedAlways) {
@@ -1117,7 +1291,7 @@ export class GeminiAgentManager extends BaseAgentManager<
     super.confirm(id, callId, data);
     // 发送确认到 worker，使用 callId 作为消息类型
     // Send confirmation to worker, using callId as message type
-    return this.postMessagePromise(callId, data);
+    return this.postMessagePromise(callId, { outcome: data, payload });
   }
 
   setYoloMode(yoloMode: boolean): void {

@@ -30,6 +30,8 @@ export interface FirstMessageConfig {
    * Leader row instead of the raw backend key.
    */
   presetAssistantId?: string;
+  /** Current workspace directory path */
+  workspace?: string;
 }
 
 /**
@@ -60,6 +62,19 @@ export async function buildSystemInstructions(config: FirstMessageConfig): Promi
     const leaderLabel = await resolveLeaderAssistantLabel(config.presetAssistantId);
     instructions.push(getTeamGuidePrompt({ backend: config.backend, leaderLabel }));
   }
+
+  // Inject Workspace Info
+  if (config.workspace) {
+    instructions.push(`[Workspace Info]
+Your current workspace directory is: ${config.workspace}
+All file operations (read, write, list, etc.) MUST be performed within this directory.
+Prefer using relative paths from the workspace root. Do NOT attempt to access paths outside this directory.`);
+  }
+
+  // Inject Skill Creation Guidance
+  instructions.push(`[Skill Creation]
+If you find yourself performing a complex, multi-step task or identifying a recurring pattern that would be useful in future sessions, suggest to the user that you can save these instructions as a "Skill".
+You can generate a SKILL.md content and tell the user they can use the "Create Skill" button in the UI (magic wand icon) to save it permanently.`);
 
   if (instructions.length === 0) {
     return undefined;
@@ -138,24 +153,13 @@ export async function prepareFirstMessageWithSkillsIndex(
       const builtinSkillsDir = builtinSkillsCopyDir + '/_builtin';
       const indexText = buildSkillsIndexText(skillsIndex);
 
-      // 告诉 Agent skills 文件的位置，让它按需读取
-      // Tell Agent where skills files are located for on-demand reading
-      const skillsInstruction = `${indexText}
+      instructions.push(`[Skills System]
+You have access to specialized skills at: ${skillsDir}
+Built-in skills are at: ${builtinSkillsDir}
+Use 'read_file' to access SKILL.md in these directories to learn how to use a skill.
 
-[Skills Location]
-Skills are stored in three locations:
-- Builtin skills (auto-enabled): ${builtinSkillsDir}/{skill-name}/SKILL.md
-- Bundled skills: ${builtinSkillsCopyDir}/{skill-name}/SKILL.md
-- User custom skills: ${skillsDir}/{skill-name}/SKILL.md
-
-Each skill has a SKILL.md file containing detailed instructions.
-To use a skill, read its SKILL.md file when needed.
-
-For example:
-- Builtin "cron" skill: ${builtinSkillsDir}/cron/SKILL.md
-- Bundled "pptx" skill: ${builtinSkillsCopyDir}/pptx/SKILL.md`;
-
-      instructions.push(skillsInstruction);
+Available Skills Index:
+${indexText}`);
     }
   }
 
@@ -165,63 +169,24 @@ For example:
     instructions.push(getTeamGuidePrompt({ backend: config.backend, leaderLabel }));
   }
 
-  if (instructions.length === 0) {
-    return { content, loadedSkills };
+  // 4. Inject Workspace Info
+  if (config.workspace) {
+    instructions.push(`[Workspace Info]
+Your current workspace directory is: ${config.workspace}
+All file operations (read, write, list, etc.) MUST be performed within this directory.
+Prefer using relative paths from the workspace root. Do NOT attempt to access paths outside this directory.`);
   }
+
+  // 5. Inject Skill Creation Guidance
+  instructions.push(`[Skill Creation]
+If you find yourself performing a complex, multi-step task or identifying a recurring pattern that would be useful in future sessions, suggest to the user that you can save these instructions as a "Skill".
+You can generate a SKILL.md content and tell the user they can use the "Create Skill" button in the UI (magic wand icon) to save it permanently.`);
 
   const systemInstructions = instructions.join('\n\n');
-  return {
-    content: `[Assistant Rules - You MUST follow these instructions]\n${systemInstructions}\n\n[User Request]\n${content}`,
-    loadedSkills,
-  };
-}
 
-/**
- * 构建系统指令（仅 skills 索引，不注入全文 - 用于 Gemini）
- * Build system instructions with skills INDEX only (no full content - for Gemini)
- *
- * Gemini 没有文件读取工具，无法自行读取 SKILL.md 文件。
- * 当 Gemini 需要某个 skill 的详细指令时，输出 [LOAD_SKILL: skill-name]，
- * 由系统截获并将 skill 全文作为 [System Response] 发回。
- *
- * Gemini has no file read tool and cannot read SKILL.md files on its own.
- * When Gemini needs detailed instructions for a skill, it outputs [LOAD_SKILL: skill-name],
- * and the system intercepts it and sends back the full skill content as [System Response].
- *
- * @param config - 首次消息配置 / First message configuration
- * @returns 系统指令字符串或 undefined / System instructions string or undefined
- */
-export async function buildSystemInstructionsWithSkillsIndex(config: FirstMessageConfig): Promise<string | undefined> {
-  const instructions: string[] = [];
+  // 注意：使用与 Gemini Agent 类似的直接前缀格式，确保 Claude/Codex 等外部 agent 能正确识别
+  // Note: Use direct prefix format similar to Gemini Agent to ensure Claude/Codex can recognize it
+  const finalContent = `[Assistant Rules - You MUST follow these instructions]\n${systemInstructions}\n\n[User Request]\n${content}`;
 
-  // 添加预设上下文 / Add preset context
-  if (config.presetContext) {
-    instructions.push(config.presetContext);
-  }
-
-  // 加载 skills 索引（包括内置 skills + 可选 skills）
-  // Load skills INDEX (including builtin skills + optional skills)
-  const skillManager = AcpSkillManager.getInstance(config.enabledSkills);
-  await skillManager.discoverSkills(config.enabledSkills, config.excludeBuiltinSkills);
-
-  if (skillManager.hasAnySkills()) {
-    const excludeSet = new Set(config.excludeBuiltinSkills ?? []);
-    const skillsIndex = skillManager.getSkillsIndex().filter((s) => !excludeSet.has(s.name));
-    if (skillsIndex.length > 0) {
-      const indexText = buildSkillsIndexText(skillsIndex);
-      instructions.push(indexText);
-    }
-  }
-
-  // Inject Team Guide prompt when agent has team guide capability
-  if (config.enableTeamGuide) {
-    const leaderLabel = await resolveLeaderAssistantLabel(config.presetAssistantId);
-    instructions.push(getTeamGuidePrompt({ backend: config.backend, leaderLabel }));
-  }
-
-  if (instructions.length === 0) {
-    return undefined;
-  }
-
-  return instructions.join('\n\n');
+  return { content: finalContent, loadedSkills };
 }

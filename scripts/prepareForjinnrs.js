@@ -191,21 +191,34 @@ function prepareForjinnrs() {
   const arch = process.env.AIONRS_ARCH || process.env.npm_config_target_arch || process.arch;
   const runtimeKey = `${platform}-${arch}`;
   const version = getVersion();
+  const targetDir = path.join(projectRoot, 'resources', 'bundled-forjinnrs', runtimeKey);
 
   // Resolve the actual version tag — asset filenames include the tag
   let tag;
   if (version === 'latest') {
     const resolved = resolveLatestTag();
     if (!resolved) {
-      throw new Error('Failed to resolve latest forjinnrs release tag from GitHub API');
+      console.warn('  Failed to resolve "latest" tag from GitHub API — skipping forjinnrs bundle');
+      const manifest = {
+        platform,
+        arch,
+        version: 'unknown',
+        generatedAt: new Date().toISOString(),
+        sourceType: 'none',
+        source: {},
+        files: [],
+        skipped: true,
+        reason: 'Failed to resolve latest release tag from GitHub API',
+      };
+      ensureDirectory(targetDir);
+      writeJson(path.join(targetDir, 'manifest.json'), manifest);
+      return { prepared: false, reason: 'tag_resolution_failed' };
     }
     tag = resolved;
     console.log(`Resolved forjinnrs "latest" → ${tag}`);
   } else {
     tag = version.startsWith('v') ? version : `v${version}`;
   }
-
-  const targetDir = path.join(projectRoot, 'resources', 'bundled-forjinnrs', runtimeKey);
   const binaryName = getBinaryName(platform);
   const targetBinaryPath = path.join(targetDir, binaryName);
 

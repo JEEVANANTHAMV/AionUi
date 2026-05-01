@@ -12,12 +12,12 @@ import { CronJobManager } from '@/renderer/pages/cron';
 import { usePresetAssistantInfo, resolveAssistantConfigId } from '@/renderer/hooks/agent/usePresetAssistantInfo';
 import { iconColors } from '@/renderer/styles/colors';
 import { Button, Popover, Menu, Tooltip, Typography } from '@arco-design/web-react';
-import { History, Plus } from '@icon-park/react';
+import { History, Plus, Magic } from '@icon-park/react';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import useSWR from 'swr';
-import { emitter } from '../../../utils/emitter';
+import { emitter } from '@/renderer/utils/emitter';
 import AcpChat from '../platforms/acp/AcpChat';
 import ChatLayout from './ChatLayout';
 import ChatSider from './ChatSider';
@@ -34,7 +34,7 @@ import { useForjinnrsModelSelection } from '../platforms/forjinnrs/useForjinnrsM
 import { usePreviewContext } from '../Preview';
 import StarOfficeMonitorCard from '../platforms/openclaw/StarOfficeMonitorCard.tsx';
 import ConversationSkillsIndicator from './ConversationSkillsIndicator';
-// import SkillRuleGenerator from './components/SkillRuleGenerator'; // Temporarily hidden
+import SkillRuleGenerator from './SkillRuleGenerator';
 
 /** Check whether a specific skill is loaded for the conversation */
 const hasLoadedSkill = (conversation: TChatConversation | undefined, skillName: string): boolean => {
@@ -100,17 +100,7 @@ const _AssociatedConversation: React.FC<{ conversation: TChatConversation }> = (
         </div>
       }
     >
-      <Button
-        size='mini'
-        icon={
-          <History
-            theme='outline'
-            size='16'
-            fill={iconColors.secondary}
-            strokeWidth={3}
-          />
-        }
-      />
+      <Button size='mini' icon={<History theme='outline' size='16' fill={iconColors.secondary} strokeWidth={3} />} />
     </Popover>
   );
 };
@@ -124,14 +114,7 @@ const _AddNewConversation: React.FC<{ conversation: TChatConversation }> = ({ co
     <Tooltip content={t('conversation.workspace.createNewConversation')}>
       <Button
         size='mini'
-        icon={
-          <Plus
-            theme='outline'
-            size='14'
-            fill={iconColors.primary}
-            strokeWidth={3}
-          />
-        }
+        icon={<Plus theme='outline' size='14' fill={iconColors.primary} strokeWidth={3} />}
         onClick={async () => {
           if (isCreatingRef.current) return;
           isCreatingRef.current = true;
@@ -175,6 +158,7 @@ const GeminiConversationPanel: React.FC<{
   sliderTitle: React.ReactNode;
   hideSendBox?: boolean;
 }> = ({ conversation, sliderTitle, hideSendBox }) => {
+  const { t } = useTranslation();
   // Save model selection to conversation via IPC
   const onSelectModel = useCallback(
     async (_provider: IProvider, modelName: string) => {
@@ -201,6 +185,18 @@ const GeminiConversationPanel: React.FC<{
     headerExtra: (
       <div className='flex items-center gap-8px'>
         <ConversationSkillsIndicator conversation={conversation} />
+        <Button
+          type='secondary'
+          size='mini'
+          icon={<Magic />}
+          onClick={() => {
+            // Trigger the generate modal in SkillRuleGenerator via event or ref
+            emitter.emit('skill.generator.open', { type: 'library_skill' });
+          }}
+        >
+          {t('conversation.skills.create', { defaultValue: 'Create Skill' })}
+        </Button>
+        <SkillRuleGenerator conversationId={conversation.id} workspace={conversation.extra?.workspace} />
         <CronJobManager
           conversationId={conversation.id}
           cronJobId={conversation.extra?.cronJobId as string | undefined}
@@ -233,6 +229,7 @@ const ForjinnrsConversationPanel: React.FC<{ conversation: ForjinnrsConversation
   conversation,
   sliderTitle,
 }) => {
+  const { t } = useTranslation();
   const onSelectModel = useCallback(
     async (_provider: IProvider, modelName: string) => {
       const selected = { ..._provider, useModel: modelName } as TProviderWithModel;
@@ -260,6 +257,17 @@ const ForjinnrsConversationPanel: React.FC<{ conversation: ForjinnrsConversation
     headerExtra: (
       <div className='flex items-center gap-8px'>
         <ConversationSkillsIndicator conversation={conversation} />
+        <Button
+          type='secondary'
+          size='mini'
+          icon={<Magic />}
+          onClick={() => {
+            emitter.emit('skill.generator.open', { type: 'library_skill' });
+          }}
+        >
+          {t('conversation.skills.create', { defaultValue: 'Create Skill' })}
+        </Button>
+        <SkillRuleGenerator conversationId={conversation.id} workspace={conversation.extra?.workspace} />
         <CronJobManager
           conversationId={conversation.id}
           cronJobId={conversation.extra?.cronJobId as string | undefined}
@@ -375,9 +383,7 @@ const ChatConversation: React.FC<{
     if (!conversation) return null;
     return (
       <div className='flex items-center justify-between w-full'>
-        <span className='text-16px font-bold text-t-primary truncate pr-8px'>
-          {t('conversation.workspace.title')}
-        </span>
+        <span className='text-16px font-bold text-t-primary truncate pr-8px'>{t('conversation.workspace.title')}</span>
         <div className='flex items-center gap-4px shrink-0'>
           <_AssociatedConversation conversation={conversation} />
           <_AddNewConversation conversation={conversation} />
@@ -463,6 +469,23 @@ const ChatConversation: React.FC<{
         </div>
       )}
       <ConversationSkillsIndicator conversation={conversation} />
+      {conversation && (
+        <Button
+          type='secondary'
+          size='mini'
+          icon={<Magic />}
+          onClick={() => {
+            emitter.emit('skill.generator.open', { type: 'library_skill' });
+          }}
+        >
+          {t('conversation.skills.create', { defaultValue: 'Create Skill' })}
+        </Button>
+      )}
+      {conversation && (
+        <div className='shrink-0'>
+          <SkillRuleGenerator conversationId={conversation.id} workspace={conversation.extra?.workspace} />
+        </div>
+      )}
       {conversation && (
         <div className='shrink-0'>
           <CronJobManager

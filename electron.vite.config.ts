@@ -75,6 +75,10 @@ export default defineConfig(({ mode }) => {
 
   return {
     main: {
+      // Watch main process files for changes and restart automatically
+      watch: {
+        rebuildDelay: 100,
+      },
       plugins: [
         // externalizeDepsPlugin replaces our custom getExternalDeps() + pluginExternalizeDynamicImports.
         // 'fix-path' excluded so it gets bundled inline (only 3KB).

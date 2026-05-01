@@ -5,13 +5,13 @@
  */
 
 import path from 'node:path';
-import { 
-  BaseDeclarativeTool, 
-  BaseToolInvocation, 
-  Kind, 
+import {
+  BaseDeclarativeTool,
+  BaseToolInvocation,
+  Kind,
   ToolErrorType,
   type ToolResult,
-  type MessageBus
+  type MessageBus,
 } from '@office-ai/aioncli-core';
 import * as fs from 'node:fs/promises';
 
@@ -65,13 +65,14 @@ class SafeReadFileToolInvocation extends BaseToolInvocation<ReadFileParams, Tool
     // 3. Simple read with safety check
     try {
       const stats = await fs.stat(this.resolvedPath);
-      if (stats.size > 1024 * 1024) { // 1MB limit for tool reading
-         return {
-           llmContent: `[File too large to read as text: ${stats.size} bytes]. Please use specialized tools or read specific ranges.`,
-           returnDisplay: `Large file skipped: ${path.basename(this.resolvedPath)}`,
-         };
+      if (stats.size > 1024 * 1024) {
+        // 1MB limit for tool reading
+        return {
+          llmContent: `[File too large to read as text: ${stats.size} bytes]. Please use specialized tools or read specific ranges.`,
+          returnDisplay: `Large file skipped: ${path.basename(this.resolvedPath)}`,
+        };
       }
-      
+
       const content = await fs.readFile(this.resolvedPath, 'utf-8');
       return {
         llmContent: content,
@@ -91,7 +92,10 @@ class SafeReadFileToolInvocation extends BaseToolInvocation<ReadFileParams, Tool
 }
 
 export class SafeReadFileTool extends BaseDeclarativeTool<ReadFileParams, ToolResult> {
-  constructor(private config: any, messageBus: MessageBus) {
+  constructor(
+    private config: any,
+    messageBus: MessageBus
+  ) {
     super(
       'read_file',
       'Read File',
@@ -110,8 +114,19 @@ export class SafeReadFileTool extends BaseDeclarativeTool<ReadFileParams, ToolRe
     );
   }
 
-  protected createInvocation(params: ReadFileParams, messageBus: MessageBus, toolName?: string, toolDisplayName?: string) {
-    return new SafeReadFileToolInvocation(this.config, params, messageBus, toolName || this.name, toolDisplayName || this.displayName);
+  protected createInvocation(
+    params: ReadFileParams,
+    messageBus: MessageBus,
+    toolName?: string,
+    toolDisplayName?: string
+  ) {
+    return new SafeReadFileToolInvocation(
+      this.config,
+      params,
+      messageBus,
+      toolName || this.name,
+      toolDisplayName || this.displayName
+    );
   }
 }
 
@@ -122,7 +137,13 @@ interface ReadManyFilesParams {
 class SafeReadManyFilesToolInvocation extends BaseToolInvocation<ReadManyFilesParams, ToolResult> {
   private config: any;
 
-  constructor(config: any, params: ReadManyFilesParams, messageBus: MessageBus, toolName: string, toolDisplayName: string) {
+  constructor(
+    config: any,
+    params: ReadManyFilesParams,
+    messageBus: MessageBus,
+    toolName: string,
+    toolDisplayName: string
+  ) {
     super(params, messageBus, toolName, toolDisplayName);
     this.config = config;
   }
@@ -137,7 +158,7 @@ class SafeReadManyFilesToolInvocation extends BaseToolInvocation<ReadManyFilesPa
 
     for (const filePath of filePaths) {
       const resolvedPath = path.resolve(this.config.getTargetDir(), filePath);
-      
+
       if (isImageFile(resolvedPath)) {
         results.push(`--- [${filePath}] ---\n[Skipped: Binary Image File]`);
         continue;
@@ -170,7 +191,10 @@ class SafeReadManyFilesToolInvocation extends BaseToolInvocation<ReadManyFilesPa
 }
 
 export class SafeReadManyFilesTool extends BaseDeclarativeTool<ReadManyFilesParams, ToolResult> {
-  constructor(private config: any, messageBus: MessageBus) {
+  constructor(
+    private config: any,
+    messageBus: MessageBus
+  ) {
     super(
       'read_many_files',
       'Read Many Files',
@@ -189,7 +213,18 @@ export class SafeReadManyFilesTool extends BaseDeclarativeTool<ReadManyFilesPara
     );
   }
 
-  protected createInvocation(params: ReadManyFilesParams, messageBus: MessageBus, toolName?: string, toolDisplayName?: string) {
-    return new SafeReadManyFilesToolInvocation(this.config, params, messageBus, toolName || this.name, toolDisplayName || this.displayName);
+  protected createInvocation(
+    params: ReadManyFilesParams,
+    messageBus: MessageBus,
+    toolName?: string,
+    toolDisplayName?: string
+  ) {
+    return new SafeReadManyFilesToolInvocation(
+      this.config,
+      params,
+      messageBus,
+      toolName || this.name,
+      toolDisplayName || this.displayName
+    );
   }
 }

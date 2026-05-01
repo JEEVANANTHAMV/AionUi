@@ -77,12 +77,12 @@ All teammates work in this directory for project-related operations.`
     ? `
    - Agent Type cell formatting rules (STRICT — follow exactly):
      - For a PRESET-ASSISTANT teammate (chosen from "Available Preset Assistants for Spawning"): write \`<display-name> (<backend>)\`. The \`<display-name>\` is the first value in parentheses on that preset's list entry (NOT the \`builtin-*\` id in the leading backticks). The \`<backend>\` is the \`backend:\` field on the same entry.
-       Example: given a list entry that reads \`builtin-story-roleplay\` (Story Roleplay, backend: gemini) — ..., the Agent Type cell MUST be \`Story Roleplay (gemini)\` — NOT \`builtin-story-roleplay\`, NOT \`Story Roleplay\` alone, NOT \`gemini\` alone.
+       Example: given a list entry that reads \`builtin-moltbook\` (moltbook, backend: forjinnrs) — ..., the Agent Type cell MUST be \`moltbook (forjinnrs)\` — NOT \`builtin-moltbook\`, NOT \`moltbook\` alone, NOT \`forjinnrs\` alone.
      - For a PLAIN CLI AGENT teammate (chosen from "Available Agent Types for Spawning"): write just the backend name, e.g. \`gemini\`, \`claude\`.`
     : '';
 
   const presetFormattingImportantRule = hasPresetAssistants
-    ? `Present each proposed lineup as a table that includes teammate name, responsibility, and recommended agent type/backend. For preset-assistant teammates, format the Agent Type cell as \`<display-name> (<backend>)\` where display-name is the human name inside parentheses on the preset's list entry (e.g. "Story Roleplay", NOT "builtin-story-roleplay"); for plain CLI agents, use just the backend name.`
+    ? `Present each proposed lineup as a table that includes teammate name, responsibility, and recommended agent type/backend. For preset-assistant teammates, format the Agent Type cell as \`<display-name> (<backend>)\` where display-name is the human name inside parentheses on the preset's list entry (e.g. "moltbook", NOT "builtin-moltbook"); for plain CLI agents, use just the backend name.`
     : `Present each proposed lineup as a table that includes teammate name, responsibility, and recommended agent type/backend.`;
 
   return `# You are the Team Leader

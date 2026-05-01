@@ -15,6 +15,7 @@ import {
 import { Magic, FolderOpen, Lightning } from '@icon-park/react';
 import { useTranslation } from 'react-i18next';
 import { ipcBridge } from '@/common';
+import { emitter } from '@/renderer/utils/emitter';
 import { ConfigStorage } from '@/common/config/storage';
 import { uuid } from '@/common/utils';
 import type { TMessage } from '@/common/chat/chatLib';
@@ -33,23 +34,27 @@ const LoadRuleModal: React.FC<{
   conversationId: string;
 }> = ({ visible, onCancel, workspace, conversationId }) => {
   const { t } = useTranslation();
+  const [activeTab, setActiveTab] = useState<'workspace' | 'library'>('workspace');
   const [loading, setLoading] = useState(false);
-  const [files, setFiles] = useState<IDirOrFile[]>([]);
-  const [loadingFile, setLoadingFile] = useState(false);
+  const [workspaceFiles, setWorkspaceFiles] = useState<IDirOrFile[]>([]);
+  const [librarySkills, setLibrarySkills] = useState<any[]>([]);
+  const [loadingAction, setLoadingAction] = useState(false);
 
   useEffect(() => {
-    if (visible && workspace) {
-      void loadFiles();
+    if (visible) {
+      if (activeTab === 'workspace' && workspace) {
+        void loadWorkspaceFiles();
+      } else if (activeTab === 'library') {
+        void loadLibrarySkills();
+      }
     }
-  }, [visible, workspace]);
+  }, [visible, activeTab, workspace]);
 
-  const loadFiles = async () => {
+  const loadWorkspaceFiles = async () => {
     if (!workspace) return;
     setLoading(true);
     try {
-      // Fetch files from workspace
       const result = await ipcBridge.fs.getFilesByDir.invoke({ dir: workspace, root: workspace });
-      // Helper to flatten tree and filter
       const flattenFiles = (nodes: IDirOrFile[]): IDirOrFile[] => {
         let acc: IDirOrFile[] = [];
         for (const node of nodes) {
@@ -65,23 +70,37 @@ const LoadRuleModal: React.FC<{
       };
 
       const flatList = result && result.length > 0 && result[0].children ? flattenFiles(result[0].children) : [];
-      // Sort by name
       flatList.sort((a, b) => a.name.localeCompare(b.name));
-      setFiles(flatList);
+      setWorkspaceFiles(flatList);
     } catch (error) {
-      console.error('Failed to load files:', error);
-      Message.error(t('conversation.skill_generator.load_error', { defaultValue: 'Failed to load files' }));
+      console.error('Failed to load workspace files:', error);
+      Message.error(t('conversation.skill_generator.load_error'));
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSelectFile = async (file: IDirOrFile) => {
-    setLoadingFile(true);
+  const loadLibrarySkills = async () => {
+    setLoading(true);
+    try {
+      const result = await ipcBridge.fs.listAvailableSkills.invoke();
+      setLibrarySkills(result || []);
+    } catch (error) {
+      console.error('Failed to load library skills:', error);
+      Message.error(
+        t('conversation.skill_generator.load_library_error', { defaultValue: 'Failed to load skills library' })
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInjectWorkspaceFile = async (file: IDirOrFile) => {
+    setLoadingAction(true);
     try {
       const content = await ipcBridge.fs.readFile.invoke({ path: file.fullPath });
       const prompt = `
-System Instruction: The user has explicitly loaded the following rule/skill. Please internalize and apply it to our conversation immediately.
+System Instruction: The user has explicitly loaded the following rule/skill from the workspace. Please internalize and apply it to our conversation immediately.
 
 Filename: ${file.name}
 
@@ -99,55 +118,147 @@ Please acknowledge receiving this rule/skill and confirm you will apply it.
         conversation_id: conversationId,
       });
 
-      Message.success(t('conversation.skill_generator.rule_loaded', { defaultValue: 'Rule loaded successfully' }));
+      Message.success(t('conversation.skill_generator.rule_loaded'));
       onCancel();
     } catch (error) {
       console.error('Failed to read file:', error);
-      Message.error(t('conversation.skill_generator.read_error', { defaultValue: 'Failed to read file' }));
+      Message.error(t('conversation.skill_generator.read_error'));
     } finally {
-      setLoadingFile(false);
+      setLoadingAction(false);
+    }
+  };
+
+  const handleInjectLibrarySkill = async (skill: any) => {
+    setLoadingAction(true);
+    try {
+      const content = await ipcBridge.fs.readFile.invoke({ path: skill.location });
+      const prompt = `
+System Instruction: The user has explicitly injected the skill "${skill.name}" from their library. Please internalize and apply the following SKILL.md definition to our conversation immediately.
+
+Skill Name: ${skill.name}
+Description: ${skill.description}
+
+SKILL.md Content:
+\`\`\`markdown
+${content}
+\`\`\`
+
+Please acknowledge receiving this skill and confirm you will apply its instructions.
+      `.trim();
+
+      await ipcBridge.conversation.sendMessage.invoke({
+        input: prompt,
+        msg_id: uuid(),
+        conversation_id: conversationId,
+      });
+
+      // Update conversation's loaded skills if possible
+      const conversation = await ipcBridge.conversation.get.invoke({ id: conversationId });
+      if (conversation) {
+        const extra = conversation.extra || {};
+        const loadedSkills = (extra as any).loadedSkills || [];
+        if (!loadedSkills.some((s: any) => s.name === skill.name)) {
+          const newSkills = [...loadedSkills, { name: skill.name, description: skill.description }];
+          await ipcBridge.conversation.update.invoke({
+            id: conversationId,
+            updates: { extra: { ...extra, loadedSkills: newSkills } },
+          });
+        }
+      }
+
+      Message.success(
+        t('conversation.skill_generator.skill_injected', { defaultValue: 'Skill injected successfully' })
+      );
+      onCancel();
+    } catch (error) {
+      console.error('Failed to inject library skill:', error);
+      Message.error(t('conversation.skill_generator.inject_error', { defaultValue: 'Failed to inject skill' }));
+    } finally {
+      setLoadingAction(false);
     }
   };
 
   return (
     <Modal
-      title={t('conversation.skill_generator.load_title', { defaultValue: 'Load Rule/Skill' })}
+      title={t('conversation.skill_generator.load_title')}
       visible={visible}
       onCancel={onCancel}
       footer={null}
-      className='w-[90vw] md:w-[500px]'
+      className='w-[90vw] md:w-[600px]'
     >
-      <Spin loading={loading} style={{ display: 'block' }}>
-        {files.length === 0 ? (
+      <Radio.Group type='button' value={activeTab} onChange={setActiveTab} style={{ marginBottom: 16, width: '100%' }}>
+        <Radio value='workspace' style={{ flex: 1, textAlign: 'center' }}>
+          {t('conversation.skill_generator.tab_workspace', { defaultValue: 'Workspace' })}
+        </Radio>
+        <Radio value='library' style={{ flex: 1, textAlign: 'center' }}>
+          {t('conversation.skill_generator.tab_library', { defaultValue: 'Skills Library' })}
+        </Radio>
+      </Radio.Group>
+
+      <Spin loading={loading} style={{ display: 'block', minHeight: 200 }}>
+        {activeTab === 'workspace' ? (
+          workspaceFiles.length === 0 ? (
+            <Empty description={t('conversation.skill_generator.no_files')} />
+          ) : (
+            <List
+              dataSource={workspaceFiles}
+              render={(file, index) => (
+                <List.Item
+                  key={index}
+                  style={{ cursor: 'pointer', padding: '12px' }}
+                  onClick={() => handleInjectWorkspaceFile(file)}
+                  className='hover:bg-[var(--color-fill-2)] rounded transition-colors'
+                >
+                  <div className='flex items-center gap-3 w-full'>
+                    <div className='bg-[var(--color-primary-light-1)] p-2 rounded'>
+                      {file.name.endsWith('.py') ? (
+                        <Lightning size={18} fill='var(--color-primary-6)' />
+                      ) : (
+                        <FolderOpen size={18} fill='var(--color-primary-6)' />
+                      )}
+                    </div>
+                    <div className='flex-1 overflow-hidden'>
+                      <Typography.Text bold>{file.name}</Typography.Text>
+                      <div className='text-[var(--color-text-3)] text-xs truncate'>
+                        {file.relativePath || file.name}
+                      </div>
+                    </div>
+                    {loadingAction && <Spin size={16} />}
+                  </div>
+                </List.Item>
+              )}
+            />
+          )
+        ) : librarySkills.length === 0 ? (
           <Empty
-            description={t('conversation.skill_generator.no_files', {
-              defaultValue: 'No relevant files found in workspace',
+            description={t('conversation.skill_generator.no_library_skills', {
+              defaultValue: 'No skills found in library',
             })}
           />
         ) : (
           <List
-            dataSource={files}
-            render={(file, index) => (
+            dataSource={librarySkills}
+            render={(skill, index) => (
               <List.Item
                 key={index}
-                actionLayout='vertical'
-                style={{ cursor: 'pointer', padding: '12px 0' }}
-                onClick={() => handleSelectFile(file)}
-                className='hover:bg-[var(--color-fill-2)] px-2 rounded transition-colors'
+                style={{ cursor: 'pointer', padding: '12px' }}
+                onClick={() => handleInjectLibrarySkill(skill)}
+                className='hover:bg-[var(--color-fill-2)] rounded transition-colors'
               >
-                <div className='flex items-center gap-3'>
+                <div className='flex items-center gap-3 w-full'>
                   <div className='bg-[var(--color-primary-light-1)] p-2 rounded'>
-                    {file.name.endsWith('.py') ? (
-                      <Lightning size={18} fill='var(--color-primary-6)' />
-                    ) : (
-                      <FolderOpen size={18} fill='var(--color-primary-6)' />
-                    )}
+                    <Lightning size={18} fill='var(--color-primary-6)' />
                   </div>
-                  <div className='flex-1'>
-                    <Typography.Text bold>{file.name}</Typography.Text>
-                    <div className='text-[var(--color-text-3)] text-xs truncate'>{file.relativePath || file.name}</div>
+                  <div className='flex-1 overflow-hidden'>
+                    <div className='flex items-center gap-2'>
+                      <Typography.Text bold>{skill.name}</Typography.Text>
+                      <span className='text-[10px] px-1.5 py-0.5 rounded bg-[var(--color-fill-3)] text-[var(--color-text-3)] uppercase'>
+                        {skill.source}
+                      </span>
+                    </div>
+                    <div className='text-[var(--color-text-3)] text-xs truncate'>{skill.description}</div>
                   </div>
-                  {loadingFile && <Spin size={16} />}
+                  {loadingAction && <Spin size={16} />}
                 </div>
               </List.Item>
             )}
@@ -162,9 +273,20 @@ const SkillRuleGenerator: React.FC<SkillRuleGeneratorProps> = ({ conversationId,
   const { t } = useTranslation();
   const [generateVisible, setGenerateVisible] = useState(false);
   const [loadVisible, setLoadVisible] = useState(false);
-  const [type, setType] = useState<'skill' | 'rule'>('skill');
+  const [type, setType] = useState<'skill' | 'rule' | 'library_skill'>('skill');
   const [presetName, setPresetName] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const handleOpen = (data?: { type?: 'skill' | 'rule' | 'library_skill' }) => {
+      if (data?.type) setType(data.type);
+      setGenerateVisible(true);
+    };
+    emitter.on('skill.generator.open', handleOpen);
+    return () => {
+      emitter.off('skill.generator.open', handleOpen);
+    };
+  }, []);
 
   const handleGenerate = async () => {
     if (!workspace) {
@@ -215,18 +337,38 @@ const SkillRuleGenerator: React.FC<SkillRuleGeneratorProps> = ({ conversationId,
 
       // 2. Construct prompt
       const finalName = presetName.trim();
+      let typeLabel = '';
+      let requirements = '';
+      if (type === 'skill') {
+        typeLabel = 'Python script (Skill)';
+        requirements = `- Create a reusable Python script. Save it as a .py file in the workspace (e.g., skill_${finalName.toLowerCase().replace(/\s+/g, '_')}.py).
+- Use the 'write_file' tool to save the file directly.`;
+      } else if (type === 'rule') {
+        typeLabel = 'Rule file (JSON/Markdown)';
+        requirements = `- Create a structured rule definition (JSON or Markdown). Save it as a .json or .md file in the workspace (e.g., rule_${finalName.toLowerCase().replace(/\s+/g, '_')}.json).
+- Use the 'write_file' tool to save the file directly.`;
+      } else if (type === 'library_skill') {
+        typeLabel = 'SKILL.md (Skill Library)';
+        requirements = `- Create a standardized SKILL.md file with YAML front matter.
+- The front matter MUST include:
+  ---
+  name: ${finalName}
+  description: A brief description of this skill's purpose.
+  ---
+- The rest of the file should contain detailed instructions for the agent on how to perform the tasks identified in the history.
+- Do NOT use tools to save this file yourself. Just output the content.`;
+      }
+
       const prompt = `
-Based on the following conversation history, please generate a ${type === 'skill' ? 'Python script (Skill)' : 'Rule file (JSON/Markdown)'} for a specialized agent named "${finalName}".
+Based on the following conversation history, please generate a ${typeLabel} for a specialized agent named "${finalName}".
 
 Context:
 ${historyText}
 
 Requirements:
-- If 'Skill': Create a reusable Python script. Save it as a .py file in the workspace (e.g., skill_${finalName.toLowerCase().replace(/\s+/g, '_')}.py).
-- If 'Rule': Create a structured rule definition (JSON or Markdown). Save it as a .json or .md file in the workspace (e.g., rule_${finalName.toLowerCase().replace(/\s+/g, '_')}.json).
-- Use the 'write_file' tool to save the file directly.
+${requirements}
 - VERY IMPORTANT: Additionally, output the EXACT content of the generated rule/skill between ---PRESET_BEGIN--- and ---PRESET_END--- tags so I can register it as a global preset.
-- After saving, reply with a brief confirmation.
+- After finishing, reply with a brief confirmation.
       `.trim();
 
       const msg_id = uuid();
@@ -241,7 +383,11 @@ Requirements:
             // Extract content between tags
             const match = capturedContent.match(/---PRESET_BEGIN---([\s\S]*?)---PRESET_END---/);
             if (match && match[1]) {
-              void registerPreset(finalName, match[1].trim());
+              if (type === 'library_skill') {
+                void saveLibrarySkill(finalName, match[1].trim());
+              } else {
+                void registerPreset(finalName, match[1].trim());
+              }
             }
             removeListener();
           }
@@ -263,6 +409,28 @@ Requirements:
       Message.error(t('conversation.skill_generator.failed', { defaultValue: 'Failed to generate' }));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const saveLibrarySkill = async (name: string, content: string) => {
+    try {
+      const result = await ipcBridge.fs.saveLibrarySkill.invoke({ name, content });
+      if (result.success) {
+        Message.success(
+          t('conversation.skill_generator.skill_saved_to_library', {
+            defaultValue: 'Skill saved to library successfully!',
+          })
+        );
+        // Refresh library list if modal is open
+        if (loadVisible) {
+          await ipcBridge.fs.listAvailableSkills.invoke();
+        }
+      } else {
+        Message.error(result.msg || 'Failed to save skill');
+      }
+    } catch (error) {
+      console.error('Failed to save library skill:', error);
+      Message.error('Failed to save library skill');
     }
   };
 
@@ -345,11 +513,16 @@ Requirements:
             })}
           </p>
         </div>
-        <Radio.Group value={type} onChange={setType}>
-          <Radio value='skill'>
-            {t('conversation.skill_generator.type_skill', { defaultValue: 'Skill (Python)' })}
+        <Radio.Group value={type} onChange={setType} direction='vertical' className='flex flex-col gap-2'>
+          <Radio value='library_skill'>
+            {t('conversation.skill_generator.type_library_skill', { defaultValue: 'Skill Library (SKILL.md)' })}
           </Radio>
-          <Radio value='rule'>{t('conversation.skill_generator.type_rule', { defaultValue: 'Rule (JSON/MD)' })}</Radio>
+          <Radio value='skill'>
+            {t('conversation.skill_generator.type_skill', { defaultValue: 'Skill script (Python)' })}
+          </Radio>
+          <Radio value='rule'>
+            {t('conversation.skill_generator.type_rule', { defaultValue: 'Rule file (JSON/MD)' })}
+          </Radio>
         </Radio.Group>
       </Modal>
 

@@ -8,9 +8,10 @@ import type { TChatConversation } from '@/common/config/storage';
 import { iconColors } from '@/renderer/styles/colors';
 import { Popover } from '@arco-design/web-react';
 import { Lightning } from '@icon-park/react';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import SessionSkillManager from './SessionSkillManager';
 
 type ConversationSkillsIndicatorProps = {
   conversation: TChatConversation | undefined;
@@ -24,6 +25,7 @@ type ConversationSkillsIndicatorProps = {
 const ConversationSkillsIndicator: React.FC<ConversationSkillsIndicatorProps> = ({ conversation }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [managerVisible, setManagerVisible] = useState(false);
 
   const loadedSkills = (conversation?.extra as { loadedSkills?: Array<{ name: string; description: string }> })
     ?.loadedSkills;
@@ -50,21 +52,37 @@ const ConversationSkillsIndicator: React.FC<ConversationSkillsIndicatorProps> = 
           </div>
         ))}
       </div>
+      <div className='mt-12px pt-8px b-t-1 b-solid b-3'>
+        <div
+          className='text-12px color-primary cursor-pointer hover:underline flex items-center justify-center gap-4px'
+          onClick={() => setManagerVisible(true)}
+        >
+          <Lightning size={12} />
+          {t('conversation.skills.manage', { defaultValue: 'Manage Skills' })}
+        </div>
+      </div>
     </div>
   );
 
   return (
-    <Popover content={content} trigger='click' position='br'>
-      <span
-        className='inline-flex items-center gap-4px rounded-full px-8px py-2px bg-2 cursor-pointer'
-        data-testid='skills-indicator'
-      >
-        <Lightning theme='filled' size={14} fill={iconColors.primary} strokeWidth={2} style={{ lineHeight: 0 }} />
-        <span className='text-13px text-t-primary lh-[1]' data-testid='skills-indicator-count'>
-          {loadedSkills.length}
+    <>
+      <Popover content={content} trigger='click' position='br'>
+        <span
+          className='inline-flex items-center gap-4px rounded-full px-8px py-2px bg-2 cursor-pointer'
+          data-testid='skills-indicator'
+        >
+          <Lightning theme='filled' size={14} fill={iconColors.primary} strokeWidth={2} style={{ lineHeight: 0 }} />
+          <span className='text-13px text-t-primary lh-[1]' data-testid='skills-indicator-count'>
+            {loadedSkills.length}
+          </span>
         </span>
-      </span>
-    </Popover>
+      </Popover>
+      <SessionSkillManager
+        visible={managerVisible}
+        onCancel={() => setManagerVisible(false)}
+        conversation={conversation}
+      />
+    </>
   );
 };
 

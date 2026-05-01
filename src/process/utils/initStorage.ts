@@ -588,7 +588,6 @@ const getBuiltinAssistants = (): AcpBackendConfig[] => {
       preset.id === 'morph-ppt' ||
       preset.id === 'cowork' ||
       preset.id === 'star-office-helper' ||
-      preset.id === 'story-roleplay' ||
       preset.id === 'moltbook' ||
       preset.id === 'beautiful-mermaid';
 

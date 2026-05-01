@@ -453,7 +453,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
     skillFiles: {
       'en-US': 'social-job-publisher-skills.md',
     },
-    defaultEnabledSkills: ['xiaohongshu-recruiter', 'x-recruiter'],
+    defaultEnabledSkills: [],
     nameI18n: {
       'en-US': 'Social Job Publisher',
     },
@@ -516,30 +516,6 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
         'Draw a detailed user login authentication flowchart',
         'Create an API sequence diagram for payment processing',
         'Create a system architecture diagram',
-      ],
-    },
-  },
-  {
-    id: 'story-roleplay',
-    avatar: 'Book',
-    presetAgentType: 'forjinnrs',
-    resourceDir: 'src/process/resources/assistant/story-roleplay',
-    ruleFiles: {
-      'en-US': 'story-roleplay.md',
-    },
-    defaultEnabledSkills: ['story-roleplay'],
-    nameI18n: {
-      'en-US': 'Story Roleplay',
-    },
-    descriptionI18n: {
-      'en-US':
-        'Immersive story roleplay. Start by: 1) Natural language to create characters, 2) Paste PNG images, or 3) Open folder with character cards (PNG/JSON) and world info.',
-    },
-    promptsI18n: {
-      'en-US': [
-        'Start an epic fantasy adventure with a brave warrior',
-        'Create a detailed character with backstory and personality',
-        'Begin an interactive story in a sci-fi setting',
       ],
     },
   },

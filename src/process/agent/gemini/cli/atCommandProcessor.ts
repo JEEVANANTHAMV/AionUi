@@ -248,7 +248,7 @@ export async function handleAtCommand({
       try {
         const absolutePath = path.resolve(dir, pathName);
         const stats = await fs.stat(absolutePath);
-        
+
         // Skip image files to prevent them from being read as text and causing token overflow
         const ext = path.extname(absolutePath).toLowerCase();
         const isImage = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp', '.svg'].includes(ext);

@@ -216,6 +216,18 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
         continue;
       }
       if (message.type === 'tool_group') {
+        const hasAskUserConfirming = message.content.some(
+          (c) => c.status === 'Confirming' && c.confirmationDetails?.type === 'ask_user'
+        );
+        if (hasAskUserConfirming) {
+          toolList = [];
+          toolSourceMessageIds = [];
+          diffsChanges = [];
+          diffsSourceMessageIds = [];
+          result.push(message);
+          continue;
+        }
+
         if (message.content.length === 1) {
           const writeFileResults = message.content
             .filter(

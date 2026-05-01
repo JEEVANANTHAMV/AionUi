@@ -71,6 +71,15 @@ export const joinPath = (basePath: string, relativePath: string): string => {
  * @description 跟对话相关的消息类型申明 及相关处理
  */
 
+export interface AskUserQuestion {
+  question: string;
+  header?: string;
+  type: 'text' | 'choice' | 'yesno';
+  placeholder?: string;
+  multiSelect?: boolean;
+  options?: Array<{ label?: string; name?: string; description?: string } | string>;
+}
+
 type TMessageType =
   | 'text'
   | 'tips'
@@ -210,6 +219,18 @@ export type IMessageToolGroup = IMessage<
             toolName: string;
             toolDisplayName: string;
             serverName: string;
+          }
+        >
+      | IMessageToolGroupConfirmationDetailsBase<
+          'ask_user',
+          {
+            questions: AskUserQuestion[];
+          }
+        >
+      | IMessageToolGroupConfirmationDetailsBase<
+          'exit_plan_mode',
+          {
+            planPath: string;
           }
         >;
   }>
@@ -388,6 +409,7 @@ export interface IConfirmation<Option extends any = any> {
     label: string;
     value: Option;
     params?: Record<string, string>; // Translation interpolation parameters
+    payload?: any;
   }>;
   /**
    * Command type for exec confirmations (e.g., 'curl', 'npm', 'git')

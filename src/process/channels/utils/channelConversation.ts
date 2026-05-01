@@ -7,10 +7,8 @@
 import type { AcpBackend } from '@/common/types/acpTypes';
 import type { PluginType } from '../types';
 
-const WEIXIN_FILE_SEND_SKILL = 'weixin-file-send';
-
 export function getChannelEnabledSkills(platform: PluginType): string[] | undefined {
-  return platform === 'weixin' ? [WEIXIN_FILE_SEND_SKILL] : undefined;
+  return undefined;
 }
 
 export function buildChannelConversationExtra(args: {
