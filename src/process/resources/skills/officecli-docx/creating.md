@@ -8,8 +8,26 @@ Use this guide when creating a new document with no template.
 
 1. **Create** blank document
 2. **Plan** document structure (outline + element types)
-3. **Build** incrementally — run each command and check output before proceeding; use `batch` only for bulk content entry (many paragraphs or table cells at once)
-4. **QA** (content + validation) -- see [SKILL.md](SKILL.md#qa-required)
+3. **Build** each element incrementally — one individual tool call at a time. **NEVER** use `batch` or create shell scripts. Content addition (paragraphs, tables, charts) MUST run as individual tool calls so errors surface immediately and the UI remains responsive.
+4. **Discovery**: If you are unsure about a property or command, use `officecli help` (e.g. `officecli help docx add table`) to see the exact schema.
+5. **QA** (content + validation) -- see [SKILL.md](SKILL.md#qa-required)
+
+---
+
+## Setup & Discovery
+
+```bash
+# Create blank document
+officecli create doc.docx
+
+# Explore capabilities if unsure
+officecli --help
+officecli help docx add
+officecli help docx set paragraph
+```
+
+> [!CAUTION]
+> **NEVER use `touch` or `python`** to create placeholders. They create invalid files. Always use `officecli create`.
 
 ---
 
@@ -41,54 +59,13 @@ Values are in twips (1440 twips = 1 inch, 567 twips = 1 cm).
 
 ---
 
-## Execution Strategy: Batch vs Incremental
-
-**Use INCREMENTAL (one command at a time):**
-
-- `add /styles --type style` — define all styles before using them; verify they exist
-- `add / --type header/footer/watermark/toc` — structural; verify before building on top
-- `add /body --type table/chart` — creates the container; fill contents after confirming
-- `validate` — always run alone
-- **When in doubt** — a single command gives immediate feedback; if it fails you know exactly where. Batch errors are harder to diagnose.
-
-**Use BATCH (heredoc):**
-
-- Multiple consecutive `add /body --type paragraph/run` — body content has no structural side effects
-- Bulk list items (bullet points, numbered steps)
-- Format painting — applying the same props to multiple paragraphs or table cells
-- Filling table rows with text
-
-**Always use `officecli open`/`close`.** It keeps the file in memory so every command skips repeated file I/O — this is the smart default, not a special optimization. Batch and resident mode are independent: each works on its own, and they can be combined.
-
-```bash
-# Batch: add multiple paragraphs at once
-cat <<'EOF' | officecli batch report.docx
-[
-  {"command":"add","parent":"/body","type":"paragraph","props":{"text":"Q4 Business Report","alignment":"center","size":"28pt","bold":true,"color":"1F4E79"}},
-  {"command":"add","parent":"/body","type":"paragraph","props":{"text":"Fiscal Year 2025","alignment":"center","size":"14pt","color":"4472C4"}},
-  {"command":"add","parent":"/body","type":"paragraph","props":{"text":"Prepared by: Team Alpha","alignment":"center","color":"666666"}}
-]
-EOF
-
-# Batch: format painting — same props on multiple table header cells
-cat <<'EOF' | officecli batch report.docx
-[
-  {"command":"set","path":"/body/tbl[1]/tr[1]/tc[1]","props":{"bold":true,"shd":"1F4E79","color":"FFFFFF"}},
-  {"command":"set","path":"/body/tbl[1]/tr[1]/tc[2]","props":{"bold":true,"shd":"1F4E79","color":"FFFFFF"}},
-  {"command":"set","path":"/body/tbl[1]/tr[1]/tc[3]","props":{"bold":true,"shd":"1F4E79","color":"FFFFFF"}}
-]
-EOF
-```
-
-**Batch chunk size:** Keep batches under 15 operations. Split by section (e.g., one batch per heading + its body paragraphs).
-
 ---
 
 ## Document Structure Recipes
 
 Complete recipes for common document types. Each recipe shows the full command sequence for reference.
 
-> **Execute recipes incrementally — one command (or one `batch` block) at a time, not as a single shell script.** Read the output after each command. If a command fails, fix it before continuing. After each structural phase (styles, headers/footers, tables, charts), verify with `validate` or `get` before proceeding.
+> **Execute recipes incrementally — one individual tool call at a time, not as a single shell script.** Read the output after each command. If a command fails, fix it before continuing. After each structural phase (styles, headers/footers, tables, charts), verify with `validate` or `get` before proceeding.
 
 ### Recipe: Business Report
 

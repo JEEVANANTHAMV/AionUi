@@ -472,7 +472,7 @@ export const transformMessage = (message: IResponseMessage): TMessage => {
         id: uuid(),
         msg_id: message.msg_id,
         conversation_id: message.conversation_id,
-        content: message.data as any,
+        content: (message.data as any) || [],
       };
     }
     case 'agent_status': {
@@ -637,7 +637,7 @@ export const composeMessage = (
   };
 
   if (message.type === 'tool_group') {
-    const remainingToolsMap = new Map(message.content.map((t) => [t.callId, t] as const));
+    const remainingToolsMap = new Map((message.content || []).map((t) => [t.callId, t] as const));
     if (remainingToolsMap.size === 0) return list;
 
     const updatesToReport: TMessage[] = [];

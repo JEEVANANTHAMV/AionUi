@@ -54,8 +54,8 @@ interface BootstrapAgentConfig {
   excludeTools: string[];
   model: TProviderWithModel;
   proxy: string;
-  projectId?: string;
-  rules?: string;
+  GOOGLE_CLOUD_PROJECT?: string;
+  presetRules?: string;
   enabledSkills: string[];
   yoloMode: boolean;
   webSearchEngine: 'google' | 'default';
@@ -193,11 +193,13 @@ export class GeminiAgentManager extends BaseAgentManager<
     this.currentMode = data.sessionMode || 'default';
     this.webSearchEngine = data.webSearchEngine;
     this.teamMcpStdioConfig = data.teamMcpStdioConfig;
-    mainLog(
-      '[GeminiAgentManager]',
-      'constructor teamMcpStdioConfig:',
-      this.teamMcpStdioConfig ? `PRESENT (command=${this.teamMcpStdioConfig.command})` : 'MISSING'
-    );
+    if (this.teamMcpStdioConfig) {
+      mainLog(
+        '[GeminiAgentManager]',
+        'constructor teamMcpStdioConfig:',
+        `PRESENT (command=${this.teamMcpStdioConfig.command})`
+      );
+    }
     // 向后兼容 / Backward compatible
     this.contextContent = data.contextContent || data.presetRules;
     this.bootstrap = this.createBootstrap();
@@ -285,8 +287,8 @@ export class GeminiAgentManager extends BaseAgentManager<
           excludeTools: excludedTools,
           model: this.model,
           proxy: config?.proxy || '',
-          projectId,
-          rules: effectivePresetRules,
+          GOOGLE_CLOUD_PROJECT: projectId,
+          presetRules: effectivePresetRules,
           enabledSkills: allEnabledSkills,
           yoloMode: effectiveYoloMode,
           webSearchEngine: config?.webSearchEngine || 'default',
@@ -458,6 +460,7 @@ export class GeminiAgentManager extends BaseAgentManager<
     silent?: boolean;
   }) {
     if (data.silent) {
+      await this.stop();
       await this.refreshWorkerIfMcpChanged();
       this.status = 'pending';
       cronBusyGuard.setProcessing(this.conversation_id, true);
@@ -514,6 +517,10 @@ export class GeminiAgentManager extends BaseAgentManager<
       };
       ipcBridge.geminiConversation.responseStream.emit(userResponseMessage);
     }
+
+    // Ensure clean state: abort any active stream and clear pending tool confirmations
+    // 确保干净的状态：中止任何活动流并清理待处理的工具确认
+    await this.stop();
 
     // Check if MCP config has changed since worker was initialized
     // If changed, kill old worker and re-bootstrap with fresh config
@@ -852,10 +859,12 @@ export class GeminiAgentManager extends BaseAgentManager<
    */
   private tryAutoApprove(content: IMessageToolGroup['content'][number]): boolean {
     const type = content.confirmationDetails?.type;
+    const description = content.description || '';
     console.debug(
       `[GeminiAgentManager] tryAutoApprove: currentMode=${this.currentMode}, confirmationType=${type}, callId=${content.callId}`
     );
-    if (this.currentMode === 'yolo' && type !== 'ask_user') {
+    const effectiveYolo = this.forceYoloMode || this.currentMode === 'yolo';
+    if (effectiveYolo && type !== 'ask_user') {
       // yolo: auto-approve ALL operations except ask_user which needs answers
       console.debug(`[GeminiAgentManager] YOLO auto-approving ${type}: callId=${content.callId}`);
       void this.postMessagePromise(content.callId, ToolConfirmationOutcome.ProceedOnce);
@@ -883,12 +892,20 @@ export class GeminiAgentManager extends BaseAgentManager<
     }
 
     // Auto-approve access to gemini-temp directories or workspaces directory (internal app paths)
-    // Avoids redundant confirmations for directories created by the app itself
-    const description = content.description || '';
     if (description.includes('gemini-temp') || description.includes('workspaces')) {
       console.log(`[GeminiAgentManager] Auto-approving safe path access: ${description}`);
       void this.postMessagePromise(content.callId, ToolConfirmationOutcome.ProceedOnce);
       return true;
+    }
+
+    // Auto-approve standalone officecli commands (no shell redirection or chaining)
+    if (type === 'exec' && description.trim().startsWith('officecli')) {
+      const shellMeta = /[;&|><]/;
+      if (!shellMeta.test(description)) {
+        console.log(`[GeminiAgentManager] Auto-approving safe officecli command: ${description}`);
+        void this.postMessagePromise(content.callId, ToolConfirmationOutcome.ProceedOnce);
+        return true;
+      }
     }
 
     return false;

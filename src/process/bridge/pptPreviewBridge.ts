@@ -18,7 +18,8 @@ import { spawn, exec, execSync, type ChildProcess } from 'node:child_process';
 import fs from 'node:fs';
 import net from 'node:net';
 import path from 'node:path';
-import { getEnhancedEnv } from '@process/utils/shellEnv';
+import { getEnhancedEnv, getBundledOfficeCliPath } from '@process/utils/shellEnv';
+import { SERVER_CONFIG } from '@process/webserver/config/constants';
 
 interface WatchSession {
   process: ChildProcess;
@@ -30,10 +31,6 @@ interface WatchSession {
 const sessions = new Map<string, WatchSession>();
 // Pending kill timers — delayed stop allows Strict Mode re-mount to reuse sessions
 const pendingKills = new Map<string, ReturnType<typeof setTimeout>>();
-// Skip further install attempts after the first failure in this session
-let installFailed = false;
-// Lazy update: check once per session on first use, not at startup
-let updateChecked = false;
 
 /**
  * Find a free TCP port by binding to port 0.
@@ -92,65 +89,6 @@ function killSession(filePath: string): void {
   }
 }
 
-/**
- * Background update check — runs at most once per day, fully async to avoid blocking main process.
- */
-function checkForUpdate(): void {
-  const markerPath = path.join(getPlatformServices().paths.getDataDir(), '.officecli-update-check');
-  try {
-    const stat = fs.statSync(markerPath);
-    if (Date.now() - stat.mtimeMs < 24 * 60 * 60 * 1000) return;
-  } catch {}
-
-  try {
-    fs.writeFileSync(markerPath, '');
-  } catch {}
-
-  exec('officecli --version', { encoding: 'utf8', timeout: 10000 }, (err, stdout) => {
-    if (err) return;
-    const localVersion = stdout.trim();
-    const latestUrl = 'https://github.com/iOfficeAI/OfficeCli/releases/latest';
-    exec(
-      `curl -fsSL -o /dev/null -w "%{url_effective}" ${latestUrl}`,
-      { encoding: 'utf8', timeout: 10000 },
-      (err2, stdout2) => {
-        if (err2) return;
-        const remoteVersion = stdout2.trim().split('/').pop()?.replace(/^v/, '') ?? '';
-        if (remoteVersion && remoteVersion !== localVersion) {
-          installOfficecli();
-        }
-      }
-    );
-  });
-}
-
-/**
- * Auto-install officecli if not found.
- */
-function installOfficecli(): boolean {
-  if (installFailed) return false;
-  try {
-    ipcBridge.pptPreview.status.emit({ state: 'installing' });
-    if (process.platform === 'win32') {
-      execSync(
-        'powershell -Command "irm https://raw.githubusercontent.com/iOfficeAI/OfficeCli/main/install.ps1 | iex"',
-        { stdio: 'inherit' }
-      );
-    } else {
-      execSync('curl -fsSL https://raw.githubusercontent.com/iOfficeAI/OfficeCli/main/install.sh | bash', {
-        stdio: 'inherit',
-      });
-      try {
-        execSync('xattr -cr ~/.local/bin/officecli && codesign -s - --force ~/.local/bin/officecli', { stdio: 'pipe' });
-      } catch {}
-    }
-    return true;
-  } catch (e) {
-    installFailed = true;
-    console.error('[pptPreview] Failed to install officecli:', e);
-    return false;
-  }
-}
 
 /**
  * Start an officecli watch process and wait for the server URL.
@@ -175,24 +113,21 @@ async function startWatch(filePath: string, retry = false): Promise<string> {
   // Reuse existing session if process is still alive
   const existing = sessions.get(filePath);
   if (existing && !existing.aborted && existing.process.exitCode === null) {
-    const url = `http://localhost:${existing.port}`;
+    const url = `${SERVER_CONFIG.BASE_URL}/api/ppt-proxy/${existing.port}/`;
     return url;
   }
 
   // Kill any existing/pending session for this file first
   killSession(filePath);
 
-  // Lazy update check: once per session on first actual use
-  if (!updateChecked) {
-    updateChecked = true;
-    checkForUpdate();
-  }
-
   const port = await findFreePort();
 
   ipcBridge.pptPreview.status.emit({ state: 'starting' });
 
-  const child = spawn('officecli', ['watch', filePath, '--port', String(port)], {
+  const bundledPath = getBundledOfficeCliPath();
+  const officecliBin = bundledPath || 'officecli';
+
+  const child = spawn(officecliBin, ['watch', filePath, '--port', String(port)], {
     stdio: ['ignore', 'pipe', 'pipe'],
     env: getEnhancedEnv(),
   });
@@ -226,7 +161,7 @@ async function startWatch(filePath: string, retry = false): Promise<string> {
           settle(new Error('Watch session was aborted'));
           return;
         }
-        const url = `http://localhost:${port}`;
+        const url = `${SERVER_CONFIG.BASE_URL}/api/ppt-proxy/${port}/`;
         waitForPort(port)
           .then(() => {
             if (session.aborted) {
@@ -253,16 +188,8 @@ async function startWatch(filePath: string, retry = false): Promise<string> {
     child.on('error', (err) => {
       console.error('[pptPreview] spawn error:', err.message);
       sessions.delete(filePath);
-      if ((err as NodeJS.ErrnoException).code === 'ENOENT' && !retry) {
-        // officecli not found — try auto-install then retry once.
-        // Clear timeout before potentially long sync install.
-        clearTimeout(timeout);
-        if (installOfficecli()) {
-          settled = true;
-          startWatch(filePath, true).then(resolve, reject);
-        } else {
-          settle(new Error('officecli is not installed and auto-install failed'));
-        }
+      if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+        settle(new Error('officecli binary not found. Please ensure it is bundled correctly.'));
       } else {
         settle(new Error(`Failed to start officecli: ${err.message}`));
       }

@@ -94,6 +94,7 @@ export async function loadCliConfig({
   mcpServers,
   skillsDir,
   enabledSkills,
+  excludeTools: extraExcludeTools,
 }: LoadCliConfigOptions): Promise<Config> {
   const argv: Partial<CliArgs> = {
     yolo: yoloMode,
@@ -209,7 +210,10 @@ export async function loadCliConfig({
   // 使用对话级别的工具配置
   const toolConfig = conversationToolConfig.getConfig();
 
-  const excludeTools = mergeExcludeTools(settings, activeExtensions).concat(toolConfig.excludeTools);
+  // 收集并合并所有需要排除的工具
+  const excludeTools = mergeExcludeTools(settings, activeExtensions)
+    .concat(toolConfig.excludeTools)
+    .concat(extraExcludeTools || []);
   const blockedMcpServers: Array<{ name: string; extensionName: string }> = [];
 
   if (!argv.allowedMcpServerNames) {

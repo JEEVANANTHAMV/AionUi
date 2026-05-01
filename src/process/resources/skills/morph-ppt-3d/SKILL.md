@@ -34,16 +34,16 @@ Based on the user's topic, suggest what kind of 3D model would work:
 
 | Topic type         | Model suggestion                    | Example                                              |
 | ------------------ | ----------------------------------- | ---------------------------------------------------- |
-| Product/brand      | The actual product or a similar one | "咖啡品牌" → coffee cup, coffee machine, coffee bean |
-| Animal/character   | The animal or mascot                | "柴犬介绍" → shiba inu dog model                     |
-| Architecture/space | Building, room, or structure        | "新办公室" → office building, interior               |
-| Vehicle/transport  | The vehicle itself                  | "电动车发布" → car, motorcycle, bicycle              |
-| Food/cooking       | The dish or ingredient              | "日料介绍" → sushi platter, ramen bowl               |
-| Tech/gadget        | The device                          | "新手机发布" → phone, tablet, laptop                 |
-| Nature/science     | The subject                         | "太阳系" → planet, sun, earth                        |
-| Abstract concept   | A symbolic object                   | "团队合作" → puzzle pieces, gears, bridge            |
+| Product/brand      | The actual product or a similar one | "Coffee brand" → coffee cup, coffee machine, coffee bean |
+| Animal/character   | The animal or mascot                | "Shiba inu introduction" → shiba inu dog model                     |
+| Architecture/space | Building, room, or structure        | "New office" → office building, interior               |
+| Vehicle/transport  | The vehicle itself                  | "EV launch" → car, motorcycle, bicycle              |
+| Food/cooking       | The dish or ingredient              | "Japanese cuisine introduction" → sushi platter, ramen bowl               |
+| Tech/gadget        | The device                          | "New phone launch" → phone, tablet, laptop                 |
+| Nature/science     | The subject                         | "Solar system" → planet, sun, earth                        |
+| Abstract concept   | A symbolic object                   | "Teamwork" → puzzle pieces, gears, bridge            |
 
-Tell the user: "你的主题是 [X]，建议用 [具体模型描述] 的 3D 模型。我推荐几个免费下载来源："
+Tell the user: "Your topic is [X], recommend using a [specific model description] 3D model. I recommend several free download sources:"
 
 ### Step 2: Search for models (agent-driven)
 
@@ -99,6 +99,24 @@ Show the user 2-3 model options with:
 Example response:
 
 ```
+Based on your topic "Shiba inu brand", I found these models:
+
+1. 🐕 Shiba Inu (Sketchfab)
+   Link: https://sketchfab.com/3d-models/shiba-xxx
+   License: CC BY 4.0 (free for commercial use)
+   Recommendation: High-quality shiba inu model, cute expression
+
+2. 🐶 Low Poly Dog (Poly Pizza)
+   Link: https://poly.pizza/m/xxx
+   License: CC0 (completely free)
+   Recommendation: Low-poly style, suitable for minimalist design
+
+3. 🦊 Fox (Khronos official sample)
+   Can be downloaded directly, guaranteed compatibility
+   Recommendation: Fox and shiba inu have similar appearance, as backup
+
+Which one do you choose? After confirmation, I'll download directly and start.
+```
 根据你的主题"柴犬品牌"，我找到了这些模型：
 
 1. 🐕 Shiba Inu (Sketchfab)
@@ -140,21 +158,21 @@ After download, verify:
 
 If Sketchfab requires login to download, tell the user:
 
-> "这个模型需要在 Sketchfab 登录后下载。你可以去页面下载 .glb 文件，然后上传给我。或者我用 Khronos 官方样例先做一版演示？"
+> "This model requires login to download on Sketchfab. You can download the .glb file from the page and upload it to me. Or should I use a Khronos official sample to create a demo version first?"
 
 ### Step 5: When user says "随便" / "你定" / "先做个演示"
 
 **Don't just grab a random model.** First guide the user to clarify their PPT topic:
 
-> 好的！模型我来搞定，但先确认一下你的 PPT 主题方向，这样我找的模型才能配合内容：
+> Okay! I'll handle the model, but first let me confirm your PPT topic direction so the model I find matches the content:
 >
-> 1. 🎮 科技/产品 — 耳机、手机、机器人...
-> 2. 🐾 动物/角色 — 可爱宠物、卡通人物...
-> 3. 🏗️ 建筑/空间 — 房屋、室内、城市...
-> 4. 🍕 食物/生活 — 美食、日用品...
-> 5. 🚀 其他 — 告诉我你的想法
+> 1. 🎮 Tech/Product — headphones, phones, robots...
+> 2. 🐾 Animals/Characters — cute pets, cartoon characters...
+> 3. 🏗️ Architecture/Space — houses, interiors, cities...
+> 4. 🍕 Food/Lifestyle — food, daily items...
+> 5. 🚀 Other — tell me your idea
 >
-> 选一个方向，或者直接说个主题词也行。
+> Choose a direction, or just give me a topic keyword.
 
 After user confirms a direction, THEN search and recommend models.
 
@@ -164,7 +182,7 @@ Only if user explicitly says "真的随便" / "什么都行" / insists on no pre
 
 | Model            | Path               | Best for                |
 | ---------------- | ------------------ | ----------------------- |
-| Shiba Inu (柴犬) | `models/shiba.glb` | 可爱/宠物/品牌/通用演示 |
+| Shiba Inu        | `models/shiba.glb` | Cute/pets/brand/general demo |
 
 ```bash
 # Find and copy built-in model to working directory (cross-platform)
@@ -192,47 +210,47 @@ curl -L -o model.glb "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample
 
 Give specific website links with step-by-step guidance:
 
-> **推荐的 3D 模型网站：**
+> **Recommended 3D model websites:**
 >
-> 1. **Sketchfab** (最大的 3D 模型平台)
->    - 链接：https://sketchfab.com/search?q=[关键词]&type=models&downloadable=true
->    - 筛选步骤：搜索关键词 → 勾选 "Downloadable" → 格式选 "glTF" → 按 "Likes" 排序
->    - 下载时选 **glTF (.glb)** 格式
->    - 注意：部分模型需要免费注册后才能下载
-> 2. **Poly Pizza** (全免费低多边形)
->    - 链接：https://poly.pizza/
->    - 特点：全部免费 CC0 授权，直接点 Download 就是 .glb
->    - 适合：简约风格、卡通风格的 PPT
-> 3. **Sketchfab 热门分类直达**
->    - 动物：https://sketchfab.com/search?q=animal&type=models&downloadable=true
->    - 食物：https://sketchfab.com/search?q=food&type=models&downloadable=true
->    - 科技：https://sketchfab.com/search?q=gadget&type=models&downloadable=true
->    - 建筑：https://sketchfab.com/search?q=architecture&type=models&downloadable=true
-> 4. **Free3D** (综合免费模型站)
->    - 链接：https://free3d.com/3d-models/glb
->    - 注意：需确认授权类型
-> 5. **TurboSquid Free** (专业模型站免费区)
->    - 链接：https://www.turbosquid.com/Search/3D-Models/free/glb
+> 1. **Sketchfab** (largest 3D model platform)
+>    - Link: https://sketchfab.com/search?q=[keyword]&type=models&downloadable=true
+>    - Filter steps: Search keyword → check "Downloadable" → format select "glTF" → sort by "Likes"
+>    - Select **glTF (.glb)** format when downloading
+>    - Note: Some models require free registration before downloading
+> 2. **Poly Pizza** (all free low-poly)
+>    - Link: https://poly.pizza/
+>    - Features: All free CC0 licensed, just click Download for .glb
+>    - Suitable for: Minimalist style, cartoon style PPTs
+> 3. **Sketchfab popular categories direct links**
+>    - Animals: https://sketchfab.com/search?q=animal&type=models&downloadable=true
+>    - Food: https://sketchfab.com/search?q=food&type=models&downloadable=true
+>    - Tech: https://sketchfab.com/search?q=gadget&type=models&downloadable=true
+>    - Architecture: https://sketchfab.com/search?q=architecture&type=models&downloadable=true
+> 4. **Free3D** (comprehensive free model site)
+>    - Link: https://free3d.com/3d-models/glb
+>    - Note: Need to confirm license type
+> 5. **TurboSquid Free** (professional model site free section)
+>    - Link: https://www.turbosquid.com/Search/3D-Models/free/glb
 >
-> 下载后把 .glb 文件发给我就行。如果下载的是 .gltf（文件夹），需要用 Blender 转成 .glb。
+> After downloading, just send me the .glb file. If you download .gltf (folder), need to convert to .glb using Blender.
 
 ### Step 7: When user gives keywords and asks agent to search
 
 **Remind about token cost before searching:**
 
-> 我可以帮你搜索，不过在线搜索会消耗一些额外的对话额度 (token)。你想：
+> I can search for you, but online search will consume some extra conversation quota (token). Do you want:
 >
-> A. 我来搜 — 我用 Sketchfab API 搜索并推荐 2-3 个（消耗少量 token）
-> B. 你自己找 — 我给你搜索链接和筛选教程，你挑好发给我（不消耗额外 token）
+> A. I search — I'll use Sketchfab API to search and recommend 2-3 models (consumes small amount of token)
+> B. You find yourself — I'll give you search links and filtering tutorial, you pick and send to me (no extra token consumption)
 >
-> 选 A 还是 B？
+> Choose A or B?
 
 If user chooses A, proceed with Step 2 (agent-driven search).
 If user chooses B, proceed with Step 6 (self-service guidance).
 
 ### License reminder
 
-Always remind before confirming download: "下载前请确认模型授权。CC0 / CC BY 可免费使用；CC BY-NC 仅限非商用。"
+Always remind before confirming download: "Before downloading, please confirm model license. CC0 / CC BY can be used for free; CC BY-NC is for non-commercial use only."
 
 ---
 

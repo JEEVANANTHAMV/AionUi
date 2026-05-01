@@ -447,17 +447,6 @@ officecli get template.pptx "/slide[3]/shape[2]"
 
 Look at the reported font size. If it is larger than you want for your content, you MUST override it in your set command.
 
-**Batch mode:** Include size, font, and color in the props object for every text-setting operation on template shapes:
-
-```bash
-cat <<'EOF' | officecli batch template.pptx
-[
-  {"command":"set","path":"/slide[3]/shape[2]","props":{"text":"Enterprise","size":"20","font":"Arial","color":"D4A843"}},
-  {"command":"set","path":"/slide[3]/shape[3]","props":{"text":"Platform","size":"20","font":"Arial","color":"D4A843"}}
-]
-EOF
-```
-
 **If `set --prop size=N` does not visually change the size** (some templates embed formatting at the XML run level that resists high-level overrides), fall back to `raw-set` to directly set the run-level font size:
 
 ```bash

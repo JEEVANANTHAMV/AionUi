@@ -812,7 +812,9 @@ export function initFsBridge(): void {
     } catch (error) {
       // Return empty metadata instead of throwing to avoid unhandled rejection
       // (bridge provider callbacks have no .catch handler)
-      console.error('[fsBridge] Failed to get file metadata:', filePath, error);
+      if ((error as any).code !== 'ENOENT') {
+        console.error('[fsBridge] Failed to get file metadata:', filePath, error);
+      }
       return {
         name: path.basename(filePath),
         path: filePath,

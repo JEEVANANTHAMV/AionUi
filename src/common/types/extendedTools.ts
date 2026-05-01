@@ -71,6 +71,7 @@ export interface BuiltinToolConfig {
   description: string;
   enabled: boolean;
   icon?: string;
+  requiresConfirmation?: boolean;
 }
 
 /**
@@ -240,6 +241,15 @@ export const DEFAULT_BUILTIN_TOOLS: BuiltinToolConfig[] = [
     description: 'Record task output',
     enabled: true,
     icon: 'CheckList',
+  },
+  {
+    id: 'officecli',
+    name: 'Office CLI',
+    category: ExtendedToolCategory.FILE_OPERATIONS,
+    description: 'Create, edit, and manage PowerPoint, Word, and Excel files via command line. Support for .pptx, .docx, and .xlsx formats.',
+    enabled: true,
+    icon: 'FolderOpen',
+    requiresConfirmation: false,
   },
 ];
 

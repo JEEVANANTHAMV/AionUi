@@ -277,7 +277,7 @@ Otherwise, post comment and mark ready to merge:
 ```bash
 gh pr edit <PR_NUMBER> --remove-label "bot:fixing" --add-label "bot:ready-to-merge"
 gh pr comment <PR_NUMBER> --body "<!-- pr-automation-bot -->
-✅ 已自动修复，代码无阻塞性问题，请人工确认后合并。"
+✅ Auto-fixed, no blocking issues. Please confirm and merge."
 ```
 
 Log: `[pr-automation] PR #<PR_NUMBER> fix complete — marked bot:ready-to-merge.`
@@ -331,7 +331,7 @@ gh pr edit <PR_NUMBER> --remove-label "bot:reviewing"
 ```bash
 # Last CI failure bot comment time
 LAST_CI_COMMENT_TIME=$(gh pr view <PR_NUMBER> --json comments \
-  --jq '[.comments[] | select(.body | test("<!-- pr-review-bot -->") and test("CI 检查未通过"))] | last | .createdAt // ""')
+  --jq '[.comments[] | select(.body | test("<!-- pr-review-bot -->") and test("CI check failed"))] | last | .createdAt // ""')
 
 # Latest commit time
 LATEST_COMMIT_TIME=$(gh pr view <PR_NUMBER> --json commits \
@@ -354,15 +354,15 @@ LATEST_COMMIT_TIME=$(gh pr view <PR_NUMBER> --json commits \
 ```bash
 gh pr comment <PR_NUMBER> --body "<!-- pr-review-bot -->
 
-## CI 检查未通过
+## CI Check Failed
 
-以下 job 在本次自动化 review 时未通过，请修复：
+The following jobs did not pass during this automated review. Please fix:
 
-| Job | 结论 |
+| Job | Conclusion |
 |-----|------|
-| <失败的 job 名称> | ❌ <FAILURE 或 CANCELLED> |
+| <failed job name> | ❌ <FAILURE or CANCELLED> |
 
-本次自动化 review 暂缓，待 CI 全部通过后将重新处理。"
+This automated review is paused. It will be reprocessed once all CI checks pass."
 ```
 
 ### Step 4.5 — Resolve Merge Conflicts
@@ -383,7 +383,7 @@ gh pr view <PR_NUMBER> --json mergeable,mergeStateStatus,headRefName,baseRefName
 ```bash
 # Last conflict bot comment time
 LAST_CONFLICT_COMMENT_TIME=$(gh pr view <PR_NUMBER> --json comments \
-  --jq '[.comments[] | select(.body | test("<!-- pr-review-bot -->") and test("合并冲突"))] | last | .createdAt // ""')
+  --jq '[.comments[] | select(.body | test("<!-- pr-review-bot -->") and test("merge conflict"))] | last | .createdAt // ""')
 
 LATEST_COMMIT_TIME=$(gh pr view <PR_NUMBER> --json commits \
   --jq '.commits | last | .committedDate')
@@ -449,14 +449,14 @@ Post comment:
 ```bash
 gh pr comment <PR_NUMBER> --body "<!-- pr-review-bot -->
 
-## 合并冲突（无法自动解决）
+## Merge Conflict (Cannot Auto-Resolve)
 
-本 PR 与目标分支存在冲突，自动 rebase 未能干净解决。请手动 rebase 后重新 push：
+This PR has conflicts with the target branch. Auto-rebase could not cleanly resolve them. Please manually rebase and push again:
 
 \`\`\`bash
 git fetch origin
 git rebase origin/<base_branch>
-# 解决冲突后
+# After resolving conflicts
 git push --force-with-lease
 \`\`\`"
 ```
@@ -563,14 +563,14 @@ If block is missing: set `CONCLUSION=REJECTED`, log the error, continue to Step 
    if [ -n "$CRITICAL_FILES" ]; then
      CRITICAL_LIST=$(echo "$CRITICAL_FILES" | sed 's/^/   - `/' | sed 's/$/`/')
      CRITICAL_SECTION="
-   > 📂 **命中核心路径的文件：**
+   > 📂 **Files matching critical path:**
    ${CRITICAL_LIST}"
    else
      CRITICAL_SECTION=""
    fi
 
    gh pr comment <PR_NUMBER> --body "<!-- pr-automation-bot -->
-   ✅ 已自动 review，代码无阻塞性问题，请人工确认后合并。${CRITICAL_SECTION}"
+   ✅ Auto-reviewed, no blocking issues. Please confirm and merge.${CRITICAL_SECTION}"
    ```
 
 2. Update labels:
@@ -596,7 +596,7 @@ If block is missing: set `CONCLUSION=REJECTED`, log the error, continue to Step 
 1. Post comment:
    ```bash
    gh pr comment <PR_NUMBER> --body "<!-- pr-automation-bot -->
-   ❌ 本 PR 存在阻塞性问题，无法自动处理，已转交人工 review。详见上方 review 报告。"
+   ❌ This PR has blocking issues and cannot be automatically processed. Transferred to human review. See the review report above for details."
    ```
 2. Update labels:
    ```bash

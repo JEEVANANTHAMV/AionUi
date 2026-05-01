@@ -61,7 +61,7 @@ gh pr list \
   --limit 50
 ```
 
-If the result is empty: display `没有找到 bot:ready-to-merge 的 PR。` and exit.
+If the result is empty: display `No bot:ready-to-merge PRs found.` and exit.
 
 For each PR, infer the type from the first commit message prefix:
 
@@ -79,7 +79,7 @@ For each PR, infer the type from the first commit message prefix:
 Display as a numbered table:
 
 ```
-# | PR   | 标题                              | 变更          | 类型
+# | PR   | Title                           | Changes       | Type
 --|------|-----------------------------------|---------------|--------
 1 | #123 | fix(auth): handle token expiry    | +45 / -12     | bugfix
 2 | #124 | feat(ui): add dark mode toggle    | +230 / -18    | feature
@@ -87,7 +87,7 @@ Display as a numbered table:
 
 Then prompt:
 
-> 请输入序号选择 PR，或输入 q 退出：
+> Enter a number to select a PR, or q to exit:
 
 - User inputs a number → use that PR
 - User inputs `q` → exit
@@ -113,16 +113,16 @@ LATEST_COMMIT_TIME=$(gh pr view $PR_NUMBER --json commits \
 
 If `LATEST_COMMIT_TIME > LABEL_SET_TIME` (new commits after the label was set), prompt:
 
-> ⚠️ 该 PR 在标记 bot:ready-to-merge 后有新提交（最新提交：`<LATEST_COMMIT_TIME>`，标签时间：`<LABEL_SET_TIME>`）。
-> 建议重新 review 后再合并。请选择：
-> r - 移除 bot:ready-to-merge 标签，触发重新 review
-> c - 忽略并继续验证
+> ⚠️ This PR has new commits after being marked bot:ready-to-merge (latest commit: `<LATEST_COMMIT_TIME>`, label time: `<LABEL_SET_TIME>`).
+> It is recommended to re-review before merging. Please select:
+> r - Remove bot:ready-to-merge label to trigger re-review
+> c - Ignore and continue verification
 
 - `r` → remove `bot:ready-to-merge` label:
   ```bash
   gh pr edit $PR_NUMBER --remove-label "bot:ready-to-merge"
   ```
-  Display `已移除标签，PR 将在下一轮自动化中重新 review。` and return to list (Step 1).
+  Display `Label removed. PR will be re-reviewed in the next automation cycle.` and return to list (Step 1).
 - `c` → continue to Check 2.
 
 #### Check 2 — CI Status
@@ -144,20 +144,20 @@ Informational exclusions: `codecov/patch` and `codecov/project` are informationa
 
 **CI still running prompt:**
 
-> ⏳ 以下 CI job 尚未完成：[job 列表]
-> 请选择：
-> w - 等待 CI 完成后继续（推出，请稍后重新运行）
-> c - 忽略，继续验证
+> ⏳ The following CI jobs are not yet complete: [job list]
+> Please select:
+> w - Wait for CI to complete (exit, please re-run later)
+> c - Ignore and continue verification
 
 - `w` → exit
 - `c` → continue to Check 3
 
 **CI failed prompt:**
 
-> ❌ 以下 CI job 未通过：[job 列表及结论]
-> 请选择：
-> s - 跳过此 PR
-> c - 忽略失败，继续验证
+> ❌ The following CI jobs failed: [job list and conclusions]
+> Please select:
+> s - Skip this PR
+> c - Ignore failure and continue verification
 
 - `s` → remove `bot:ready-to-merge` label (let pr-automation re-process next round), return to list (Step 1):
   ```bash
@@ -229,7 +229,7 @@ git worktree remove "$WORKTREE_DIR" --force 2>/dev/null || true
 gh pr merge $PR_NUMBER --squash --auto
 ```
 
-Display `已自动解决冲突并推送，PR 已设置 auto-merge，等待 CI 通过后自动合并。` and skip to next PR (return to Step 1).
+Display `Conflict auto-resolved and pushed. PR auto-merge enabled. Will auto-merge when CI passes.` and skip to next PR (return to Step 1).
 
 If merge **has conflicts**, attempt manual resolution:
 
@@ -252,24 +252,24 @@ git worktree remove "$WORKTREE_DIR" --force 2>/dev/null || true
 
 Prompt:
 
-> ❌ 合并冲突无法自动解决。请选择：
-> m - 提示作者手动解决冲突
-> s - 跳过此 PR
-> r - 标记为 bot:needs-human-review
+> ❌ Merge conflicts cannot be auto-resolved. Please select:
+> m - Notify author to manually resolve conflicts
+> s - Skip this PR
+> r - Mark as bot:needs-human-review
 
 - `m` → post comment to PR:
 
   ```bash
   gh pr comment $PR_NUMBER --body "<!-- pr-verify-bot -->
 
-  ## 合并冲突（无法自动解决）
+  ## Merge Conflict (Cannot Auto-Resolve)
 
-  本 PR 与目标分支存在冲突，无法自动解决。请手动 merge 或 rebase 后重新 push：
+  This PR has conflicts with the target branch and cannot be auto-resolved. Please manually merge or rebase and push again:
 
   \`\`\`bash
   git fetch origin
   git merge origin/<base_branch>
-  # 解决冲突后
+  # After resolving conflicts
   git push
   \`\`\`"
   ```
@@ -286,7 +286,7 @@ Prompt:
   ```bash
   gh pr edit $PR_NUMBER --remove-label "bot:ready-to-merge" --add-label "bot:needs-rebase"
   gh pr comment $PR_NUMBER --body "<!-- pr-verify-bot -->
-  PR 存在合并冲突，无法自动解决。请作者手动解决后重新 push。"
+  PR has merge conflicts that cannot be auto-resolved. Author must manually resolve and push again."
   ```
 - `r` → add label and return to list:
   ```bash
@@ -341,33 +341,33 @@ fi
 Display concise summary:
 
 ```
-=== PR #<PR_NUMBER>: <标题> ===
+=== PR #<PR_NUMBER>: <Title> ===
 
-作者: <author>  |  基分支: <base>  |  变更: +<add> / -<del>
+Author: <author>  |  Base Branch: <base>  |  Changes: +<add> / -<del>
 
-Review 结论: ✅ 批准合并 / ⚠️ 有条件批准 / ❌ 需要修改
-问题数量: CRITICAL(0) HIGH(1) MEDIUM(2) LOW(3)
-修复状态: ✅ 已修复 2 个 / ⏭️ 驳回 1 个  [若有 pr-fix 报告]
+Review Conclusion: ✅ Approved / ⚠️ Conditionally Approved / ❌ Needs Changes
+Issue Count: CRITICAL(0) HIGH(1) MEDIUM(2) LOW(3)
+Fix Status: ✅ 2 fixed / ⏭️ 1 dismissed  [if pr-fix report exists]
 
-变更文件 (N 个):
+Changed Files (N):
   src/renderer/features/auth/AuthModal.tsx  +45 / -12
   src/common/utils/token.ts                 +23 / -5
   ...
 
-核心路径: ⚠️ 涉及核心路径文件  [若 HAS_CRITICAL_PATH=true]
-           src/process/channels/auth.ts
+Critical Path: ⚠️ Touches critical path files  [if HAS_CRITICAL_PATH=true]
+               src/process/channels/auth.ts
 ```
 
 Then prompt:
 
-> d - 查看完整 review 报告 | 回车继续影响分析
+> d - View full review report | Enter to continue impact analysis
 
 - `d` → display full review comment text, then re-show this prompt
 - Enter → continue to Step 4
 
 If no `<!-- pr-review-bot -->` comment found, display:
 
-> ⚠️ 未找到 review 报告。该 PR 可能未经过自动化 review 流程。
+> ⚠️ No review report found. This PR may not have gone through the automated review process.
 
 And continue to Step 4.
 
@@ -495,6 +495,51 @@ Calculate confidence level based on impact analysis and test results:
 Display the full verification report:
 
 ```
+=== Verification Report: PR #<PR_NUMBER> ===
+
+## Impact Analysis
+
+Changed Files (N):
+  [list of changed files]
+
+Upstream Impact:
+  L1 Direct Dependencies: N files
+  L2 Indirect Dependencies: N files
+  [impact map summary]
+
+UI Rendering Impact: ✅ None / ⚠️ Affects N components
+
+Critical Path: ✅ Not involved / ⚠️ Involved [file list]
+
+## Test Results
+
+Full Test Suite: ✅ Passed / ❌ Failed
+  Passed: N  |  Failed: N  |  Skipped: N
+
+Coverage Status:
+  [list files with/without tests]
+
+Supplemental Test Recommendations (N):
+  ✅ [commit] src/common/utils/__tests__/token.verify.test.ts — 3 test cases covering expiry edge cases
+  ⏭️ [skip]  src/common/utils/__tests__/token.verify.test.ts — 1 integration test, local verification only
+
+## Overall Confidence
+
+🟢 HIGH / 🟡 MEDIUM / 🔴 LOW
+[1-sentence explanation]
+```
+
+Then display action menu:
+
+```
+Please select an action:
+  m  - Merge directly (squash merge)
+  mt - Merge with supplemental tests
+  v  - Manual verification (run app locally before deciding)
+  r  - Reject merge (mark bot:needs-human-review)
+  s  - Skip (no label change, return to list)
+  d  - View full review report
+```
 === 验证报告：PR #<PR_NUMBER> ===
 
 ## 影响分析
@@ -558,7 +603,7 @@ cd "$REPO_ROOT"
 git worktree remove "$WORKTREE_DIR" --force 2>/dev/null || true
 ```
 
-Display `✅ PR #<PR_NUMBER> 已合并。` then return to list (Step 1).
+Display `✅ PR #<PR_NUMBER> merged.` then return to list (Step 1).
 
 #### `mt` — Merge with Supplemental Tests
 
@@ -612,22 +657,22 @@ cd "$REPO_ROOT"
 git worktree remove "$WORKTREE_DIR" --force 2>/dev/null || true
 ```
 
-Display `✅ 已推送补充测试并设置 auto-merge。CI 通过后 PR #<PR_NUMBER> 将自动合并。` then return to list (Step 1).
+Display `✅ Supplemental tests pushed and auto-merge enabled. PR #<PR_NUMBER> will auto-merge when CI passes.` then return to list (Step 1).
 
 #### `v` — Manual Verification
 
 Display the command for the user to run in another terminal:
 
 ```
-在另一个终端中运行以下命令启动应用进行验证：
+Run the following command in another terminal to start the app for verification:
 
   cd /tmp/forjinn-desk-verify-<PR_NUMBER> && bun run start
 
-验证完成后，请在此选择：
-  m  - 合并
-  mt - 提交补充测试后合并
-  r  - 拒绝合并
-  s  - 跳过
+After verification, please select here:
+  m  - Merge
+  mt - Merge with supplemental tests
+  r  - Reject merge
+  s  - Skip
 ```
 
 Wait for user input and execute the corresponding action as defined in this step.
@@ -636,7 +681,7 @@ Wait for user input and execute the corresponding action as defined in this step
 
 Prompt for reason:
 
-> 请输入拒绝原因（将写入 PR 评论）：
+> Please enter the rejection reason (will be written to PR comment):
 
 Read reason from user input.
 
@@ -651,16 +696,16 @@ Post rejection comment:
 ```bash
 gh pr comment $PR_NUMBER --body "<!-- pr-verify-bot -->
 
-## 人工验证：未通过
+## Manual Verification: Failed
 
-本 PR 在 pr-verify 验证阶段被拒绝，需要人工 review。
+This PR was rejected during the pr-verify verification stage and requires human review.
 
-**拒绝原因：** <user-provided reason>
+**Rejection Reason:** <user-provided reason>
 
-**验证详情：**
-- 置信度：🟢 HIGH / 🟡 MEDIUM / 🔴 LOW
-- 测试结果：通过 N / 失败 N / 跳过 N
-- 影响范围：L1 N 个文件，L2 N 个文件"
+**Verification Details:**
+- Confidence: 🟢 HIGH / 🟡 MEDIUM / 🔴 LOW
+- Test Results: Passed N / Failed N / Skipped N
+- Impact Scope: L1 N files, L2 N files"
 ```
 
 Clean up worktree:
@@ -670,7 +715,7 @@ cd "$REPO_ROOT"
 git worktree remove "$WORKTREE_DIR" --force 2>/dev/null || true
 ```
 
-Display `已标记 bot:needs-human-review，PR #<PR_NUMBER> 已移交人工处理。` then return to list (Step 1).
+Display `Marked bot:needs-human-review. PR #<PR_NUMBER> transferred to human handling.` then return to list (Step 1).
 
 #### `s` — Skip
 
@@ -703,6 +748,15 @@ done
 
 **Display session summary:**
 
+```
+=== pr-verify Session Summary ===
+
+✅ Merged:        [#123 fix(auth): handle token expiry, ...]
+🔄 Auto-merge:    [#124 feat(ui): add dark mode toggle, ...]
+❌ Rejected:      [#125 refactor(db): restructure schema, ...]
+⏭️ Skipped:       [#126 chore: update deps, ...]
+
+Processed N PRs in total.
 ```
 === pr-verify 会话总结 ===
 

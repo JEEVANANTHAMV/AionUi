@@ -19,6 +19,7 @@ import { SafeReadFileTool, SafeReadManyFilesTool } from './fs-safe';
 import { VisionAnalyzeTool } from './vision';
 import { RemoteRunCommandTool } from './remote-run-command';
 import { DocumentConverterTool } from './document-converter';
+import { OfficeCliTool } from './officecli';
 import type { ICustomHttpTool } from '@/common/config/storage';
 
 interface ConversationToolConfigOptions {
@@ -58,8 +59,6 @@ export class ConversationToolConfig {
   async initializeForConversation(authType: AuthType): Promise<void> {
     this.useAionuiWebFetch = true;
     this.excludeTools.push('web_fetch');
-    this.excludeTools.push('read_file');
-    this.excludeTools.push('read_many_files');
 
     // 根据 webSearchEngine 配置决定启用哪个搜索工具
     // gemini_web_search 只能在 Google OAuth 认证下使用，因为它需要创建 Google OAuth 客户端
@@ -160,9 +159,11 @@ export class ConversationToolConfig {
     // Register safe file reading tools
     const safeReadFileTool = new SafeReadFileTool(config, config.getMessageBus());
     toolRegistry.registerTool(safeReadFileTool);
+    console.log('[ConversationToolConfig] Registered custom read_file tool');
 
     const safeReadManyFilesTool = new SafeReadManyFilesTool(config, config.getMessageBus());
     toolRegistry.registerTool(safeReadManyFilesTool);
+    console.log('[ConversationToolConfig] Registered custom read_many_files tool');
 
     // 注册视觉分析工具 / Register vision analysis tool
     const visionAnalyzeTool = new VisionAnalyzeTool(config, geminiClient, config.getMessageBus());
@@ -182,6 +183,10 @@ export class ConversationToolConfig {
     // Register document conversion tool
     const documentConverterTool = new DocumentConverterTool(config, config.getMessageBus());
     toolRegistry.registerTool(documentConverterTool);
+
+    // Register Office CLI tool (ACP/Trusted)
+    const officeCliTool = new OfficeCliTool(config.getMessageBus());
+    toolRegistry.registerTool(officeCliTool);
 
     // 注册 gemini_web_search 工具（仅OpenAI模型）
     if (this.useGeminiWebSearch) {

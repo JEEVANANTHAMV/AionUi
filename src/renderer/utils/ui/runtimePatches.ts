@@ -33,7 +33,12 @@ const ARCO_MESSAGE_KEY_PATTERNS = [
 
 // Silence React 19 ref deprecation warnings from third-party libraries
 // 抑制第三方库中 React 19 ref 废弃警告（等待库更新）
-const REACT_19_REF_PATTERNS = ['accessing element.ref was removed in react 19', 'ref is now a regular prop'];
+const REACT_19_REF_PATTERNS = [
+  'accessing element.ref was removed in react 19',
+  'ref is now a regular prop',
+  'getrootdomnode',
+  'finddomnode',
+];
 
 const extractMessage = (value: unknown): string | undefined => {
   if (!value) return undefined;

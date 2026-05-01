@@ -15,7 +15,7 @@
 
 import { getPlatformServices } from '@/common/platform';
 import { execFile, execFileSync, spawn } from 'child_process';
-import { accessSync, existsSync, readdirSync } from 'fs';
+import fs, { accessSync, existsSync, readdirSync } from 'fs';
 import os from 'os';
 import path from 'path';
 
@@ -52,6 +52,33 @@ export function getBunGlobalBinDir(): string {
 }
 
 /**
+ * Get the path to the bundled officecli binary for the current platform and arch.
+ * Returns null if not found.
+ */
+export function getBundledOfficeCliPath(): string | null {
+  const resourcesPath = getPlatformServices().paths.isPackaged()
+    ? process.resourcesPath
+    : path.join(process.cwd(), 'resources');
+
+  const platform = process.platform;
+  const arch = process.arch;
+
+  let binaryName = '';
+  if (platform === 'win32') {
+    binaryName = arch === 'arm64' ? 'officecli-win-arm64.exe' : 'officecli-win-x64.exe';
+  } else if (platform === 'darwin') {
+    binaryName = arch === 'arm64' ? 'officecli-mac-arm64' : 'officecli-mac-x64';
+  } else if (platform === 'linux') {
+    binaryName = arch === 'arm64' ? 'officecli-linux-arm64' : 'officecli-linux-x64';
+  }
+
+  if (!binaryName) return null;
+
+  const bundledPath = path.join(resourcesPath, 'officecli', binaryName);
+  return existsSync(bundledPath) ? bundledPath : null;
+}
+
+/**
  * Environment variables to inherit from user's shell.
  * These may not be available when Electron app starts from Finder/launchd.
  *
@@ -73,6 +100,57 @@ const SHELL_INHERITED_ENV_VARS = [
 
 /** Cache for shell environment (loaded once per session) */
 let cachedShellEnv: Record<string, string> | null = null;
+
+/**
+ * Ensure a binary named 'officecli' exists in the resources/officecli directory,
+ * aliasing the platform-specific binary.
+ */
+function ensureOfficeCliAlias(): string | null {
+  const dir = path.join(
+    getPlatformServices().paths.isPackaged()
+      ? process.resourcesPath
+      : path.join(process.cwd(), 'resources'),
+    'officecli'
+  );
+
+  if (!existsSync(dir)) return null;
+
+  const platform = process.platform;
+  const arch = process.arch;
+  let srcName = '';
+  let destName = 'officecli';
+
+  if (platform === 'win32') {
+    srcName = arch === 'arm64' ? 'officecli-win-arm64.exe' : 'officecli-win-x64.exe';
+    destName = 'officecli.exe';
+  } else if (platform === 'darwin') {
+    srcName = arch === 'arm64' ? 'officecli-mac-arm64' : 'officecli-mac-x64';
+  } else if (platform === 'linux') {
+    srcName = arch === 'arm64' ? 'officecli-linux-arm64' : 'officecli-linux-x64';
+  }
+
+  if (!srcName) return null;
+
+  const srcPath = path.join(dir, srcName);
+  const destPath = path.join(dir, destName);
+
+  if (existsSync(srcPath)) {
+    if (!existsSync(destPath)) {
+      try {
+        if (platform === 'win32') {
+          fs.copyFileSync(srcPath, destPath);
+        } else {
+          fs.symlinkSync(srcName, destPath);
+          fs.chmodSync(destPath, 0o755);
+        }
+      } catch (e) {
+        // Silently fail if we can't create the alias (e.g. read-only filesystem)
+      }
+    }
+    return dir;
+  }
+  return null;
+}
 
 /**
  * Resolve the user's login shell path.
@@ -424,6 +502,12 @@ export function getEnhancedEnv(customEnv?: Record<string, string>): Record<strin
   const bundledBunDir = getBundledBunDir();
   if (bundledBunDir) {
     mergedPath = `${bundledBunDir}${separator}${mergedPath}`;
+  }
+
+  // Prepend bundled officecli directory
+  const officeCliDir = ensureOfficeCliAlias();
+  if (officeCliDir) {
+    mergedPath = `${officeCliDir}${separator}${mergedPath}`;
   }
 
   return {

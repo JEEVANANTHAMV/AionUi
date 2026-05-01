@@ -56,7 +56,7 @@ gh pr view <PR_NUMBER> --json statusCheckRollup \
   --jq '.statusCheckRollup[] | {name: .name, status: .status, conclusion: .conclusion}'
 ```
 
-**必检 job 列表：**
+**Required jobs:**
 
 - `Code Quality`
 - `Unit Tests (ubuntu-latest)`
@@ -65,30 +65,30 @@ gh pr view <PR_NUMBER> --json statusCheckRollup \
 - `Coverage Test`
 - `i18n-check`
 
-（`build-test` 为可选 job，不纳入必检范围。）
+(`build-test` is an optional job, not included in required checks.)
 
-**特殊情形：** 满足以下任一条件时，跳过此步骤，直接继续：
+**Special cases:** Skip this step and continue directly if ANY of the following conditions are met:
 
-- `statusCheckRollup` 为空（CI 从未触发）
-- `statusCheckRollup` 非空，但所有必检 job 均不在列表中（说明 pr-checks.yml 工作流整体未触发，如仅改动 docs/md 文件的 PR）
+- `statusCheckRollup` is empty (CI never triggered)
+- `statusCheckRollup` is non-empty, but none of the required jobs are in the list (indicates pr-checks.yml workflow did not trigger at all, such as PRs that only modify docs/md files)
 
-**解析逻辑：** 分三种情形处理：
+**Parsing logic:** Handle three scenarios:
 
 **Informational checks exclusion:** `codecov/patch` and `codecov/project` are configured as `informational: true` in `codecov.yml` — they never block merging and must be **excluded** from all failure checks below. Treat them as non-existent when evaluating CI status.
 
-**情形 1 — 全部通过**（所有必检 job 均满足 `status == COMPLETED && conclusion == SUCCESS`，**且** `statusCheckRollup` 中无任何**非 informational** job 的 `conclusion` 为 `FAILURE` 或 `CANCELLED`；`codecov/*` 失败不影响此判断）
+**Scenario 1 — All passed** (all required jobs satisfy `status == COMPLETED && conclusion == SUCCESS`, **and** no **non-informational** job in `statusCheckRollup` has `conclusion` of `FAILURE` or `CANCELLED`; `codecov/*` failures do not affect this determination)
 
-直接继续后续步骤，无需提示。
+Continue directly to subsequent steps, no prompt needed.
 
-**情形 2 — 部分仍在运行**（存在 `status` 为 `QUEUED` 或 `IN_PROGRESS` 的**必检** job；非必检 job 仍在运行不影响此判断）
+**Scenario 2 — Some still running** (there are required jobs with `status` of `QUEUED` or `IN_PROGRESS`; non-required jobs still running do not affect this determination)
 
-显示警告并询问：
+Display warning and ask:
 
-> ⏳ 以下 CI job 尚未完成：[job 列表]
-> PR CI 未全部完成，建议等待后再 review。是否仍要继续？(yes/no)
+> ⏳ The following CI jobs are not yet complete: [job list]
+> PR CI is not fully complete, it is recommended to wait before reviewing. Do you still want to continue? (yes/no)
 
-- 用户选 **no** → 终止
-- 用户选 **yes** → 继续后续步骤
+- User selects **no** → terminate
+- User selects **yes** → continue to subsequent steps
 
 - **Automation mode:** do not prompt. Output signal and stop:
   ```
@@ -101,21 +101,21 @@ gh pr view <PR_NUMBER> --json statusCheckRollup \
   ```
   Then exit.
 
-**情形 3 — 存在失败**（`statusCheckRollup` 中存在**任意非 informational** job 的 `conclusion` 为 `FAILURE` 或 `CANCELLED`，不限于必检列表；`codecov/*` 始终排除在外）
+**Scenario 3 — Some failed** (there is **any non-informational** job in `statusCheckRollup` with `conclusion` of `FAILURE` or `CANCELLED`, not limited to required list; `codecov/*` always excluded)
 
-显示警告并询问：
+Display warning and ask:
 
-> ❌ 以下 CI job 未通过：[job 列表及结论]
-> PR CI 存在失败，review 结论可能不准确。是否仍要继续？(yes/no)
+> ❌ The following CI jobs failed: [job list and conclusions]
+> PR CI has failures, review conclusion may be inaccurate. Do you still want to continue? (yes/no)
 
-- 用户选 **yes** → 继续，并在最终报告"变更概述"段落末尾追加 CI 状态警告（格式见"报告增强"节）
-- 用户选 **no** → 终止 review，随即询问：
+- User selects **yes** → continue, and append CI status warning at the end of the final report's "Change Overview" section (format see "Report Enhancement" section)
+- User selects **no** → terminate review, then ask:
 
-  > 是否在 PR #\<PR_NUMBER\> 发表评论，提醒作者修复失败的 CI job？(yes/no)
-  - 用户选 **yes** → 发布 CI 失败提醒评论（格式见下方"CI 失败提醒评论"节），然后退出
-  - 用户选 **no** → 直接退出
+  > Post a comment on PR #<PR_NUMBER> to remind the author to fix the failed CI jobs? (yes/no)
+  - User selects **yes** → post CI failure reminder comment (format see below "CI Failure Reminder Comment" section), then exit
+  - User selects **no** → exit directly
 
-- **Automation mode:** do not prompt. Post CI failure comment automatically (same format as "CI 失败提醒评论"), then output signal and stop:
+- **Automation mode:** do not prompt. Post CI failure comment automatically (same format as "CI Failure Reminder Comment"), then output signal and stop:
   ```
   <!-- automation-result -->
   CONCLUSION: CI_FAILED
@@ -126,32 +126,32 @@ gh pr view <PR_NUMBER> --json statusCheckRollup \
   ```
   Then exit.
 
-#### CI 失败提醒评论
+#### CI Failure Reminder Comment
 
-当 CI 失败且用户选择不继续 review 但选择发布提醒时，评论格式：
+When CI fails and user chooses not to continue review but chooses to post reminder, comment format:
 
 ```bash
 gh pr comment <PR_NUMBER> --body "<!-- pr-review-bot -->
 
-## CI 检查未通过
+## CI Check Failed
 
-以下 job 在本次 review 时未通过，请修复：
+The following jobs did not pass during this review. Please fix:
 
-| Job | 结论 |
+| Job | Conclusion |
 |-----|------|
-| <失败的 job 名称> | ❌ <FAILURE 或 CANCELLED> |
+| <failed job name> | ❌ <FAILURE or CANCELLED> |
 
-本次 code review 暂缓，待 CI 全部通过后将重新执行。"
+This code review is paused. It will be re-executed once all CI checks pass."
 ```
 
-（仅列出实际失败的 job，跳过已通过的。）
+(Only list jobs that actually failed, skip those that passed.)
 
-#### 报告增强
+#### Report Enhancement
 
-当 CI 存在失败但用户选择继续时，在最终报告"变更概述"段落末尾追加：
+When CI has failures but user chooses to continue, append at the end of the final report's "Change Overview" section:
 
 ```
-> ⚠️ **CI 状态警告**：以下 job 在 review 时未通过：`<job 名称>`（<结论>）。本报告结论仅供参考，建议修复 CI 后重新 review。
+> ⚠️ **CI Status Warning**: The following jobs failed during review: `<job name>` (<conclusion>). This report's conclusion is for reference only. It is recommended to re-review after fixing CI.
 ```
 
 ---
@@ -262,31 +262,31 @@ Write the code review report in **Chinese**.
 
 Review dimensions:
 
-- **方案合理性** — 整体方案是否正确解决了问题；是否引入不必要的复杂度；是否与项目已有架构和模式一致；是否存在更简单/优雅的实现路径；方案本身是否存在已知缺陷或设计盲点。具体评估要点：方案是否真正解决了 PR 描述的问题（而不是解决了另一个问题）；是否绕过了框架/库提供的现成机制（重复造轮子）；是否与 `src/process/`、`src/renderer/`、IPC bridge 等架构边界一致；是否引入了不必要的抽象层或过度工程化；方案是否有已知的边界情况或竞态条件，在设计层面未被考虑
-- **正确性** — 逻辑是否正确，边界条件是否处理
-- **安全性** — 注入、XSS、密钥泄露、权限越界
-- **供应链安全** — 防范恶意代码注入，重点关注：(1) `eval()`、`new Function()`、`vm.runInNewContext()` 等动态代码执行；(2) base64/hex 编码的可疑字符串或 Unicode 转义序列（常见后门混淆手法）；(3) 新增的 `fetch`/`axios`/`http`/`net` 等网络请求，尤其是指向外部域名或动态拼接的 URL（数据外泄风险）；(4) 对 `process.env` 中敏感变量的非常规读取或外传；(5) 修改构建脚本、postinstall hook、或 CI 配置中植入额外命令。发现上述模式标记为 **CRITICAL**
-- **不可变性** — 是否存在对象/数组直接变异（本项目关键原则）
-- **错误处理** — 异常是否被静默吞掉，错误信息是否合理
-- **性能** — 不必要的重渲染、大循环、阻塞调用
-- **代码质量** — 函数长度、嵌套深度、命名清晰度
-- **遗留 console.log** — 生产代码中是否有调试日志残留
-- **数据库变更** — 若 PR 涉及 migration 文件或数据库 schema：(1) migration 是否正确（字段类型、约束、索引、默认值、可回滚性）；(2) 变更是否合理且与 PR 目标一致；(3) 对现有数据是否有丢失风险；(4) migration 顺序和依赖是否正确。不正确的 migration 标记为 CRITICAL。
-- **IPC bridge / preload** — 若 PR 涉及 `src/preload.ts` 或 IPC channel 定义：(1) 是否暴露了不必要的 Node.js API 给 renderer；(2) 所有暴露的 API 是否有输入校验；(3) renderer 是否能在无授权情况下触发特权操作。暴露不安全 API 标记为 CRITICAL。
-- **Electron 安全配置** — 若 PR 涉及 `electron-builder.yml`、`entitlements.plist` 或 `electron.vite.config.ts` 中的 Electron 配置：(1) sandbox/nodeIntegration/contextIsolation 设置是否被弱化；(2) entitlements 是否授权过度；(3) 签名和公证是否被破坏。安全回退标记为 CRITICAL。
-- **测试** — 对照 [testing skill](../testing/SKILL.md) 的标准评估，以下任一情况须指出：
-  - 新增功能没有对应测试用例
-  - 修改了逻辑但未更新已有相关测试
-  - 新增的源文件被 `vitest.config.ts` 的 `coverage.exclude` 意外排除（即本应计入覆盖但被错误排除）
-  - 已有测试不符合 testing skill Step 2 的质量规则
-  - `codecov/patch` CI check 显示 FAILURE（patch 覆盖率低于 50%）：虽然 `codecov.yml` 将此 check 设为 `informational: true`（不阻塞合并），但覆盖率不足说明本次改动新增代码缺乏测试，应在 review 中指出（级别 LOW，供作者参考）
-- **可测试性** — 变更后的代码是否仍可独立测试；依赖是否可 mock；
-  是否与已有模块保持解耦；能否在不依赖完整运行环境的情况下运行单元测试。
-  发现耦合时区分来源：
-  - **本次改动新引入的耦合** — 按影响程度定级（新功能从设计阶段就应解耦，列为 HIGH；导致测试无法运行则列为 CRITICAL）
-  - **已存在的历史耦合** — 不作为本 PR 阻塞点，建议单独开 issue 跟踪
+- **Solution Rationality** — Does the overall solution correctly solve the problem; does it introduce unnecessary complexity; is it consistent with the project's existing architecture and patterns; are there simpler/more elegant implementation paths; does the solution itself have known defects or design blind spots. Specific evaluation points: Does the solution truly solve the problem described in the PR (rather than solving a different problem); does it bypass existing mechanisms provided by frameworks/libraries (reinventing the wheel); is it consistent with architectural boundaries such as `src/process/`, `src/renderer/`, IPC bridge; does it introduce unnecessary abstraction layers or over-engineering; does the solution have known edge cases or race conditions not considered at the design level
+- **Correctness** — Is the logic correct, are edge conditions handled
+- **Security** — Injection, XSS, key leaks, privilege escalation
+- **Supply Chain Security** — Prevent malicious code injection, focus on: (1) dynamic code execution such as `eval()`, `new Function()`, `vm.runInNewContext()`; (2) suspicious base64/hex encoded strings or Unicode escape sequences (common backdoor obfuscation techniques); (3) new network requests such as `fetch`/`axios`/`http`/`net`, especially to external domains or dynamically concatenated URLs (data exfiltration risk); (4) unconventional reading or transmission of sensitive variables in `process.env`; (5) additional commands embedded in build scripts, postinstall hooks, or CI configurations. Mark the above patterns as **CRITICAL**
+- **Immutability** — Are there direct mutations of objects/arrays (a key principle in this project)
+- **Error Handling** — Are exceptions silently swallowed, are error messages reasonable
+- **Performance** — Unnecessary re-renders, large loops, blocking calls
+- **Code Quality** — Function length, nesting depth, naming clarity
+- **Leftover console.log** — Are there debug logs remaining in production code
+- **Database Changes** — If PR involves migration files or database schema: (1) is the migration correct (field types, constraints, indexes, defaults, rollback capability); (2) are changes reasonable and consistent with PR goals; (3) is there risk of data loss to existing data; (4) are migration order and dependencies correct. Incorrect migrations are marked as CRITICAL.
+- **IPC bridge / preload** — If PR involves `src/preload.ts` or IPC channel definitions: (1) are unnecessary Node.js APIs exposed to renderer; (2) do all exposed APIs have input validation; (3) can renderer trigger privileged operations without authorization. Exposing unsafe APIs is marked as CRITICAL.
+- **Electron Security Configuration** — If PR involves Electron configuration in `electron-builder.yml`, `entitlements.plist`, or `electron.vite.config.ts`: (1) are sandbox/nodeIntegration/contextIsolation settings weakened; (2) are entitlements over-authorized; (3) are signing and notarization compromised. Security regressions are marked as CRITICAL.
+- **Testing** — Evaluate against [testing skill](../testing/SKILL.md) standards, point out any of the following:
+  - New functionality without corresponding test cases
+  - Logic modified but existing related tests not updated
+  - New source files accidentally excluded by `vitest.config.ts` `coverage.exclude` (should be included in coverage but incorrectly excluded)
+  - Existing tests do not meet testing skill Step 2 quality rules
+  - `codecov/patch` CI check shows FAILURE (patch coverage below 50%): Although `codecov.yml` sets this check as `informational: true` (does not block merge), insufficient coverage indicates new code lacks tests and should be pointed out in review (level LOW, for author reference)
+- **Testability** — Is the modified code still independently testable; can dependencies be mocked;
+  does it maintain decoupling from existing modules; can unit tests run without depending on a full runtime environment.
+  When coupling is found, distinguish the source:
+  - **Coupling newly introduced by this change** — rate by impact (new features should be decoupled from design stage, listed as HIGH; if tests cannot run, list as CRITICAL)
+  - **Existing historical coupling** — not a blocking point for this PR, suggest creating a separate issue to track
 
-**只报告真实存在的问题。** 如果某个维度代码没有问题，跳过即可，不要为了显示"有在认真 review"而凑问题。以实际代码为准，有则报告，无则如实说代码干净。方案合理性维度同理——如果方案本身没有问题，如实写"方案合理"即可，不要为了体现"有深度"而刻意挑剔。
+**Only report real problems.** If a dimension has no code problems, skip it. Do not fabricate issues to show "thorough review". Base on actual code — report if exists, state code is clean if not. Same for solution rationality — if the solution itself has no problems, simply write "solution is reasonable", do not deliberately nitpick to show "depth".
 
 For each issue found:
 
@@ -300,91 +300,90 @@ Use the following report template:
 ---
 
 ````markdown
-## Code Review：<PR 标题> (#<PR_NUMBER>)
+## Code Review: <PR Title> (#<PR_NUMBER>)
 
-### 变更概述
+### Change Overview
 
-[2–3 句话说明这个 PR 改了什么，影响了哪些模块。]
-
----
-
-### 方案评估
-
-**结论**：✅ 方案合理 / ⚠️ 方案有缺陷 / ❌ 方案根本错误
-
-[2–4 句话说明：方案是否正确解决了目标问题；是否与项目架构一致；有无更优雅的替代方案（如有，简述思路）；方案层面有无设计盲点。]
+[2-3 sentences explaining what this PR changes and which modules are affected.]
 
 ---
 
-### 问题清单
+### Solution Assessment
 
-#### 🔴 CRITICAL — <问题标题>
+**Conclusion**: ✅ Solution Reasonable / ⚠️ Solution Has Defects / ❌ Solution Fundamentally Wrong
 
-**文件**：`path/to/file.ts`，第 N 行
+[2-4 sentences explaining: whether the solution correctly solves the target problem; whether it is consistent with project architecture; whether there are more elegant alternative solutions (if any, briefly describe); whether there are design blind spots at the solution level.]
 
-**问题代码**：
+---
+
+### Issue List
+
+#### 🔴 CRITICAL — <Issue Title>
+
+**File**: `path/to/file.ts`, line N
+
+**Problematic Code**:
 
 ```ts
-// 有问题的代码
+// problematic code
 ```
 ````
 
-**问题说明**：[说明为什么有问题]
+**Problem Description**: [explain why it's a problem]
 
-**修复建议**：
+**Fix Suggestion**:
 
 ```ts
-// 修复后的代码
+// fixed code
 ```
 
 ---
 
-#### 🟠 HIGH — <问题标题>
+#### 🟠 HIGH — <Issue Title>
 
-（格式同上）
-
----
-
-#### 🟡 MEDIUM — <问题标题>
-
-（格式同上）
+(Same format as above)
 
 ---
 
-#### 🔵 LOW — <问题标题>
+#### 🟡 MEDIUM — <Issue Title>
 
-（格式同上）
+(Same format as above)
 
 ---
 
-### 汇总
+#### 🔵 LOW — <Issue Title>
 
-| #   | 严重级别    | 文件        | 问题 |
+(Same format as above)
+
+---
+
+### Summary
+
+| #   | Severity    | File        | Issue |
 | --- | ----------- | ----------- | ---- |
 | 1   | 🔴 CRITICAL | `file.ts:N` | ...  |
 | 2   | 🟠 HIGH     | `file.ts:N` | ...  |
 
-### 结论
+### Conclusion
 
-[以下三选一：]
+[Choose one of the following three:]
 
-- ✅ **批准合并** — 无阻塞性问题
-- ⚠️ **有条件批准** — 存在小问题，处理后可合并
-- ❌ **需要修改** — 存在阻塞性问题，必须先解决
+- ✅ **Approved to Merge** — No blocking issues
+- ⚠️ **Conditionally Approved** — Minor issues exist, can merge after handling
+- ❌ **Needs Changes** — Blocking issues exist, must be resolved first
 
-[一句话说明理由]
+[One-sentence explanation]
 
 ---
 
-_本报告由本地 `pr-review` skill 生成，包含完整项目上下文，无截断限制。_
-
-````
+_This report was generated by the local `pr-review` skill, includes full project context, no truncation limits._
+```
 
 ---
 
 If no issues are found across all dimensions, output:
 
-> ✅ 未发现明显问题，代码质量良好，建议批准合并。
+> ✅ No obvious issues found, code quality is good, recommend approval to merge.
 
 ### Step 8 — Ask to Post Comment
 
@@ -393,7 +392,7 @@ Print the complete review report to the terminal.
 **Automation mode:** skip the prompt — automatically proceed to post the comment.
 
 **Non-automation mode:** ask the user:
-> Review 完成。是否将此报告发布为 PR #<PR_NUMBER> 的评论？(yes/no)
+> Review complete. Post this report as a comment on PR #<PR_NUMBER>? (yes/no)
 If the user says **no**, skip posting.
 
 To post:
@@ -423,14 +422,14 @@ gh pr comment <PR_NUMBER> --body "<!-- pr-review-bot -->
 
 Map the review conclusion to CONCLUSION value based on the **highest severity issue found**:
 
-| Highest issue severity | Review 结论   | CONCLUSION  |
+| Highest issue severity | Review Conclusion   | CONCLUSION  |
 | ---------------------- | ------------- | ----------- |
-| None / LOW only        | ✅ 批准合并   | APPROVED    |
-| MEDIUM                 | ⚠️ 有条件批准 | CONDITIONAL |
-| HIGH                   | ⚠️ 有条件批准 | CONDITIONAL |
-| CRITICAL               | ❌ 需要修改   | REJECTED    |
+| None / LOW only        | ✅ Approved to Merge   | APPROVED    |
+| MEDIUM                 | ⚠️ Conditionally Approved | CONDITIONAL |
+| HIGH                   | ⚠️ Conditionally Approved | CONDITIONAL |
+| CRITICAL               | ❌ Needs Changes   | REJECTED    |
 
-**Key rule:** If all issues are LOW (or there are no issues), emit `APPROVED` even when the human-facing verdict says "有条件批准". `pr-fix` explicitly skips LOW issues, so triggering a fix session for LOW-only reviews wastes a round with no actionable outcome.
+**Key rule:** If all issues are LOW (or there are no issues), emit `APPROVED` even when the human-facing verdict says "Conditionally Approved". `pr-fix` explicitly skips LOW issues, so triggering a fix session for LOW-only reviews wastes a round with no actionable outcome.
 
 Determine `IS_CRITICAL_PATH` using the `CRITICAL_PATH_PATTERN` env var (defined in `scripts/pr-automation.conf`, passed by daemon at runtime).
 When a pattern is defined, check and capture matched files:

@@ -19,6 +19,15 @@ import { DEFAULT_BUILTIN_TOOLS, ExtendedToolCategory as ToolCategory, ToolSource
 import type { IMcpServer } from '@/common/config/storage';
 import { ConfigStorage } from '@/common/config/storage';
 import { RendererType } from '@/common/types/codex/types/toolTypes';
+import { getPlatformServices } from '@/common/platform';
+import fs from 'node:fs';
+import path from 'node:path';
+import { exec, execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+import { getEnhancedEnv, getBundledOfficeCliPath } from '@process/utils/shellEnv';
+
+const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
 export interface ExtendedToolsServiceEvents {
   'tool-registered': { toolId: string; category: ExtendedToolCategory };
@@ -412,9 +421,6 @@ class ExtendedToolsService extends EventEmitter {
    * Execute built-in tool
    */
   private async executeBuiltinTool(toolId: string, params: Record<string, unknown>): Promise<string> {
-    const fs = require('fs');
-    const path = require('path');
-
     switch (toolId) {
       case 'http_get':
       case 'http_post': {
@@ -597,6 +603,9 @@ class ExtendedToolsService extends EventEmitter {
         return `Successfully stopped all team agents.`;
       }
 
+      case 'officecli':
+        return this.executeOfficeCli(params);
+
       case 'task_create': {
         const taskId = `task_${Date.now()}`;
         const task: any = {
@@ -652,6 +661,63 @@ class ExtendedToolsService extends EventEmitter {
     }
 
     return `Executed built-in tool: ${toolId}`;
+  }
+
+  /**
+   * Execute officecli command safely using execFile
+   */
+  public async executeOfficeCli(params: Record<string, unknown>): Promise<string> {
+    const rawCommand = params.command as string;
+    if (!rawCommand) throw new Error('Command is required');
+
+    // Split the command string into parts, respecting quotes
+    // This is a simple version, but safer than direct shell execution
+    const parts = rawCommand.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
+    const subcommand = parts[0];
+    const subcommandArgs = parts.slice(1).map(arg => arg.replace(/^"|"$/g, ''));
+
+    const file = params.file as string;
+    const pathArg = params.path as string;
+    const args = (params.args as string[]) || [];
+    const flags = (params.flags as Record<string, any>) || {};
+
+    const bundledPath = getBundledOfficeCliPath();
+    const officecliBin = bundledPath || 'officecli';
+
+    const finalArgs: string[] = [subcommand, ...subcommandArgs];
+
+    if (file) finalArgs.push(file);
+    if (pathArg) finalArgs.push(pathArg);
+    if (args.length) finalArgs.push(...args);
+
+    for (const [key, value] of Object.entries(flags)) {
+      if (value === true) {
+        finalArgs.push(`--${key}`);
+      } else if (value !== false && value !== undefined) {
+        finalArgs.push(`--${key}`, String(value));
+      }
+    }
+
+    if (params.input) {
+      finalArgs.push('--input', params.input as string);
+    }
+    if (params.output) {
+      // DANGER: Prevent overwriting input file with output if the model is confused
+      if (params.output === file || params.output === pathArg) {
+         throw new Error('Output file cannot be the same as the input file');
+      }
+      finalArgs.push('--output', params.output as string);
+    }
+
+    try {
+      const { stdout, stderr } = await execFileAsync(officecliBin, finalArgs, {
+        env: getEnhancedEnv(),
+      });
+      if (stderr && !stdout) return stderr;
+      return stdout;
+    } catch (e: any) {
+      return `Error executing officecli: ${e.message}\n${e.stdout || ''}\n${e.stderr || ''}`;
+    }
   }
 
   /**
@@ -727,6 +793,47 @@ class ExtendedToolsService extends EventEmitter {
    * Convert built-in tool config to extended definition
    */
   private convertBuiltinToExtended(tool: BuiltinToolConfig): ExtendedToolDefinition {
+    let schema: Record<string, unknown> = {};
+
+    if (tool.id === 'officecli') {
+      schema = {
+        type: 'object',
+        properties: {
+          command: {
+            type: 'string',
+            description:
+              'The officecli subcommand to execute (e.g., create, add, set, get, view, batch, open, close, query, validate)',
+          },
+          file: {
+            type: 'string',
+            description: 'The target office file (.pptx, .docx, .xlsx)',
+          },
+          path: {
+            type: 'string',
+            description: 'The element path (e.g., /slide[1], /slide[1]/shape[1])',
+          },
+          args: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Additional positional arguments',
+          },
+          flags: {
+            type: 'object',
+            description: 'Command line flags (e.g., { "depth": 1, "browser": true })',
+          },
+          input: {
+            type: 'string',
+            description: 'Input file or text',
+          },
+          output: {
+            type: 'string',
+            description: 'Output file path',
+          },
+        },
+        required: ['command'],
+      };
+    }
+
     return {
       id: tool.id,
       name: tool.name,
@@ -750,7 +857,7 @@ class ExtendedToolsService extends EventEmitter {
       isEnabled: tool.enabled,
       isSystem: true,
       requiresConfirmation: false,
-      schema: {},
+      schema: schema,
     };
   }
 

@@ -356,9 +356,9 @@ export class GeminiAgent {
   }
 
   private async initialize(): Promise<void> {
-    const path = this.workspace;
+    const workspacePath = this.workspace;
 
-    if (!path) {
+    if (!workspacePath) {
       throw new Error('GeminiAgent workspace is empty — cannot initialize without a valid workspace path');
     }
 
@@ -367,14 +367,21 @@ export class GeminiAgent {
     // by OS cleanup or antivirus before the worker process starts initialization.
     // loadServerHierarchicalMemory calls fs.realpath(workspace) without try-catch,
     // causing an unhandled ENOENT rejection (Sentry ELECTRON-6W).
-    await fs.promises.mkdir(path, { recursive: true });
+    await fs.promises.mkdir(workspacePath, { recursive: true });
+
+    // Ensure .geminiignore exists to suppress library warnings about missing ignore file
+    // 确保 .geminiignore 存在，以消除库关于缺少忽略文件的警告
+    const ignorePath = path.join(workspacePath, '.geminiignore');
+    if (!fs.existsSync(ignorePath)) {
+      await fs.promises.writeFile(ignorePath, '');
+    }
 
     // Verify workspace is resolvable before aioncli-core attempts fs.realpath()
     // internally. The mkdir above handles ENOENT, but EACCES (permission denied)
     // still causes an unhandled rejection inside the library (Sentry ELECTRON-BM).
-    await fs.promises.realpath(path);
+    await fs.promises.realpath(workspacePath);
 
-    const settings = loadSettings(path).merged;
+    const settings = loadSettings(workspacePath).merged;
     if (this.contextFileName) {
       settings.contextFileName = this.contextFileName;
     }
@@ -386,9 +393,9 @@ export class GeminiAgent {
     // 初始化对话级别的工具配置
     await this.toolConfig.initializeForConversation(this.authType!);
 
-    const extensions = loadExtensions(path);
+    const extensions = loadExtensions(workspacePath);
     this.config = await loadCliConfig({
-      workspace: path,
+      workspace: workspacePath,
       settings,
       extensions,
       sessionId,
@@ -515,7 +522,7 @@ export class GeminiAgent {
     // Rules 定义系统行为规则，在会话开始时就应该生效
     // Rules define system behavior, should be effective from session start
     console.log(`[GeminiAgent] presetRules length: ${this.presetRules?.length || 0}`);
-    const visionInstruction = `\n\n[Vision Capability]\nIf you see image references (e.g. @uploads/image.png) and need to analyze their content, use the 'vision_analyze' tool. Do NOT use 'read_file' for images.`;
+    const visionInstruction = `\n\n[Vision Capability]\nIf you see image references (e.g. @uploads/image.png) and need to analyze their content, use the 'vision_analyze' tool. Do NOT use 'read_file' for images.\n\n[Office Operations]\nYou have a direct tool 'officecli' for PowerPoint, Word, and Excel operations. ALWAYS use this tool instead of 'run_shell_command' for any officecli commands. The tool takes a 'command' string (e.g. 'view slides.pptx text') and optional 'file', 'path', 'args', 'flags' parameters.`;
     const currentMemory = this.config.getUserMemory();
 
     let rulesSection = '';
@@ -586,7 +593,7 @@ export class GeminiAgent {
       onToolCallsUpdate: (updatedCoreToolCalls: ToolCall[]) => {
         try {
           const prevTrackedCalls = this.trackedCalls || [];
-          const toolCalls: TrackedToolCall[] = updatedCoreToolCalls.map((coreTc) => {
+          const toolCalls: TrackedToolCall[] = (updatedCoreToolCalls || []).map((coreTc) => {
             const existingTrackedCall = prevTrackedCalls.find((ptc) => ptc.request.callId === coreTc.request.callId);
             const newTrackedCall: TrackedToolCall = {
               ...coreTc,

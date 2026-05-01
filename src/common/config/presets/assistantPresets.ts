@@ -100,7 +100,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   {
     id: 'morph-ppt',
     avatar: 'Slide',
-    enabled: true,
+    enabled: false,
     presetAgentType: 'forjinnrs',
     resourceDir: 'src/process/resources/assistant/morph-ppt',
     ruleFiles: {
@@ -125,7 +125,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   {
     id: 'morph-ppt-3d',
     avatar: 'Cube',
-    enabled: true,
+    enabled: false,
     presetAgentType: 'forjinnrs',
     resourceDir: 'src/process/resources/assistant/morph-ppt-3d',
     ruleFiles: {
@@ -150,7 +150,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   {
     id: 'pitch-deck-creator',
     avatar: 'Slide',
-    enabled: true,
+    enabled: false,
     presetAgentType: 'forjinnrs',
     resourceDir: 'src/process/resources/assistant/pitch-deck-creator',
     ruleFiles: {
@@ -175,6 +175,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   {
     id: 'dashboard-creator',
     avatar: 'ChartGraph',
+    enabled: false,
     presetAgentType: 'forjinnrs',
     resourceDir: 'src/process/resources/assistant/dashboard-creator',
     ruleFiles: {
@@ -199,6 +200,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   {
     id: 'academic-paper',
     avatar: 'BookOpen',
+    enabled: false,
     presetAgentType: 'forjinnrs',
     resourceDir: 'src/process/resources/assistant/academic-paper',
     ruleFiles: {
@@ -223,6 +225,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   {
     id: 'financial-model-creator',
     avatar: 'Finance',
+    enabled: false,
     presetAgentType: 'forjinnrs',
     resourceDir: 'src/process/resources/assistant/financial-model-creator',
     ruleFiles: {
@@ -247,6 +250,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   {
     id: 'star-office-helper',
     avatar: 'Tv',
+    enabled: false,
     presetAgentType: 'forjinnrs',
     resourceDir: 'src/process/resources/assistant/star-office-helper',
     ruleFiles: {
@@ -270,6 +274,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   {
     id: 'cowork',
     avatar: 'cowork.svg',
+    enabled: true,
     presetAgentType: 'forjinnrs',
     resourceDir: 'src/process/resources/assistant/cowork',
     ruleFiles: {
@@ -354,11 +359,13 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   {
     id: 'game-3d',
     avatar: 'GameHandle',
+    enabled: false,
     presetAgentType: 'forjinnrs',
     resourceDir: 'src/process/resources/assistant/game-3d',
     ruleFiles: {
       'en-US': 'game-3d.md',
     },
+    defaultEnabledSkills: [],
     nameI18n: {
       'en-US': '3D Game',
     },
@@ -376,11 +383,13 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   {
     id: 'ui-ux-pro-max',
     avatar: 'GraphicDesign',
+    enabled: false,
     presetAgentType: 'forjinnrs',
     resourceDir: 'src/process/resources/assistant/ui-ux-pro-max',
     ruleFiles: {
       'en-US': 'ui-ux-pro-max.md',
     },
+    defaultEnabledSkills: [],
     nameI18n: {
       'en-US': 'UI/UX Pro Max',
     },
@@ -399,11 +408,13 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   {
     id: 'planning-with-files',
     avatar: 'Plan',
+    enabled: false,
     presetAgentType: 'forjinnrs',
     resourceDir: 'src/process/resources/assistant/planning-with-files',
     ruleFiles: {
       'en-US': 'planning-with-files.md',
     },
+    defaultEnabledSkills: [],
     nameI18n: {
       'en-US': 'Planning with Files',
     },
@@ -422,11 +433,13 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   {
     id: 'human-3-coach',
     avatar: 'Compass',
+    enabled: false,
     presetAgentType: 'forjinnrs',
     resourceDir: 'src/process/resources/assistant/human-3-coach',
     ruleFiles: {
       'en-US': 'human-3-coach.md',
     },
+    defaultEnabledSkills: [],
     nameI18n: {
       'en-US': 'HUMAN 3.0 Coach',
     },
@@ -445,6 +458,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   {
     id: 'social-job-publisher',
     avatar: 'Speaker',
+    enabled: false,
     presetAgentType: 'forjinnrs',
     resourceDir: 'src/process/resources/assistant/social-job-publisher',
     ruleFiles: {
@@ -480,7 +494,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
     skillFiles: {
       'en-US': 'moltbook-skills.md',
     },
-    defaultEnabledSkills: ['moltbook'],
+    defaultEnabledSkills: [],
     nameI18n: {
       'en-US': 'moltbook',
     },
@@ -498,6 +512,7 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
   {
     id: 'beautiful-mermaid',
     avatar: 'ChartLine',
+    enabled: true,
     presetAgentType: 'forjinnrs',
     resourceDir: 'src/process/resources/assistant/beautiful-mermaid',
     ruleFiles: {

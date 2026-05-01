@@ -29,7 +29,7 @@ export default forkTask(({ data }, pipe) => {
         // Clone the tool data array to avoid modifying the agent's internal references by accident.
         // This ensures the agent's internal state still has the 'onConfirm' function 
         // even after we "clean" the version we send to the UI.
-        const originalTools = event.data as any[];
+        const originalTools = (event.data as any[]) || [];
         event.data = originalTools.map((tool: any) => {
           const { confirmationDetails, ...other } = tool;
           if (confirmationDetails) {

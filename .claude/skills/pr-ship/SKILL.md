@@ -107,7 +107,7 @@ done
 
 Then `EMPTY_CI_COUNT++` and ScheduleWakeup 270s to re-check. If `EMPTY_CI_COUNT >= 3` (~13.5 minutes), abort:
 
-> CI 持续未触发（已等待约 13.5 分钟）。请检查仓库 CI 配置后重新调用 `/pr-ship $PR_NUMBER`。
+> CI continuously not triggered (waited ~13.5 minutes). Please check repository CI configuration and re-run `/pr-ship $PR_NUMBER`.
 
 ### CI Failure Handler
 
@@ -115,7 +115,7 @@ Then `EMPTY_CI_COUNT++` and ScheduleWakeup 270s to re-check. If `EMPTY_CI_COUNT 
 
 If `RETRY_COUNT >= 3`:
 
-> 已达到最大重试次数 (3/3)。请手动检查 PR #$PR_NUMBER 后重新调用 `/pr-ship $PR_NUMBER`。
+> Maximum retry count reached (3/3). Please manually check PR #$PR_NUMBER and re-run `/pr-ship $PR_NUMBER`.
 
 Exit.
 
@@ -129,7 +129,7 @@ FAILED_JOBS=$(gh pr view $PR_NUMBER --json statusCheckRollup \
 
 Report to user:
 
-> CI 失败：$FAILED_JOBS。正在尝试修复 ($RETRY_COUNT/3)...
+> CI failed: $FAILED_JOBS. Attempting to fix ($RETRY_COUNT/3)...
 
 **Step 3 — Fetch failure details:**
 
@@ -262,12 +262,21 @@ gh pr merge $PR_NUMBER --squash --auto
 
 Output:
 
-> ✅ PR #$PR_NUMBER 已设置 auto-merge，CI 通过后将自动合并。
+> ✅ PR #$PR_NUMBER auto-merge enabled, will auto-merge when CI passes.
 
 ### AUTO_MERGE = false (--no-auto-merge)
 
 Display summary:
 
+```
+=== PR #$PR_NUMBER Ready ===
+
+Title: <title>
+Changes: +<additions> / -<deletions> (<file_count> files)
+Review: <conclusion>
+CI: All passed
+
+Type merge to confirm merge, or abort to cancel.
 ```
 === PR #$PR_NUMBER 就绪 ===
 
@@ -286,7 +295,7 @@ gh pr view $PR_NUMBER --json title,additions,deletions,changedFiles \
   --jq '{title: .title, additions: .additions, deletions: .deletions, files: .changedFiles}'
 ```
 
-- User says **merge** → `gh pr merge $PR_NUMBER --squash` → output `✅ PR #$PR_NUMBER 已合并。`
+- User says **merge** → `gh pr merge $PR_NUMBER --squash` → output `✅ PR #$PR_NUMBER merged.`
 - User says **abort** → exit, output PR URL
 
 ---

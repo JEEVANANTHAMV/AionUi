@@ -23,8 +23,26 @@ Use this guide when creating a new presentation with no template.
 
 1. **Create** blank presentation
 2. **Plan** slide structure (content outline + layout types)
-3. **Build** each slide — one command at a time; use `batch` only for bulk repetitive operations (many shapes with identical props, filling many text boxes). Structural operations (`add slide`, `add chart`, `set transition`) should run individually so errors surface immediately.
-4. **QA** (content + visual + validation) -- see [SKILL.md](SKILL.md#qa-required)
+3. **Build** each slide — one individual tool call at a time. **NEVER** use `batch` or create shell scripts. Structural operations (`add slide`, `add chart`, `set transition`) and content addition (shapes, text) MUST run as individual tool calls so errors surface immediately and the UI remains responsive.
+4. **Discovery**: If you are unsure about a property or command, use `officecli help` (e.g. `officecli help pptx add shape`) to see the exact schema.
+5. **QA** (content + visual + validation) -- see [SKILL.md](SKILL.md#qa-required)
+
+---
+
+## Setup & Discovery
+
+```bash
+# Create blank presentation
+officecli create slides.pptx
+
+# Explore capabilities if unsure
+officecli --help
+officecli help pptx add
+officecli help pptx set shape
+```
+
+> [!CAUTION]
+> **NEVER use `touch` or `python`** to create placeholders. They create invalid files. Always use `officecli create`.
 
 ---
 
@@ -76,6 +94,28 @@ officecli set slides.pptx /slide[N] --prop "background=1E2761-CADCFC-180"
 
 ---
 
+## B. Color & Contrast System (MANDATORY)
+
+> [!IMPORTANT]
+> **NO MORE "SHIT COLORS"**: Never use default office colors. Never use black text on dark backgrounds or white text on light backgrounds. Every element must be readable at a glance from 10 feet away.
+
+### 1. Contrast Rule
+- **Dark Backgrounds** (Blue, Off-black): Use **WHITE** (`FFFFFF`) or **LIGHT CYAN** (`CADCFC`) for text.
+- **Light Backgrounds** (White, Light Gray): Use **DARK GRAY** (`333333`) or **NAVY** (`1E2761`) for text.
+- **Box Fills**: If you put text inside a colored box, the text color MUST contrast with that box.
+  - *Example*: If `--prop fill=1E2761` (Dark Blue), you MUST use `--prop color=FFFFFF` (White).
+
+### 2. Premium Color Palettes (Pick One per Deck)
+
+| Palette | Background | Primary Accent | Secondary Accent | Text (on BG) |
+| :--- | :--- | :--- | :--- | :--- |
+| **Midnight Executive** | `1E2761` | `CADCFC` | `8899BB` | `FFFFFF` |
+| **Minimalist Light** | `FFFFFF` | `1E2761` | `B85042` | `333333` |
+| **Forest Modern** | `2C5F2D` | `97BC62` | `F5F5F5` | `FFFFFF` |
+| **Sunset Startup** | `1E1E1E` | `FF6F61` | `D4A843` | `FFFFFF` |
+
+---
+
 ## Setup
 
 ```bash
@@ -108,19 +148,19 @@ Default 16:9 dimensions: 33.867cm x 19.05cm (13.333in x 7.5in).
 
 Each pattern below is a complete recipe. Adapt colors, fonts, and positions to your palette.
 
-### Title Slide (Dark Background)
+### Title Slide (Midnight Executive Palette)
 
 ```bash
-# Add slide with dark background
+# Add slide with dark navy background
 officecli add slides.pptx / --type slide --prop layout=blank --prop background=1E2761
 
-# Large centered title
+# Large centered title (White text for high contrast)
 officecli add slides.pptx /slide[1] --type shape --prop text="Quarterly Business Review" --prop x=2cm --prop y=5cm --prop width=29.87cm --prop height=4cm --prop font=Georgia --prop size=44 --prop bold=true --prop color=FFFFFF --prop align=center --prop valign=center --prop fill=none
 
-# Subtitle
+# Subtitle (Soft blue for secondary emphasis)
 officecli add slides.pptx /slide[1] --type shape --prop text="Q4 2025 | Finance Division" --prop x=2cm --prop y=10cm --prop width=29.87cm --prop height=2cm --prop font=Calibri --prop size=20 --prop color=CADCFC --prop align=center --prop fill=none
 
-# Date/footer
+# Date/footer (Slate blue)
 officecli add slides.pptx /slide[1] --type shape --prop text="December 2025" --prop x=2cm --prop y=16cm --prop width=29.87cm --prop height=1.5cm --prop font=Calibri --prop size=12 --prop color=8899BB --prop align=center --prop fill=none
 ```
 
@@ -150,20 +190,18 @@ officecli add slides.pptx /slide[3] --type shape --prop "text=Our market positio
 
 # Right column -- image or chart placeholder
 officecli add slides.pptx /slide[3] --type shape --prop preset=roundRect --prop x=18cm --prop y=5cm --prop width=14cm --prop height=12cm --prop fill=E8EDF3 --prop line=CADCFC --prop lineWidth=1pt
-
-# Or add an actual image:
-# officecli add slides.pptx /slide[3] --type picture --prop path=market-chart.png --prop x=18cm --prop y=5cm --prop width=14cm --prop height=12cm --prop alt="Market share chart"
 ```
 
-### Stats / Callout Slide (Big Numbers)
+### Stats / Callout Slide (High Contrast)
 
 ```bash
+# Dark background
 officecli add slides.pptx / --type slide --prop layout=blank --prop background=1E2761
 
-# Title
+# Title (White)
 officecli add slides.pptx /slide[4] --type shape --prop text="By The Numbers" --prop x=2cm --prop y=1cm --prop width=29.87cm --prop height=2.5cm --prop font=Georgia --prop size=32 --prop bold=true --prop color=FFFFFF --prop align=center --prop fill=none
 
-# Stat 1
+# Stat 1 (Soft Blue for large numbers)
 officecli add slides.pptx /slide[4] --type shape --prop text="25%" --prop x=2cm --prop y=5cm --prop width=9cm --prop height=4cm --prop font=Georgia --prop size=64 --prop bold=true --prop color=CADCFC --prop align=center --prop valign=bottom --prop fill=none
 officecli add slides.pptx /slide[4] --type shape --prop text="Revenue Growth" --prop x=2cm --prop y=9.5cm --prop width=9cm --prop height=2cm --prop font=Calibri --prop size=14 --prop color=8899BB --prop align=center --prop fill=none
 
@@ -542,7 +580,7 @@ officecli add slides.pptx /slide[N] --type chart \
 
 #### Multi-Series Column Chart
 
-Include all series in the `add` command using `series1`, `series2`, etc. or the `data` prop. Both forms work in single commands and in batch mode:
+Include all series in the `add` command using `series1`, `series2`, etc. or the `data` prop. Both forms work in single tool calls:
 
 ```bash
 # Using seriesN props

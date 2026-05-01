@@ -835,7 +835,7 @@ const MessageToolGroup: React.FC<IMessageToolGroupProps> = ({ message }) => {
 
   // 收集所有 WriteFile 结果用于汇总显示 / Collect all WriteFile results for summary display
   const writeFileResults = useMemo(() => {
-    return message.content
+    return (message.content || [])
       .filter(
         (item) =>
           item.name === 'WriteFile' &&
@@ -848,7 +848,7 @@ const MessageToolGroup: React.FC<IMessageToolGroupProps> = ({ message }) => {
 
   // 找到第一个 WriteFile 的索引 / Find the index of first WriteFile
   const firstWriteFileIndex = useMemo(() => {
-    return message.content.findIndex(
+    return (message.content || []).findIndex(
       (item) =>
         item.name === 'WriteFile' &&
         item.resultDisplay &&
@@ -859,7 +859,7 @@ const MessageToolGroup: React.FC<IMessageToolGroupProps> = ({ message }) => {
 
   return (
     <div>
-      {message.content.map((content, index) => {
+      {(message.content || []).map((content, index) => {
         const { status, callId, name, description, resultDisplay, confirmationDetails } = content;
         const isLoading = status !== 'Success' && status !== 'Error' && status !== 'Canceled';
         // status === "Confirming" &&

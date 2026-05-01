@@ -128,6 +128,8 @@ export interface IConfigStorageRefer {
   'migration.assistantsSplitCustom'?: boolean;
   /** Migration flag: Electron desktop config has been imported to server config */
   'migration.electronConfigImported'?: boolean;
+  // 迁移标记：更新默认启用的助手为 5 个 (Word, PPT, Excel, Cowork, Mermaid) / Migration flag: update default enabled assistants to 5 (Word, PPT, Excel, Cowork, Mermaid)
+  'migration.defaultEnabledAssistantsUpdated'?: boolean;
   // 关闭窗口时最小化到系统托盘 / Minimize to system tray when closing window
   'system.closeToTray'?: boolean;
   // 任务完成时显示系统通知 / Show system notification when task completes

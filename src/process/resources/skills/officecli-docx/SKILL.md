@@ -8,29 +8,35 @@ description: "Use this skill any time a .docx file is involved -- as input, outp
 
 # OfficeCLI DOCX Skill
 
-## BEFORE YOU START (CRITICAL)
+**Note:** `officecli` is integrated as a direct tool. You can call it using the `officecli` tool in your environment. You do not need to use `run_shell_command`.
 
-**If `officecli` is not installed:**
+---
 
-`macOS / Linux`
+## 🆘 Help System (EXPLORE FIRST)
+
+> [!TIP]
+> **Don't Guess — Ask for Help**: If you are unsure about a command, property, or path, run `help` first. This is faster and more reliable than trial-and-error.
 
 ```bash
-if ! command -v officecli >/dev/null 2>&1; then
-    curl -fsSL https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.sh | bash
-fi
+officecli --help                # Main help
+officecli docx set              # All settable elements and properties
+officecli docx add              # All addable element types
+officecli docx view             # All view modes
+officecli docx get              # All navigable paths
+officecli docx query            # Query selector syntax
 ```
 
-`Windows (PowerShell)`
+---
 
-```powershell
-if (-not (Get-Command officecli -ErrorAction SilentlyContinue)) {
-    irm https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.ps1 | iex
-}
-```
+## 🚀 Creating Files (MANDATORY PATTERN)
 
-Verify: `officecli --version`
-
-If `officecli` is still not found after first install, open a new terminal and run the verify command again.
+> [!CAUTION]
+> **NEVER use `touch` or `python`** to create `.pptx` or `.docx` placeholders. A 0-byte file created by `touch` is NOT a valid Office document and will cause `officecli` to fail.
+>
+> **ALWAYS use `officecli create`**:
+> ```bash
+> officecli create doc.docx
+> ```
 
 ---
 
@@ -50,7 +56,8 @@ If `officecli` is still not found after first install, open a new terminal and r
 
 ## Execution Model
 
-**Run commands one at a time. Do not write all commands into a shell script and execute it as a single block.**
+> [!IMPORTANT]
+> **SERIAL EXECUTION ONLY**: Run commands one at a time. **NEVER** write commands into a shell script (`.sh`) or a JSON batch file and execute it. **NEVER** create temporary script files. Execute each `add`, `set`, and `get` command as an individual tool call.
 
 OfficeCLI is incremental: every `add`, `set`, and `remove` immediately modifies the file and returns output. Use this to catch errors early:
 
@@ -288,9 +295,9 @@ officecli validate doc.docx
 ### Pre-Delivery Checklist
 
 - [ ] Metadata set (title, author)
-- [ ] 页码字段已注入 — 用 `officecli get doc.docx "/footer[2]" --depth 3` 确认输出中有 `fldChar` 元素。
-      ⚠️ `view outline` 显示 "Footer: Page" 时**无法**区分静态文字和动态字段 — 必须用 `get --depth 3` 命令验证 `fldChar` 存在。
-      如无 first-page footer，用 `"/footer[1]"` 替代 `"/footer[2]"`。**Required: raw-set PAGE field injection** — `--prop field=page` in add command is silently ignored.
+- [ ] Page number field injected — use `officecli get doc.docx "/footer[2]" --depth 3` to confirm output contains `fldChar` element.
+      ⚠️ When `view outline` shows "Footer: Page", it **cannot** distinguish between static text and dynamic fields — must use `get --depth 3` command to verify `fldChar` exists.
+      If no first-page footer, use `"/footer[1]"` instead of `"/footer[2]"`. **Required: raw-set PAGE field injection** — `--prop field=page` in add command is silently ignored.
 - [ ] First-page footer added (`--type footer --prop type=first --prop text=""`) if document has a cover page — CLI automatically enables differentFirstPage (no separate set command needed)
 - [ ] Cover page content fills >= 60% of the page (has accent bars, subtitle, author, date, contact info) — **lower half must not be >40% empty**: if the title block ends above the page midpoint, add an abstract excerpt block, document scope statement, key highlights list, or decorative closing band. See creating.md → Cover Page Design for templates.
 - [ ] **[REQUIRED]** TOC present when document has 3 or more headings — add with `officecli add doc.docx /body --type toc --prop levels="1-3" --prop title="Table of Contents" --prop hyperlinks=true --prop pagenumbers=true --index 0`; TOC displays as a field code in CLI output — press F9 in Word to refresh/render it
@@ -312,6 +319,9 @@ officecli validate doc.docx
 6. Repeat until a full pass reveals no new issues
 
 **Do not declare success until you've completed at least one fix-and-verify cycle.**
+
+> [!IMPORTANT]
+> **Tool Call Pattern**: When calling `officecli` as a tool, pass the subcommand as the `command` argument (e.g. `command: "view doc.docx text"`).
 
 **NOTE**: Unlike pptx, there is no visual preview mode (`view svg`/`view html`) for docx. Content verification relies on `view text`, `view annotated`, `view outline`, `view issues`, and `validate`. For visual verification, the user must open the file in Word.
 
@@ -339,7 +349,6 @@ officecli validate doc.docx
 | Spacing in raw numbers                | Use unit-qualified values: `'12pt'`, `'0.5cm'`, `'1.5x'` not raw twips                                                                                                                                                         |
 | Empty paragraphs for spacing          | Use `spaceBefore`/`spaceAfter` properties on paragraphs                                                                                                                                                                        |
 | `$` in `--prop text=` (shell)         | `--prop text="$50M"` strips the value. Use single quotes: `--prop text='$50M'`                                                                                                                                                 |
-| `$` and `'` in batch JSON             | Use heredoc: `cat <<'EOF' \| officecli batch` -- single-quoted delimiter prevents shell expansion                                                                                                                              |
 | Wrong border format                   | Use `style;size;color;space` format: `single;4;FF0000;1`                                                                                                                                                                       |
 | listStyle on run instead of paragraph | `listStyle` is a paragraph property, not a run property                                                                                                                                                                        |
 | Row-level bold/color/shd              | Row `set` only supports `height`, `header`, and `c1/c2/c3` text shortcuts. Use cell-level `set` for formatting (bold, shd, color, font)                                                                                        |
@@ -366,25 +375,6 @@ officecli close doc.docx          # Write once to disk
 
 Use this pattern for every document build, regardless of command count.
 
-## Performance: Batch Mode
-
-Execute multiple operations in a single open/save cycle:
-
-```bash
-cat <<'EOF' | officecli batch doc.docx
-[
-  {"command":"add","parent":"/body","type":"paragraph","props":{"text":"Introduction","style":"Heading1"}},
-  {"command":"add","parent":"/body","type":"paragraph","props":{"text":"This report covers Q4 results.","font":"Calibri","size":"11pt"}}
-]
-EOF
-```
-
-Batch supports: `add`, `set`, `get`, `query`, `remove`, `move`, `swap`, `view`, `raw`, `raw-set`, `validate`.
-
-Batch fields: `command`, `path`, `parent`, `type`, `from`, `to`, `index`, `after`, `before`, `props` (dict), `selector`, `mode`, `depth`, `part`, `xpath`, `action`, `xml`.
-
-`parent` = container to add into (for `add`). `path` = element to modify (for `set`, `get`, `remove`, `move`, `swap`).
-
 ---
 
 # officecli: v1.0.23
@@ -396,15 +386,13 @@ Batch fields: `command`, `path`, `parent`, `type`, `from`, `to`, `index`, `after
 | **No visual preview**                                | Unlike pptx (SVG/HTML), docx has no built-in rendering. Use `view text`/`view outline`/`view annotated`/`view issues` for verification. Users must open in Word for visual check.                                                                                                                                                     |
 | **Track changes creation requires raw XML**          | OfficeCLI can accept/reject tracked changes (`set / --prop accept-changes=all`) but cannot create tracked changes (insertions/deletions with author markup) via high-level commands. Use `raw-set` with XML for tracked change creation.                                                                                              |
 | **Tab stops may require raw XML**                    | Tab stop creation is not exposed in officecli docx high-level commands. Use `raw-set` to add tab stop definitions in paragraph properties.                                                                                                                                                                                            |
+| **Table cell solidFill schema warning**              | Setting `color` on table cell run properties may produce `solidFill` schema validation errors. The table renders correctly in Word. Ignore if it opens correctly. Alternatively, set text color at the row level (`set tr[N] --prop color=HEX`) instead of the cell level.                                                            |
 | **Chart series cannot be added after creation**      | Same as pptx: `set --prop data=` can only update existing series, not add new ones. Delete and recreate the chart with all series in the `add` command.                                                                                                                                                                               |
 | **Complex numbering definitions**                    | `listStyle=bullet/numbered` covers simple cases. For multi-level lists with custom formatting, use `numId`/`numLevel` properties. Creating new numbering definitions may require understanding the numbering part.                                                                                                                    |
-| **Shell quoting in batch with echo**                 | `echo '...' \| officecli batch` fails when JSON values contain apostrophes or `$`. Use heredoc: `cat <<'EOF' \| officecli batch doc.docx`.                                                                                                                                                                                            |
-| **Batch intermittent failure**                       | Approximately 1-in-15 batch operations may fail with "Failed to send to resident" when using batch+resident mode. Retry the command, or close/reopen the file. Split large batch arrays into 10-15 operation chunks.                                                                                                                  |
 | **Table-level `padding` produces invalid XML**       | Do not use `set tbl[N] --prop padding=N`. It creates invalid `tblCellMar`. Use cell-level `padding.top`/`padding.bottom` instead. If already applied, remove with `raw-set --xpath "//w:tbl[N]/w:tblPr/w:tblCellMar" --action remove`.                                                                                                |
 | **Internal hyperlinks not supported**                | The `hyperlink` command only accepts absolute URIs (`https://...`). Fragment URLs (`#bookmark`) are rejected. For internal cross-references, use descriptive text or `raw-set` with `<w:hyperlink w:anchor="bookmarkName">`.                                                                                                          |
 | **Table `--index` positioning unreliable**           | `--index N` on `add /body --type table` may be ignored (table appends to end). `move` also may not work for tables. Workaround: add content in the desired order, or remove/re-add surrounding elements.                                                                                                                              |
 | **`\mathcal` in equations causes validation errors** | The `\mathcal` LaTeX command generates invalid `m:scr` XML. Use `\mathit` or plain letters instead.                                                                                                                                                                                                                                   |
-| **`view text` shows "1." for all numbered items**    | Display-only limitation. Rendered output in Word/LibreOffice shows correct auto-incrementing numbers.                                                                                                                                                                                                                                 |
 | **`chartType=pie`/`doughnut` in LibreOffice PDF**    | **Do NOT use `chartType=pie` or `chartType=doughnut` when LibreOffice PDF delivery is required.** These chart types render without visible slices in LibreOffice PDF export — only labels and legend appear, slices are invisible. Use `chartType=column` or `chartType=bar` instead. Charts render correctly in Microsoft Word only. |
 
 ---

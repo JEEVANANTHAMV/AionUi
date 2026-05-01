@@ -1014,6 +1014,13 @@ const initStorage = async () => {
     const promptsI18nMigrationDone = await configFile.get(PROMPTS_I18N_MIGRATION_KEY).catch(() => false);
     const needsPromptsI18nMigration = !promptsI18nMigrationDone;
 
+    // 5.2.4 检查是否需要迁移：更新默认启用的助手为 5 个 (Word, PPT, Excel, Cowork, Mermaid)
+    // Check if migration needed: update default enabled assistants to 5 (Word, PPT, Excel, Cowork, Mermaid)
+    const DEFAULT_ENABLED_ASSISTANTS_MIGRATION_KEY = 'migration.defaultEnabledAssistantsUpdated';
+    const defaultEnabledMigrationDone = await configFile.get(DEFAULT_ENABLED_ASSISTANTS_MIGRATION_KEY).catch(() => false);
+    const needsDefaultEnabledMigration = !defaultEnabledMigrationDone;
+    console.log('[Forjinn-Desk] needsDefaultEnabledMigration:', needsDefaultEnabledMigration, 'flag value:', defaultEnabledMigrationDone);
+
     // 更新或添加内置助手配置
     // Update or add built-in assistant configurations
     const updatedAgents = [...existingAgents];
@@ -1058,9 +1065,9 @@ const initStorage = async () => {
           descriptionI18nMissing ||
           !!descriptionI18nChanged ||
           needsPromptsI18nUpdate;
-        // 当 enabled 是 undefined 或需要迁移时，设置默认值（Cowork 启用，其他禁用）
-        // When enabled is undefined or migration needed, set default value (Cowork enabled, others disabled)
-        const needsEnabledFix = existing.enabled === undefined || needsMigration;
+        // 当 enabled 是 undefined 或需要迁移时，设置默认值（Word, PPT, Excel, Cowork, Mermaid 启用，其他禁用）
+        // When enabled is undefined or migration needed, set default value (Word, PPT, Excel, Cowork, Mermaid enabled, others disabled)
+        const needsEnabledFix = existing.enabled === undefined || needsMigration || needsDefaultEnabledMigration;
         // 迁移时强制使用默认值，否则保留用户设置
         // Force default value during migration, otherwise preserve user setting
         const resolvedEnabled = needsEnabledFix ? builtin.enabled : existing.enabled;
@@ -1118,6 +1125,9 @@ const initStorage = async () => {
     }
     if (needsPromptsI18nMigration) {
       await configFile.set(PROMPTS_I18N_MIGRATION_KEY, true);
+    }
+    if (needsDefaultEnabledMigration) {
+      await configFile.set(DEFAULT_ENABLED_ASSISTANTS_MIGRATION_KEY, true);
     }
     mark('5.2 assistant config + migrations');
   } catch (error) {

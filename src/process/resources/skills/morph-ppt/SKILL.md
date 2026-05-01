@@ -413,9 +413,9 @@ This requires slide 3 as an explicit intermediate keyframe — never try to fake
 
 ### Phase 4: Visual Verification + Deliver
 
-## Phase 4 视觉验证（REQUIRED — final-check 通过后不可跳过）
+## Phase 4 Visual Verification (REQUIRED — cannot skip after final-check passes)
 
-### 4A. morph_final_check.py（CLI 数量验证）
+### 4A. morph_final_check.py (CLI count verification)
 
 If you used `morph-helpers.py`, the build script calls `helper("verify", ...)` and `helper("final-check", ...)` automatically. Also validate the final structure:
 
@@ -424,30 +424,30 @@ officecli validate <file>.pptx
 officecli view <file>.pptx outline
 ```
 
-### 4B. 截图目视验证（必须执行）
+### 4B. Screenshot Visual Verification (Must Execute)
 
-**final-check 通过不等于视觉正确。** `morph_final_check` 只验证 `#sN-` 前缀 shapes 的 ghost 状态（x=36cm 检查），它**无法检测**：
+**final-check passing does NOT equal visual correctness.** `morph_final_check` only verifies ghost status of `#sN-` prefix shapes (x=36cm check), it **cannot detect**:
 
-- `!!` shapes 在场景切换后仍停留在可视区域（x < 33.87cm）——这类问题会通过 final-check 但产生视觉叠加
-- 相邻幻灯片间 scene actor 位置/尺寸未发生变化（动画静止）
+- `!!` shapes still remaining in visible area after scene transition (x < 33.87cm) — these issues will pass final-check but produce visual overlap
+- Scene actor position/size not changed between adjacent slides (animation is static)
 
-必须对每张 slide 截图验证：
+Must screenshot each slide for verification:
 
 ```bash
-# 方案1: officecli view（pptx 有 SVG 预览）
+# Option 1: officecli view (pptx has SVG preview)
 officecli view deck.pptx svg --output-dir screenshots/
 
-# 方案2: LibreOffice PDF → Chrome PNG（更准确）
+# Option 2: LibreOffice PDF → Chrome PNG (more accurate)
 libreoffice --headless --convert-to pdf deck.pptx
-# 然后用 Chrome DevTools MCP 截图每页
+# Then use Chrome DevTools MCP to screenshot each page
 ```
 
-逐 slide 检查清单：
+Slide-by-slide checklist:
 
-- [ ] 每张 slide 中，前一节的 `!!` content shapes 均不可见（x >= 33.87cm 已移出视野）
-- [ ] 每个场景切换的第一张 slide（新章节起始）：前一节所有 `!!` shapes 已 ghost
-- [ ] 最后一个场景的收尾 slide：整洁，无残留前场景内容
-- [ ] 装饰性 `!!` shapes（背景圆、角标等）在正确位置
+- [ ] On each slide, previous section's `!!` content shapes are not visible (x >= 33.87cm, moved out of view)
+- [ ] First slide of each scene transition (new chapter start): all previous section's `!!` shapes have been ghosted
+- [ ] Closing slide of last section: clean, no residual previous scene content
+- [ ] Decorative `!!` shapes (background circles, corner marks, etc.) are in correct positions
 
 **If verification fails**, see Troubleshooting section below.
 

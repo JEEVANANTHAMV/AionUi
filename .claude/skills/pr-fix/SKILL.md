@@ -235,18 +235,18 @@ Build an enhanced issue list. Each issue now has:
 ```bash
 gh pr edit <PR_NUMBER> --remove-label "bot:fixing" --add-label "bot:needs-human-review"
 gh pr comment <PR_NUMBER> --body "<!-- pr-automation-bot -->
-⚠️ Triage 阶段发现 CRITICAL 问题 #<issue_number> 可能为误报，但自动化流程无法自行驳回 CRITICAL 级别问题，已转交人工确认。
+⚠️ Triage phase found CRITICAL issue #<issue_number> may be a false positive, but automation cannot dismiss CRITICAL issues. Transferred to human review.
 
-**问题：** <issue description>
-**驳回理由：** <reason>"
+**Issue:** <issue description>
+**Dismissal reason:** <reason>"
 ```
 
 Then **EXIT**.
 
 **Interactive mode (no `--automation`):** Present the dismissal reasoning to the user and ask for confirmation:
 
-> Triage 认为 CRITICAL 问题 #N 可能是误报：<reason>
-> 是否同意驳回此问题？(yes/no)
+> Triage thinks CRITICAL issue #N may be a false positive: <reason>
+> Do you agree to dismiss this issue? (yes/no)
 
 - User says **yes** → mark as `DISMISSED`
 - User says **no** → mark as `FIX` (apply original suggestion)
@@ -371,15 +371,15 @@ gh pr merge "$NEW_PR_NUMBER" --squash --auto
 
 # Close original fork PR immediately with a comment (don't wait for Closes #N)
 gh pr close <PR_NUMBER> --comment "<!-- pr-fix-verification -->
-原 PR 为 fork 且未开启 maintainer 写入权限，无法直接推送修复。
-已在主仓库创建跟进 PR #${NEW_PR_NUMBER}，包含本次 review 的所有修复，CI 通过后将自动合并。"
+Original PR is a fork without maintainer write access, cannot push fixes directly.
+Follow-up PR #${NEW_PR_NUMBER} created in main repo with all fixes from this review, will auto-merge when CI passes."
 ```
 
 Closing immediately ensures pr-automation won't pick up the original PR in the next round (closed PRs are excluded by `--state open` in Step 1). No need to set `bot:done` label since the PR is closed.
 
 Output to user:
 
-> Fork PR 无 maintainer 写入权限，已在主仓库创建跟进 PR #<NEW_PR_NUMBER>，CI 通过后自动合并。
+> Fork PR has no maintainer write access. Follow-up PR #<NEW_PR_NUMBER> created in main repo, will auto-merge when CI passes.
 
 ---
 
@@ -391,37 +391,37 @@ For each issue in the original summary table, verify the fix exists in actual co
 2. Grep for the original problematic pattern to confirm it is gone
 3. Confirm the corrected code is in place
 
-Post the verification report as a PR comment AND output it in the conversation. The report now includes a **Triage 决策** section before the fix table:
+Post the verification report as a PR comment AND output it in the conversation. The report now includes a **Triage Decision** section before the fix table:
 
 ```bash
 gh pr comment <PR_NUMBER> --body "$(cat <<'EOF'
 <!-- pr-fix-verification -->
-## PR Fix 验证报告
+## PR Fix Verification Report
 
-**原始 PR:** #<PR_NUMBER>
-**修复方式:** 直接推送到 `<head_branch>`
+**Original PR:** #<PR_NUMBER>
+**Fix Method:** Direct push to `<head_branch>`
 
-### Triage 决策
+### Triage Decision
 
-| # | 严重级别 | 原始问题 | 判定 | 理由 |
+| # | Severity | Original Issue | Verdict | Reason |
 |---|---------|---------|------|------|
-| 2 | 🟠 HIGH | <问题描述> | ⏭️ 驳回 | <驳回理由，引用具体代码或项目约定> |
-| 3 | 🟡 MEDIUM | <问题描述> | 🔄 替代方案 | <为什么原建议不适用，替代方案是什么> |
+| 2 | 🟠 HIGH | <issue description> | ⏭️ Dismissed | <dismissal reason, citing specific code or project conventions> |
+| 3 | 🟡 MEDIUM | <issue description> | 🔄 Alternative Fix | <why original suggestion not applicable, what alternative is> |
 
-> 仅列出被驳回（DISMISSED）或使用替代方案（FIX_ALT）的问题。采纳原建议（FIX）的问题不在此表中。
-> 若所有问题均采纳原建议，省略此区块。
+> Only list issues that were dismissed (DISMISSED) or used alternative fixes (FIX_ALT). Issues that adopted the original suggestion (FIX) are not in this table.
+> If all issues adopted the original suggestion, omit this section.
 
-### 修复结果
+### Fix Results
 
-| # | 严重级别 | 文件 | 问题 | 修复方式 | 状态 |
+| # | Severity | File | Issue | Fix Method | Status |
 |---|---------|------|------|---------|------|
-| 1 | 🔴 CRITICAL | `file.ts:N` | <原始问题> | <修复措施> | ✅ 已修复 |
-| 2 | 🟠 HIGH     | `file.ts:N` | <原始问题> | <修复措施> | ✅ 已修复（替代方案） |
-| 3 | 🟡 MEDIUM   | `file.ts:N` | <原始问题> | — | ⏭️ 驳回 |
+| 1 | 🔴 CRITICAL | `file.ts:N` | <original issue> | <fix measure> | ✅ Fixed |
+| 2 | 🟠 HIGH     | `file.ts:N` | <original issue> | <fix measure> | ✅ Fixed (alternative) |
+| 3 | 🟡 MEDIUM   | `file.ts:N` | <original issue> | — | ⏭️ Dismissed |
 
-**总结：** ✅ 已修复 N 个 | 🔄 替代方案 N 个 | ⏭️ 驳回 N 个 | ❌ 未能修复 N 个
+**Summary:** ✅ N fixed | 🔄 N alternative fixes | ⏭️ N dismissed | ❌ N not fixed
 
-> 🔵 LOW 级别问题已跳过（不阻塞合并，修复优先级低）。
+> 🔵 LOW severity issues skipped (do not block merge, low fix priority).
 EOF
 )"
 ```
