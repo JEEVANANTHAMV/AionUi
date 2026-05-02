@@ -109,10 +109,19 @@ export const useGeminiMessage = (conversation_id: string, onError?: (message: IR
         return;
       }
 
+      // Associate assistant response ID with active request ID if we are waiting for a response
+      if (waitingResponseRef.current && ['start', 'thought', 'content', 'thinking', 'tool_group'].includes(message.type)) {
+        if (activeMsgIdRef.current !== message.msg_id) {
+          activeMsgIdRef.current = message.msg_id;
+        }
+      }
+
       // Filter out events not belonging to current active request (prevents aborted events from interfering)
-      // Note: only filter out thought and start messages, other messages must be rendered
       if (activeMsgIdRef.current && message.msg_id && message.msg_id !== activeMsgIdRef.current) {
-        if (message.type === 'thought') {
+        // Request trace, system events, and errors should always be logged/processed
+        if (['request_trace', 'info', 'agent_status', 'error'].includes(message.type)) {
+          // Allow
+        } else {
           return;
         }
       }

@@ -111,8 +111,11 @@ class BaseAgentManager<Data, ConfirmationOption extends any = any>
 
   stop() {
     this.confirmations = [];
-    return this.postMessagePromise('stop.stream', {}).catch(() => {
-      // Worker process may have already exited — stopping a dead process is a no-op
+    return Promise.race([
+      this.postMessagePromise('stop.stream', {}),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 1000))
+    ]).catch(() => {
+      // Worker process may have already exited or timed out — stopping a dead process is a no-op
     });
   }
 

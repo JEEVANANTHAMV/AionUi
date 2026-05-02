@@ -500,6 +500,11 @@ export function initConversationBridge(
   // 通用 sendMessage 实现 - 统一调用 IAgentManager.sendMessage
   // Generic sendMessage - dispatches via IAgentManager.sendMessage interface
   ipcBridge.conversation.sendMessage.provider(async (params) => {
+    console.log(`[conversationBridge] sendMessage invoked with params:`, {
+      conversation_id: params?.conversation_id,
+      inputLength: params?.input?.length,
+      msg_id: params?.msg_id
+    });
     // Notify pet of user sending message (pre-emptive thinking)
     try {
       const { getEventBridge } = await import('../pet/petManager');
@@ -514,7 +519,9 @@ export function initConversationBridge(
     const { conversation_id, files, ...other } = params;
     let task: IAgentManager | undefined;
     try {
+      console.log(`[conversationBridge] calling getOrBuildTask for ${conversation_id}`);
       task = await workerTaskManager.getOrBuildTask(conversation_id);
+      console.log(`[conversationBridge] getOrBuildTask resolved for ${conversation_id}, task type: ${task?.type}`);
     } catch (err) {
       console.error(`[conversationBridge] sendMessage: failed to get/build task: ${conversation_id}`, err);
       return {

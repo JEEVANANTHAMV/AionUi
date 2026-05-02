@@ -632,11 +632,12 @@ export class GeminiAgent {
    * + client.ts "Please continue." mechanism). Forjinn-Desk does NOT retry at this layer
    * to avoid redundant classifier-router calls and quota amplification.
    */
-  private handleMessage(
-    stream: AsyncGenerator<ServerGeminiStreamEvent, Turn, unknown>,
-    msg_id: string,
+  private async handleMessage(
+    stream: any,
+    requestMsgId: string,
+    responseMsgId: string,
     abortController: AbortController
-  ): Promise<void> {
+  ) {
     const toolCallRequests: ToolCallRequestInfo[] = [];
     let heartbeatWarned = false;
 
@@ -647,6 +648,21 @@ export class GeminiAgent {
         console.warn(`[GeminiAgent] Stream heartbeat timeout at ${new Date(event.lastEventTime).toISOString()}`);
         if (!heartbeatWarned) {
           heartbeatWarned = true;
+        }
+      } else if (event.type === 'state_change' && event.state === 'connected') {
+        if (this.geminiClient) {
+          this.onStreamEvent({
+            type: 'request_trace',
+            data: {
+              timestamp: Date.now(),
+              platform: this.model.platform,
+              modelId: this.model.id,
+              baseUrl: this.model.baseUrl || 'unknown',
+              agentType: 'gemini',
+              provider: (this.model as any).provider || 'unknown',
+            },
+            msg_id: uuid(), // Request trace always uses a fresh ID
+          });
         }
       } else if (event.type === 'state_change' && event.state === 'failed') {
         console.error(`[GeminiAgent] Stream connection failed: ${event.reason}`);
@@ -687,11 +703,11 @@ export class GeminiAgent {
           return;
         }
 
-        // Use a fresh msg_id for error events so error/tips messages don't
-        // replace already-streamed content that shares the original msg_id.
+        // Use responseMsgId for content-related events so they don't replace
+        // the user's request message which has requestMsgId.
         this.onStreamEvent({
           ...data,
-          msg_id: data.type === 'error' ? uuid() : msg_id,
+          msg_id: data.type === 'error' ? uuid() : responseMsgId,
         });
       },
       { onConnectionEvent }
@@ -702,7 +718,7 @@ export class GeminiAgent {
           // 对导航工具发送 preview_open 事件，但不阻止执行
           // Agent needs chrome-devtools to fetch web page content
           // Agent 需要 chrome-devtools 来获取网页内容
-          this.emitPreviewForNavigationTools(toolCallRequests, msg_id);
+          this.emitPreviewForNavigationTools(toolCallRequests, requestMsgId);
 
           // Schedule ALL tool requests including chrome-devtools
           // 调度所有工具请求，包括 chrome-devtools
@@ -779,7 +795,7 @@ export class GeminiAgent {
     }
   }
 
-  submitQuery(
+  async submitQuery(
     query: unknown,
     msg_id: string,
     abortController: AbortController,
@@ -787,7 +803,7 @@ export class GeminiAgent {
       prompt_id?: string;
       isContinuation?: boolean;
     }
-  ): string | undefined {
+  ): Promise<string | undefined> {
     this.lastQuery = query;
     this.lastOptions = options;
     try {
@@ -800,15 +816,17 @@ export class GeminiAgent {
         startNewPrompt();
       }
 
+      const responseMsgId = uuid();
       const stream = this.geminiClient.sendMessageStream(query, abortController.signal, prompt_id);
 
       // Send start event immediately when stream is created
       // 流创建后立即发送 start 事件，确保 UI 显示停止按钮
-      this.onStreamEvent({ type: 'start', data: '', msg_id });
+      this.onStreamEvent({ type: 'start', data: '', msg_id: responseMsgId });
 
-      this.handleMessage(stream, msg_id, abortController)
+      await this.handleMessage(stream, msg_id, responseMsgId, abortController)
         .catch((e: unknown) => {
           const errorMessage = e instanceof Error ? e.message : JSON.stringify(e);
+          console.error('[GeminiAgent] Stream failed with error:', errorMessage);
           this.onStreamEvent({
             type: 'error',
             data: errorMessage,
@@ -819,7 +837,7 @@ export class GeminiAgent {
           this.onStreamEvent({
             type: 'finish',
             data: '',
-            msg_id,
+            msg_id: responseMsgId,
           });
         });
       return '';

@@ -530,7 +530,14 @@ export class GeminiAgentManager extends BaseAgentManager<
     this.status = 'pending';
     cronBusyGuard.setProcessing(this.conversation_id, true);
 
+    console.log(`[GeminiAgentManager] sendMessage: conversation_id=${this.conversation_id}, inputLength=${data.input?.length}, msg_id=${data.msg_id}`);
+    const start = Date.now();
     const result = await this.bootstrap
+      .then(() => {
+        const duration = Date.now() - start;
+        console.log(`[GeminiAgentManager] bootstrap finished in ${duration}ms for ${this.conversation_id}`);
+        return super.sendMessage(data);
+      })
       .catch((e) => {
         cronBusyGuard.setProcessing(this.conversation_id, false);
         this.emit('gemini.message', {
@@ -544,7 +551,6 @@ export class GeminiAgentManager extends BaseAgentManager<
           });
         });
       })
-      .then(() => super.sendMessage(data))
       .finally(() => {
         cronBusyGuard.setProcessing(this.conversation_id, false);
       });
